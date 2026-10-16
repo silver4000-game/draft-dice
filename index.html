@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261016b">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261016b">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261016b">
+<meta name="draft-dice-rev" content="20261016c">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261016c">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261016c">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -547,8 +547,7 @@ function startBattle(){
   if(!isAuth())return;
   const F={1:sumOf(1),2:sumOf(2)},rolls=[];
   const rl=f=>f>0?1+Math.floor(Math.random()*f):0;
-  for(;;){const r={1:rl(F[1]),2:rl(F[2])};rolls.push(r);if(r[1]!==r[2]||(F[1]===0&&F[2]===0)||rolls.length>=20)break}
-  const last=rolls[rolls.length-1];if(last[1]===last[2]&&(F[1]||F[2])){if(F[1]>=F[2])last[1]=Math.min(F[1],last[1]+1);if(last[1]===last[2])last[2]=Math.max(1,last[2]-1)}
+  rolls.push({1:rl(F[1]),2:rl(F[2])});   /* 1回だけ。同じ目は引き分け */
   if(S.mode==="pvp")send({type:"battle",faces:F,rolls:rolls});
   runBattle(F,rolls);
 }
@@ -568,8 +567,7 @@ function rollStep(i){
     if(performance.now()-t0>=D.ROLL){
       dm.className="die";dop.className="die";
       setDie(dm,F[me],r[me]);setDie(dop,F[op],r[op]);
-      if(r[1]===r[2]&&!F[1]&&!F[2]){finishBattle(0,0);return}
-      if(r[1]===r[2]){banner("引き分け もう1回");tone(440,0.2,"triangle",0.06);later(()=>rollStep(i+1),1400);return}
+      if(r[1]===r[2]){finishBattle(0,0);return}
       const w=r[1]>r[2]?1:2;
       (w===me?dm:dop).classList.add("win");(w===me?dop:dm).classList.add("lose");
       finishBattle(w,r[w]);return;
@@ -596,7 +594,7 @@ function showResult(){
   const line=(k,p)=>'<div class="rLine"><span class="k">'+k+'</span><span>'+S.acq[p].map(pickTxt).join("＋")+"＝"+F[p]+'面</span><span style="color:#e8c36a">→</span><span style="font-size:20px;color:#fff">'+r[p]+'</span></div>';
   const mineGot=!w?0:w===me?S.got:-S.got,life=S.totals[me]||0;
   const col=n=>n>0?"#6aa8ff":n<0?"#ff5a6a":"#e8c36a";
-  $("rCalc").innerHTML=line("自分",me)+line("相手",op)+'<div style="margin-top:6px;font-size:15px;font-weight:800">'+(!w?"どちらも0面なので引き分け":(w===me?"":"相手の目 ")+r[w]+"×100＝"+S.got)+'</div><div style="font-size:18px;font-weight:800;color:#e8c36a;margin-top:6px">今回</div>';
+  $("rCalc").innerHTML=line("自分",me)+line("相手",op)+'<div style="margin-top:6px;font-size:15px;font-weight:800">'+(!w?(!F[1]&&!F[2]?"どちらも0面なので引き分け":"同じ目なので引き分け"):(w===me?"":"相手の目 ")+r[w]+"×100＝"+S.got)+'</div><div style="font-size:18px;font-weight:800;color:#e8c36a;margin-top:6px">今回</div>';
   $("rPts").innerHTML='<div style="color:'+col(mineGot)+'">'+(mineGot>0?"+":mineGot===0?"±":"")+mineGot+'</div><div style="font-size:18px;font-weight:800;color:#e8c36a;margin-top:10px">今までの通算</div><div style="color:'+col(life)+'">'+(life===0?"±0":(life>0?"+":"")+life)+'</div>';
   show("result");
 }
