@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261018f">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261018f">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261018f">
+<meta name="draft-dice-rev" content="20261018g">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261018g">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261018g">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -301,7 +301,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 </div>
 <div class="acts"><button class="gold" id="grab" disabled>獲得</button></div>
 </section>
-<section id="result"><div class="box"><div id="rTitle">Win</div><div id="rCalc" style="font-size:14px;line-height:1.7;margin:8px 0;color:#e8c36a"></div><div id="rPts" style="font-size:40px;font-weight:900;margin:6px 0"></div><div class="row"><button id="again">もう1度</button><button id="home">やめる</button></div></div></section>
+<section id="result"><div class="box"><div id="rTitle">Win</div><div id="rCalc" style="font-size:14px;line-height:1.7;margin:8px 0;color:#e8c36a"></div><div id="rPts" style="font-size:40px;font-weight:900;margin:6px 0 16px"></div><div class="row"><button id="again">もう1度</button><button id="home">やめる</button></div></div></section>
 <div id="ask"><div style="color:#e8c36a;font-weight:800">モード選択に戻りますか？</div><div class="row"><button id="askYes" class="gold">はい</button><button id="askNo">いいえ</button></div></div>
 </div>
 <script>
@@ -639,10 +639,9 @@ function showResult(){
   const me=S.me,op=oppOf(me),w=S.winner,F=S.faces,r=S.rolls[S.rolls.length-1];
   $("rTitle").textContent=!w?"Draw":w===me?"Win":"Lose";
   $("rTitle").style.color=!w?"#e8c36a":w===me?"#ffb347":"#7a8cff";
-  const line=(k,p)=>'<div class="rLine"><span class="k">'+k+'</span><span>'+S.acq[p].map(pickTxt).join("＋")+"＝"+F[p]+'面</span><span style="color:#e8c36a">→</span><span style="font-size:20px;color:#fff">'+r[p]+'</span></div>';
   const mineGot=!w?0:w===me?S.got:-S.got,life=S.totals[me]||0;
   const col=n=>n>0?"#6aa8ff":n<0?"#ff5a6a":"#e8c36a";
-  $("rCalc").innerHTML=line("自分",me)+line("相手",op)+'<div style="margin-top:6px;font-size:15px;font-weight:800">'+(!w?(!F[1]&&!F[2]?"どちらも0面なので引き分け":"同じ目なので引き分け"):(w===me?"":"相手の目 ")+r[w]+"×100＝"+S.got)+'</div><div style="font-size:18px;font-weight:800;color:#e8c36a;margin-top:6px">今回</div>';
+  $("rCalc").innerHTML='<div style="font-size:18px;font-weight:800;color:#e8c36a;margin-top:10px">今回</div>';  /* 式と説明は出さない */
   $("rPts").innerHTML='<div style="color:'+col(mineGot)+'">'+(mineGot>0?"+":mineGot===0?"±":"")+mineGot+'</div><div style="font-size:18px;font-weight:800;color:#e8c36a;margin-top:10px">今までの通算</div><div style="color:'+col(life)+'">'+(life===0?"±0":(life>0?"+":"")+life)+'</div>';
   show("result");
 }
