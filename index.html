@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261018d">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261018d">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261018d">
+<meta name="draft-dice-rev" content="20261018e">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261018e">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261018e">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -93,7 +93,8 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .topbar{width:100%;display:flex;justify-content:space-between;align-items:center;font-size:13px;position:relative}
 #oppName{box-sizing:border-box;display:flex;align-items:center;justify-content:center;min-height:40px;height:40px;width:88px;padding:0 8px;border:2px solid #e8c36a;border-radius:12px;background:#0a241ccc;color:#e8c36a;font-weight:800;font-size:13px;white-space:nowrap;line-height:1}
 #retry{min-height:40px;height:40px;min-width:88px;width:88px;font-size:13px;padding:0}
-.tot{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;line-height:1.1}
+.tot{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;line-height:1.05;box-sizing:border-box;height:40px;min-width:88px;max-width:170px;padding:2px 12px 0;border:2px solid #e8c36a;border-radius:12px;background:#0a241ccc;display:flex;flex-direction:column;align-items:center;justify-content:center;white-space:nowrap}
+.tot .diff{font-size:17px}
 .tot small{display:block;font-size:11px;font-weight:800;color:#e8c36a}
 .diff{font-size:20px;font-weight:900}.diff.plus{color:#7dffb0}.diff.minus{color:#ff8aa0}.diff.zero{color:#e8c36a}
 .board{flex:1;width:100%;border-radius:14px;margin:8px 0;background:radial-gradient(ellipse at center,#146047,#0a3328);border:3px solid #0a241c;display:flex;flex-direction:column;align-items:center;justify-content:space-between;position:relative;padding:12px 6px;overflow:hidden}
@@ -255,9 +256,9 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 <div class="ruleArt"><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#7dffb0" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="100.53"/></svg><b>5</b></span><span class="rBtn">獲得</span><span class="ruleArr">→</span><span class="rPk">5</span></div>
 <div class="ruleTxt">押すと<span class="ruleGold">円がいっぱいになった時</span>の数字がもらえる<br>2人とも獲得したら<span class="ruleGold">次のラウンド</span>へ</div>
 </div>
-<div class="ruleHead">ー　取られた　ー</div>
+<div class="ruleHead">ー　相手獲得　ー</div>
 <div class="ruleRow" style="flex-direction:column;gap:8px">
-<div class="ruleArt"><span class="rTag taken">取られた</span></div>
+<div class="ruleArt"><span class="rTag taken">相手獲得</span></div>
 <div class="ruleTxt">相手が先に獲得しても<br>自分は<span class="ruleYes">まだ選べる</span></div>
 </div>
 <div class="ruleHead">ー　被った　ー</div>
@@ -267,7 +268,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 </div>
 <div class="ruleHead">ー　未獲得　ー</div>
 <div class="ruleRow" style="flex-direction:column;gap:8px">
-<div class="ruleArt"><span class="rTag kaburi" style="color:#e8c36a">ラウンド終了</span><span class="ruleArr">→</span><span class="rPk miss">―</span></div>
+<div class="ruleArt"><span class="rTag taken">取れなかった</span><span class="ruleArr">→</span><span class="rPk miss">―</span></div>
 <div class="ruleTxt">獲得する前にラウンドが終わると<br><span class="ruleNo">未獲得</span>（0として数える）<br>0面のサイコロは<span class="ruleNo">必ず0</span></div>
 </div>
 <div class="ruleHead">ー　例　ー</div>
@@ -464,7 +465,7 @@ function render(){
   $("oppName").textContent=S.matchNo+"戦目";
   paintDiff();
   paintPicks("pkOpp",oppOf(S.me));paintPicks("pkMe",S.me);S.lastNew=null;
-  const battle=S.phase==="battle"||S.phase==="result";
+  const battle=(S.phase==="battle"&&!!S.faces)||S.phase==="result";  /* サイコロ勝負が始まるまではゲージと演出を出したまま */
   $("gauge").style.display=battle?"none":"";
   $("dice").classList.toggle("on",battle);
   $("num").textContent=S.n==null?"?":S.n;
@@ -549,8 +550,8 @@ function applyEv(ev){
   if(ev.t==="take"){
     S.lastNew={i:S.acq[ev.who].length-1};
     if(ev.who===me){fx("get","獲得！");sfxGet()}
-    else if(S.acq[me][S.acq[ev.who].length-1]!=null){fx("auto","相手も獲得");sfxTaken()}
-    else{fx("taken","取られた");sfxTaken()}
+    else if(S.acq[me][S.acq[ev.who].length-1]!=null){fx("auto","相手獲得");sfxTaken()}
+    else{fx("taken","相手獲得");sfxTaken()}
     numFx("");d=900;
     if(ev.who===me)S.pressed[me]=false;
   }
@@ -558,7 +559,7 @@ function applyEv(ev){
   if(ev.ended){
     if(ev.ended.indexOf(me)>=0)S.pressed[me]=false;
     const mm=ev.ended.indexOf(me)>=0,om=ev.ended.indexOf(op)>=0;
-    const show=()=>{S.lastNew={i:ev.k?S.acq[me].length-1:0};fx("auto","ラウンド終了");sfxTaken();numFx("");render()};
+    const show=()=>{S.lastNew={i:ev.k?S.acq[me].length-1:0};if(mm){fx("taken","取れなかった");sfxTaken()}numFx("");render()};  /* 自分がもう取っていた時は演出なし（相手の枠が―になるだけ） */
     if(d)later(show,d);else show();
     d+=900;
   }
@@ -583,10 +584,12 @@ function startBattle(){
   const F={1:sumOf(1),2:sumOf(2)},rolls=[];
   const rl=f=>f>0?1+Math.floor(Math.random()*f):0;
   rolls.push({1:rl(F[1]),2:rl(F[2])});   /* 1回だけ。同じ目は引き分け */
-  if(S.mode==="pvp")send({type:"battle",faces:F,rolls:rolls});
-  runBattle(F,rolls);
+  const first=Math.random()<0.5?1:2, extra=Math.round(800+Math.random()*400);   /* 先に止まるサイコロと、もう片方が遅れる時間 */
+  if(S.mode==="pvp")send({type:"battle",faces:F,rolls:rolls,first:first,extra:extra});
+  runBattle(F,rolls,first,extra);
 }
-function runBattle(F,rolls){
+function runBattle(F,rolls,first,extra){
+  S.first=first||1;S.extra=extra||1000;
   S.phase="battle";S.faces=F;S.rolls=rolls;S.battleDone=false;S.waiting=true;
   const me=S.me,op=oppOf(me);
   setDie($("dieMe"),F[me],null);setDie($("dieOpp"),F[op],null);
@@ -594,28 +597,33 @@ function runBattle(F,rolls){
   render();rollStep(0);
 }
 function rollStep(i){
-  const r=S.rolls[i],F=S.faces,me=S.me,op=oppOf(me);
-  const dm=$("dieMe"),dop=$("dieOpp");
-  dm.className="die";dop.className="die";
-  /* だんだん遅くなって止まる（間隔を少しずつのばす ease-out） */
-  const ds=[];let d=45,sum=0;while(sum<2500){ds.push(d);sum+=d;d*=1.12}
-  const sc=D.ROLL/sum,svgs=[dm,dop].map(e=>e.querySelector("svg"));let ang=0,k=0;
-  const rr=f=>f>0?1+Math.floor(Math.random()*f):0;
-  const spin=()=>{
-    if(k>=ds.length){
-      svgs.forEach(v=>{v.style.transition="transform .25s ease-out";v.style.transform="rotate("+Math.round(ang/360)*360+"deg)"});
-      setDie(dm,F[me],r[me]);setDie(dop,F[op],r[op]);
-      if(r[1]===r[2]){finishBattle(0,0);return}
-      const w=r[1]>r[2]?1:2;
-      (w===me?dm:dop).classList.add("win");(w===me?dop:dm).classList.add("lose");
-      finishBattle(w,r[w]);return;
-    }
-    const dl=ds[k++]*sc;ang+=36;
-    svgs.forEach(v=>{v.style.transition="transform "+Math.round(dl)+"ms linear";v.style.transform="rotate("+ang+"deg)"});
-    setDie(dm,F[me],rr(F[me]));setDie(dop,F[op],rr(F[op]));
-    sfxTick();later(spin,dl);
+  const r=S.rolls[i],F=S.faces,me=S.me;
+  const first=S.first||1,rr=f=>f>0?1+Math.floor(Math.random()*f):0;
+  let done=0;
+  const settle=()=>{
+    if(r[1]===r[2]){finishBattle(0,0);return}
+    const w=r[1]>r[2]?1:2,dm=$("dieMe"),dop=$("dieOpp");
+    (w===me?dm:dop).classList.add("win");(w===me?dop:dm).classList.add("lose");
+    finishBattle(w,r[w]);
   };
-  spin();
+  /* だんだん遅くなって止まる（間隔を少しずつのばす ease-out）。片方は先に止まり、もう片方は少し遅れて止まる */
+  const run=(p,total)=>{
+    const el=p===me?$("dieMe"):$("dieOpp"),v=el.querySelector("svg");el.className="die";
+    const ds=[];let d=45,sum=0;while(sum<2500){ds.push(d);sum+=d;d*=1.12}
+    const sc=total/sum;let ang=0,k=0;
+    const tick=()=>{
+      if(k>=ds.length){
+        v.style.transition="transform .25s ease-out";v.style.transform="rotate("+Math.round(ang/360)*360+"deg)";
+        setDie(el,F[p],r[p]);tone(200,0.12,"triangle",0.08);
+        if(++done===2)settle();return;
+      }
+      const dl=ds[k++]*sc;ang+=36;
+      v.style.transition="transform "+Math.round(dl)+"ms linear";v.style.transform="rotate("+ang+"deg)";
+      setDie(el,F[p],rr(F[p]));sfxTick();later(tick,dl);
+    };
+    tick();
+  };
+  run(first,D.ROLL);run(oppOf(first),D.ROLL+(S.extra||1000));
 }
 function finishBattle(w,roll){
   if(S.applied)return;S.applied=true;
@@ -662,7 +670,7 @@ function onNet(m){
   if(m.type==="press"){if(S.host&&S.phase==="draft"&&need(2)&&(m.round==null||m.round===S.round))S.pressed[2]=true;return}
   if(m.type==="win"){if(S.host)return;applySnap(m.st);S.waiting=false;S.tickStart=performance.now();winFx();render();return}
   if(m.type==="res"){if(S.host)return;applySnap(m.st);S.waiting=true;applyEv(m.ev);if(!need(2))S.pressed[2]=false;render();return}
-  if(m.type==="battle"){if(S.host)return;runBattle(m.faces,m.rolls);return}
+  if(m.type==="battle"){if(S.host)return;runBattle(m.faces,m.rolls,m.first,m.extra);return}
   if(m.type==="vote"){S.votes[m.who]=true;if(S.host&&S.votes[1]&&S.votes[2]){send({type:"goAgain"});goAgain()}return}
   if(m.type==="goAgain"){if(!S.host)goAgain();return}
 }
