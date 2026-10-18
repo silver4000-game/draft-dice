@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261018q">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261018q">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261018q">
+<meta name="draft-dice-rev" content="20261019a">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261019a">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261019a">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -118,6 +118,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .gauge .fg{fill:none;stroke:#e8c36a;stroke-width:14;stroke-linecap:round}
 .gauge.pressed .fg{stroke:#7dffb0}
 .gauge.pressed .bg{stroke:#0d3a2a}
+.gauge .rb{display:none}.gauge.bonus:not(.pressed) .rb{display:inline}.gauge.bonus:not(.pressed) .fg{visibility:hidden}   /* ボーナスラウンドは虹色の線 */
 .num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:Cinzel,serif;font-size:84px;font-weight:900;color:#f4ead0;line-height:1}
 .num.pop{animation:numPop .35s ease-out}
 .num.end{font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;font-size:52px;letter-spacing:.06em;padding-left:.15em;color:#ff8a96;text-shadow:0 2px 10px #0008}
@@ -301,7 +302,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 <div class="board">
   <div class="side"><div class="who">相手</div><div class="picks" id="pkOpp"></div></div>
   <div class="center">
-    <div class="gauge" id="gauge"><svg viewBox="0 0 200 200"><circle class="bg" cx="100" cy="100" r="86"/><circle class="fg" id="gfg" cx="100" cy="100" r="86"/></svg><div class="num" id="num">1</div><div class="gsub" id="gsub">リセット</div><div class="fx" id="fx"><div class="t"></div><br><div class="s"></div></div></div>
+    <div class="gauge" id="gauge"><svg viewBox="0 0 200 200"><circle class="bg" cx="100" cy="100" r="86"/><circle class="fg" id="gfg" cx="100" cy="100" r="86"/><defs><mask id="rbMask" maskUnits="userSpaceOnUse" x="-20" y="-20" width="240" height="240"><circle id="rbM" cx="100" cy="100" r="86" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round"/></mask></defs><g class="rb" id="rbRing" mask="url(#rbMask)"></g></svg><div class="num" id="num">1</div><div class="gsub" id="gsub">リセット</div><div class="fx" id="fx"><div class="t"></div><br><div class="s"></div></div></div>
     <div class="dice" id="dice">
       <div class="dcol"><div class="dlab">相手</div><div class="die" id="dieOpp"><svg viewBox="0 0 100 100"><polygon/></svg><b>?</b></div><div class="dface" id="dfOpp"></div></div>
       <div class="dcol"><div class="dlab">自分</div><div class="die" id="dieMe"><svg viewBox="0 0 100 100"><polygon/></svg><b>?</b></div><div class="dface" id="dfMe"></div><div class="dhint" id="dhMe">タップで止める</div></div>
@@ -455,12 +456,21 @@ function setDie(el,faces,val){el.querySelector("polygon").setAttribute("points",
 
 const GC=2*Math.PI*86;
 $("gfg").setAttribute("stroke-dasharray",GC.toFixed(2));
+$("rbM").setAttribute("stroke-dasharray",GC.toFixed(2));
+(function(){  /* 虹色リング: 色付きの短い弧を一周並べ、進み具合の円でマスクする（Safariでも動くSVGのみ） */
+  const N=72,R=86,ns="http://www.w3.org/2000/svg",g=$("rbRing");
+  for(let i=0;i<N;i++){const a0=(i/N)*2*Math.PI,a1=((i+1.6)/N)*2*Math.PI;
+    const p=document.createElementNS(ns,"path");
+    p.setAttribute("d","M"+(100+R*Math.cos(a0)).toFixed(2)+" "+(100+R*Math.sin(a0)).toFixed(2)+"A"+R+" "+R+" 0 0 1 "+(100+R*Math.cos(a1)).toFixed(2)+" "+(100+R*Math.sin(a1)).toFixed(2));
+    p.setAttribute("fill","none");p.setAttribute("stroke","hsl("+Math.round(i*360/N)+",95%,62%)");p.setAttribute("stroke-width","22");
+    g.appendChild(p)}
+})();
 function gaugeLoop(){
   requestAnimationFrame(gaugeLoop);
   if(!$("game").classList.contains("on"))return;
   let f=0;
   if(S.phase==="draft"&&!S.waiting)f=Math.max(0,Math.min(1,(performance.now()-S.tickStart)/winDur(winK())));
-  $("gfg").setAttribute("stroke-dashoffset",(GC*(1-f)).toFixed(2));
+  const off=(GC*(1-f)).toFixed(2);$("gfg").setAttribute("stroke-dashoffset",off);$("rbM").setAttribute("stroke-dashoffset",off);
 }
 requestAnimationFrame(gaugeLoop);
 
@@ -485,6 +495,7 @@ function render(){
   $("gauge").style.display=battle?"none":"";
   $("dice").classList.toggle("on",battle);
   $("num").textContent=S.endShow?"終了":S.n==null?"?":S.n;$("num").classList.toggle("end",!!S.endShow);
+  $("gauge").classList.toggle("bonus",!!S.bonus&&S.phase==="draft");
   $("gauge").classList.toggle("pressed",!!S.pressed[S.me]&&need(S.me)&&S.phase==="draft");
   const k=winK(),ep=endPct(k);
   const bon=!battle&&S.phase==="draft"&&S.bonus;$("rinfo").firstChild.textContent=battle?"サイコロ勝負":bon?"ボーナスラウンド（"+(S.bonus.p===S.me?"自分":"相手")+"）":"";$("rinfo").style.display=battle||bon?"":"none";
