@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261018e">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261018e">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261018e">
+<meta name="draft-dice-rev" content="20261018f">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261018f">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261018f">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -663,8 +663,12 @@ function applySnap(st){
   S.n=st.n;S.win=st.win;S.round=st.round;S.rt=st.rt;S.acq={1:st.acq[1].slice(),2:st.acq[2].slice()};S.phase=st.phase;
   if(st.p2)S.pressed[2]=true;
 }
-function onNet(m){
+function onNet(m,conn){
   if(!m)return;
+  /* 開始の合図: 入室側が hello → 作成側が start を返して両方同時に始める（他のゲームと同じ流れ） */
+  if(m.type==="hello"){if(!S.host||S.netStarted)return;if(conn)S.conn=conn;S.netStarted=true;send({type:"start"});startMatch();return}
+  if(m.type==="start"){if(S.host||S.netStarted)return;S.netStarted=true;clearHello();startMatch();return}
+  if(!S.host&&!S.netStarted&&(m.type==="win"||m.type==="res")){S.netStarted=true;clearHello();startMatch()}
   if(m.type==="bye"){oppGone();return}
   if(m.type==="chat"){showBubble(m.text||"",false);return}
   if(m.type==="press"){if(S.host&&S.phase==="draft"&&need(2)&&(m.round==null||m.round===S.round))S.pressed[2]=true;return}
@@ -676,10 +680,12 @@ function onNet(m){
 }
 function watchConn(conn){
   const epoch=S.netEpoch||0;let opened=false;
-  S.conn=conn;conn.on("data",onNet);conn.on("open",()=>{opened=true});
+  S.conn=conn;conn.on("data",m=>onNet(m,conn));conn.on("open",()=>{opened=true});
   conn.on("close",()=>{if((S.netEpoch||0)!==epoch||S.netDead||!opened||S.conn!==conn)return;oppGone()});
 }
+function clearHello(){if(S.helloT){clearInterval(S.helloT);S.helloT=null}}
 function hangup(tell){
+  clearHello();
   S.netEpoch=(S.netEpoch||0)+1;
   try{if(tell&&S.conn&&S.conn.open)S.conn.send({type:"bye"})}catch(e){}
   const c=S.conn,p=S.peer;S.conn=null;S.peer=null;
@@ -700,7 +706,7 @@ function oppGone(){
 function boot(host,code){
   $("roomSt").textContent="接続中…";
   const opts={host:"0.peerjs.com",port:443,path:"/",secure:true,debug:0,config:{iceServers:[{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun1.l.google.com:19302"},{urls:"stun:global.stun.twilio.com:3478"}]}};
-  S.netEpoch=(S.netEpoch||0)+1;S.netDead=false;
+  S.netEpoch=(S.netEpoch||0)+1;S.netDead=false;S.netStarted=false;clearHello();
   if(S.peer)try{S.peer.destroy()}catch(e){}
   const peer=new Peer(host?pid(code):undefined,opts);S.peer=peer;
   peer.on("error",e=>{
@@ -712,7 +718,7 @@ function boot(host,code){
   peer.on("open",()=>{
     if(host){
       $("roomSt").textContent="合言葉 "+code+" で待機中";
-      peer.on("connection",conn=>{if(S.conn&&S.conn.open){try{conn.close()}catch(e){}return}watchConn(conn);conn.on("open",()=>{startMatch()})});
+      peer.on("connection",conn=>{if(S.conn&&S.conn.open){try{conn.close()}catch(e){}return}watchConn(conn);conn.on("open",()=>{$("roomSt").textContent="相手が入室した"})});
     }else{
       let tries=0;
       const tryJoin=()=>{
@@ -720,7 +726,11 @@ function boot(host,code){
         $("roomSt").textContent=tries>1?("入室を再試行中… "+tries):"部屋に接続中…";
         const conn=peer.connect(pid(code),{reliable:true});
         watchConn(conn);
-        conn.on("open",()=>{$("roomSt").textContent="接続した";startMatch()});
+        conn.on("open",()=>{
+          S.conn=conn;$("roomSt").textContent="接続した。開始待ち…";
+          clearHello();send({type:"hello"});let n=0;
+          S.helloT=setInterval(()=>{if(S.netStarted||S.conn!==conn||++n>10){clearHello();return}send({type:"hello"})},1000);  /* 届かなかった時のために少しの間送り直す */
+        });
         conn.on("error",()=>{if(tries<8)setTimeout(tryJoin,700);else $("roomSt").textContent="入室できない。先に部屋を作っているか確認して"});
       };
       tryJoin();
