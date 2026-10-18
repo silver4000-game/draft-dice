@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261018j">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261018j">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261018j">
+<meta name="draft-dice-rev" content="20261018k">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261018k">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261018k">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -246,10 +246,10 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 <div class="ruleRow" style="flex-direction:column;gap:8px">
 <div class="rStages">
 <div class="rStage"><span>1〜3回目</span><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#e8c36a" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>2</b></span><span class="rg">1〜3</span><span class="re z">終わる確率 0%</span></div>
-<div class="rStage"><span>4〜6回目</span><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#e8c36a" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>5</b></span><span class="rg">1〜6</span><span class="re">終わる確率 3%</span></div>
-<div class="rStage"><span>7〜9回目</span><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#e8c36a" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>8</b></span><span class="rg">1〜9</span><span class="re">終わる確率 6%</span></div>
+<div class="rStage"><span>4〜6回目</span><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#e8c36a" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>5</b></span><span class="rg">1〜6</span><span class="re">終わる確率 5%</span></div>
+<div class="rStage"><span>7〜9回目</span><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#e8c36a" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>8</b></span><span class="rg">1〜9</span><span class="re">終わる確率 10%</span></div>
 </div>
-<div class="ruleTxt">3回ごとに 数字は<span class="ruleGold">大きく</span>なり<br>終わる確率も<span class="ruleNo">＋3%</span>ずつ上がる</div>
+<div class="ruleTxt">3回ごとに 数字は<span class="ruleGold">大きく</span>なり<br>終わる確率も<span class="ruleNo">＋5%</span>ずつ上がる</div>
 </div>
 <div class="ruleHead">ー　獲得　ー</div>
 <div class="ruleRow" style="flex-direction:column;gap:8px">
@@ -483,7 +483,7 @@ function render(){
   }else{g.textContent="獲得";g.disabled=true}
 }
 /* 出る数字・終わる確率のバッジ。3回ごとに上がる時はパッと光る */
-function heat(ep){return ep<=0?0:ep<=6?1:ep<=12?2:ep<=18?3:4}
+function heat(ep){return ep<=0?0:ep<=10?1:ep<=20?2:ep<=30?3:4}
 function paintStat(battle,k,ep){
   const on=!battle&&S.phase==="draft";
   $("stat").classList.toggle("off",!on);$("stat").style.display=battle?"none":"";
@@ -509,7 +509,7 @@ function startMatch(){
 }
 function winK(){return S.rt+1}                 /* このラウンドの何回目の3秒か */
 function rangeMax(k){return 3*Math.ceil(k/3)}    /* 1〜3回目:3, 4〜6回目:6, 7〜9回目:9 ... */
-function endPct(k){return (Math.ceil(k/3)-1)*3}  /* 1〜3回目:0%, 4〜6回目:3%, 7〜9回目:6% ... */
+function endPct(k){return (Math.ceil(k/3)-1)*5}  /* 1〜3回目:0%, 4〜6回目:5%, 7〜9回目:10% ... */
 function beginWindow(){
   if(S.phase!=="draft")return;
   S.win++;S.waiting=false;S.tickStart=performance.now();
@@ -573,7 +573,7 @@ function cpuThink(){
   let T=S.cpuT;
   const diff=sumOf(1)-sumOf(2);
   if(S.round===ROUNDS&&!need(1)){if(diff>0)T+=Math.min(3,Math.floor(diff/3));else if(diff<-6)T=Math.max(3,T-2)}
-  let press=n>=T||(E>=9&&n>=Math.ceil(M*0.75))||(E>=15&&n>=Math.ceil(M*0.5))||E>=24;
+  let press=n>=T||(E>=10&&n>=Math.ceil(M*0.75))||(E>=15&&n>=Math.ceil(M*0.5))||E>=25;
   if(press&&need(1)&&E<15&&n<M&&Math.random()<0.15)press=false;   // 被りを避けて1回待つ
   if(press){const w=S.win;later(()=>{if(S.phase==="draft"&&!S.waiting&&S.win===w&&need(2))S.pressed[2]=true},D.T*(0.1+Math.random()*0.77))}
 }
