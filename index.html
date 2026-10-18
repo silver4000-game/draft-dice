@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261018i">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261018i">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261018i">
+<meta name="draft-dice-rev" content="20261018j">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261018j">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261018j">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -93,8 +93,8 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .topbar{width:100%;display:flex;justify-content:space-between;align-items:center;font-size:13px;position:relative}
 #oppName{box-sizing:border-box;display:flex;align-items:center;justify-content:center;min-height:40px;height:40px;width:88px;padding:0 8px;border:2px solid #e8c36a;border-radius:12px;background:#0a241ccc;color:#e8c36a;font-weight:800;font-size:13px;white-space:nowrap;line-height:1}
 #retry{min-height:40px;height:40px;min-width:88px;width:88px;font-size:13px;padding:0}
-.tot{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;line-height:1.05;box-sizing:border-box;height:40px;min-width:88px;max-width:170px;padding:2px 12px 0;border:2px solid #e8c36a;border-radius:12px;background:#0a241ccc;display:flex;flex-direction:column;align-items:center;justify-content:center;white-space:nowrap}
-.tot .diff{font-size:17px}
+.tot{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;line-height:1.05;box-sizing:border-box;height:40px;min-width:88px;max-width:170px;padding:0 12px;border:2px solid #e8c36a;border-radius:12px;background:#0a241ccc;display:flex;flex-direction:column;align-items:center;justify-content:center;white-space:nowrap}
+.tot .diff{font-size:20px;line-height:1}
 .tot small{display:block;font-size:11px;font-weight:800;color:#e8c36a}
 .diff{font-size:20px;font-weight:900}.diff.plus{color:#7dffb0}.diff.minus{color:#ff8aa0}.diff.zero{color:#e8c36a}
 .board{flex:1;width:100%;border-radius:14px;margin:8px 0;background:radial-gradient(ellipse at center,#146047,#0a3328);border:3px solid #0a241c;display:flex;flex-direction:column;align-items:center;justify-content:space-between;position:relative;padding:12px 6px;overflow:hidden}
@@ -284,7 +284,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 <section id="room"><h1>部屋</h1><p class="hint">合言葉は3文字以上</p><input id="code" maxlength="8" placeholder="あいことば" /><div class="row" style="margin-top:10px"><button id="mk">部屋を作る</button><button id="jn">入る</button></div><p class="hint" id="roomSt"></p><button id="roomBack" style="margin-top:14px">戻る</button></section>
 
 <section id="game">
-<div class="topbar"><div><b id="oppName">1戦目</b></div><div class="tot"><small>通算</small><span class="diff zero" id="sc">±0</span></div><div><button id="retry" type="button">やり直し</button></div></div>
+<div class="topbar"><div><b id="oppName">1戦目</b></div><div class="tot"><span class="diff zero" id="sc">±0</span></div><div><button id="retry" type="button">やり直し</button></div></div>
 <div class="board">
   <div class="side"><div class="who">相手</div><div class="picks" id="pkOpp"></div></div>
   <div class="center">
@@ -538,6 +538,7 @@ function resolveWindow(){
     if(S.round>=ROUNDS){ev.end=true;S.phase="battle"}
     else{S.round++;ev.next=S.round;pause+=D.PAUSE_RD;cpuRoundInit()}
   }
+  if(ev.t==="take"&&!ev.next&&!ev.end&&!ev.ended)pause=0;   /* 片方だけ先に獲得した時は止めずにそのまま次の3秒へ */
   S.waiting=true;
   if(S.mode==="pvp")send({type:"res",ev:ev,st:snap()});
   applyEv(ev);render();
@@ -640,7 +641,7 @@ function showResult(){
   const mineGot=!w?0:w===me?S.got:-S.got,life=S.totals[me]||0;
   const col=n=>n>0?"#6aa8ff":n<0?"#ff5a6a":"#e8c36a";
   $("rCalc").innerHTML='<div style="font-size:18px;font-weight:800;color:#e8c36a;margin-top:10px">今回</div>';  /* 式と説明は出さない */
-  $("rPts").innerHTML='<div style="color:'+col(mineGot)+'">'+(mineGot>0?"+":mineGot===0?"±":"")+mineGot+'</div><div style="color:'+col(life)+';margin-top:14px">'+(life===0?"±0":(life>0?"+":"")+life)+'</div>';
+  $("rPts").innerHTML='<div style="color:'+col(mineGot)+'">'+(mineGot>0?"+":mineGot===0?"±":"")+mineGot+'</div><div style="font-size:18px;font-weight:800;color:#e8c36a;margin-top:10px">今までの通算</div><div style="color:'+col(life)+'">'+(life===0?"±0":(life>0?"+":"")+life)+'</div>';
   show("result");
 }
 function goAgain(){if(S.phase!=="result")return;S.matchNo++;S.votes={};startMatch()}
