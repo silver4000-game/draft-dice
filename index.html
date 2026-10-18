@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261018m">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261018m">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261018m">
+<meta name="draft-dice-rev" content="20261018n">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261018n">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261018n">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -240,8 +240,8 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 <section id="rules"><h1>ルール</h1><div class="rules-body">
 <div class="ruleHead" style="margin-top:6px">ー　流れ　ー</div>
 <div class="ruleSteps">
-<div class="ruleStep"><span class="ruleNum">1</span><div class="ruleStepBody">2.75秒ごとに数字が<span class="ruleGold">ランダムに変わる</span></div></div>
-<div class="ruleStep"><span class="ruleNum">2</span><div class="ruleStepBody"><span class="ruleGold">獲得</span>を押すと、2.75秒たった時の数字をもらえる<br>（1ラウンドに1回）</div></div>
+<div class="ruleStep"><span class="ruleNum">1</span><div class="ruleStepBody">最初の3回は2.4秒、そのあとは2.7秒ごとに<br>数字が<span class="ruleGold">ランダムに変わる</span></div></div>
+<div class="ruleStep"><span class="ruleNum">2</span><div class="ruleStepBody"><span class="ruleGold">獲得</span>を押すと、円がいっぱいになった時の数字をもらえる<br>（1ラウンドに1回）</div></div>
 <div class="ruleStep"><span class="ruleNum">3</span><div class="ruleStepBody">ラウンドは<span class="ruleNo">終わる確率</span>で急に終わる<br>それまでに獲得しないと<span class="ruleNo">未獲得</span></div></div>
 <div class="ruleStep"><span class="ruleNum">4</span><div class="ruleStepBody">これを<span class="ruleGold">3ラウンド</span>くり返す</div></div>
 <div class="ruleStep"><span class="ruleNum">5</span><div class="ruleStepBody">もらった数字の合計が<span class="ruleGold">サイコロの面の数</span>になる<br>（未獲得は0）</div></div>
@@ -312,7 +312,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 <script>
 const $=id=>document.getElementById(id);
 /* durations (ms) */
-const D={T:2750,PAUSE_EV:1100,PAUSE_RD:1600,START:1400,ROLL:2500,AUTOSTOP:10000};
+const D={T1:2400,T2:2700,PAUSE_EV:1100,PAUSE_RD:1600,START:1400,ROLL:2500,AUTOSTOP:10000};
 const ROUNDS=3;
 let audioCtx=null;
 let gameGen=0;
@@ -448,7 +448,7 @@ function gaugeLoop(){
   requestAnimationFrame(gaugeLoop);
   if(!$("game").classList.contains("on"))return;
   let f=0;
-  if(S.phase==="draft"&&!S.waiting)f=Math.max(0,Math.min(1,(performance.now()-S.tickStart)/D.T));
+  if(S.phase==="draft"&&!S.waiting)f=Math.max(0,Math.min(1,(performance.now()-S.tickStart)/winDur(winK())));
   $("gfg").setAttribute("stroke-dashoffset",(GC*(1-f)).toFixed(2));
 }
 requestAnimationFrame(gaugeLoop);
@@ -512,7 +512,8 @@ function startMatch(){
   banner("ドラフト開始");
   if(isAuth())later(()=>{cpuRoundInit();beginWindow()},D.START);
 }
-function winK(){return S.rt+1}                 /* このラウンドの何回目の2.75秒か */
+function winDur(k){return k<=3?D.T1:D.T2}       /* 1〜3回目（1〜3・0%）は2.4秒、4回目からは2.7秒。被った後も1回目から */
+function winK(){return S.rt+1}                 /* このラウンドの何回目か */
 function rangeMax(k){return 3*Math.ceil(k/3)}    /* 1〜3回目:3, 4〜6回目:6, 7〜9回目:9 ... */
 function endPct(k){return (Math.ceil(k/3)-1)*5}  /* 1〜3回目:0%, 4〜6回目:5%, 7〜9回目:10% ... */
 function beginWindow(){
@@ -521,7 +522,7 @@ function beginWindow(){
   S.n=1+Math.floor(Math.random()*rangeMax(winK()));
   if(S.mode==="pvp")send({type:"win",st:snap()});
   cpuThink();winFx();render();
-  later(resolveWindow,D.T);
+  later(resolveWindow,winDur(winK()));
 }
 function winFx(){S.endShow=false;sfxUp(S.n);numFx("pop")}
 function resolveWindow(){
@@ -534,8 +535,8 @@ function resolveWindow(){
   S.pressed={1:false,2:false};
   S.rt++;
   let pause=ev.t==="none"?0:D.PAUSE_EV;
-  /* 終わる確率: その2.75秒の獲得を先に決めてから判定 */
-  if(ev.t==="kaburi")S.rt=0;   /* 被ったら 1〜3・0% に戻る（この2.75秒の終わる判定はしない） */
+  /* 終わる確率: その回の獲得を先に決めてから判定 */
+  if(ev.t==="kaburi")S.rt=0;   /* 被ったら 1〜3・0% に戻る（この回の終わる判定はしない） */
   else if((need(1)||need(2))&&Math.random()*100<endPct(k)){ev.ended=[1,2].filter(need);ev.ended.forEach(p=>S.acq[p].push(null))}
   if(!need(1)&&!need(2)){
     if(ev.ended)pause+=D.PAUSE_EV;
@@ -543,7 +544,7 @@ function resolveWindow(){
     if(S.round>=ROUNDS){ev.end=true;S.phase="battle"}
     else{S.round++;ev.next=S.round;pause+=D.PAUSE_RD;cpuRoundInit()}
   }
-  if(ev.t==="take"&&!ev.next&&!ev.end&&!ev.ended)pause=0;   /* 片方だけ先に獲得した時は止めずにそのまま次の2.75秒へ */
+  if(ev.t==="take"&&!ev.next&&!ev.end&&!ev.ended)pause=0;   /* 片方だけ先に獲得した時は止めずにそのまま次の回へ */
   S.waiting=true;
   if(S.mode==="pvp")send({type:"res",ev:ev,st:snap()});
   applyEv(ev);render();
@@ -580,7 +581,7 @@ function cpuThink(){
   if(S.round===ROUNDS&&!need(1)){if(diff>0)T+=Math.min(3,Math.floor(diff/3));else if(diff<-6)T=Math.max(3,T-2)}
   let press=n>=T||(E>=10&&n>=Math.ceil(M*0.75))||(E>=15&&n>=Math.ceil(M*0.5))||E>=25;
   if(press&&need(1)&&E<15&&n<M&&Math.random()<0.15)press=false;   // 被りを避けて1回待つ
-  if(press){const w=S.win;later(()=>{if(S.phase==="draft"&&!S.waiting&&S.win===w&&need(2))S.pressed[2]=true},D.T*(0.1+Math.random()*0.77))}
+  if(press){const w=S.win;later(()=>{if(S.phase==="draft"&&!S.waiting&&S.win===w&&need(2))S.pressed[2]=true},winDur(k)*(0.1+Math.random()*0.77))}
 }
 /* dice battle */
 function startBattle(){
@@ -589,13 +590,13 @@ function startBattle(){
   if(S.mode==="pvp")send({type:"battle",faces:F});
   runBattle(F);
   const bid=S.bid;
-  if(S.mode==="cpu")later(()=>hostStop(2,bid),1000+Math.random()*2000);   /* CPUは1〜3秒でタップ */
-  later(()=>{hostStop(1,bid);hostStop(2,bid)},D.AUTOSTOP);                  /* 長い間タップしない時は自動で止める */
+  if(S.mode==="cpu")later(()=>hostStop(2,bid,shownOf(2)),1000+Math.random()*2000);   /* CPUは1〜3秒でタップ */
+  later(()=>{hostStop(1,bid,shownOf(1));hostStop(2,bid,shownOf(2))},D.AUTOSTOP);                  /* 長い間タップしない時は自動で止める */
 }
 /* サイコロ勝負: 自分のサイコロはタップで止める。目は止めた瞬間に作成側（CPU戦は自分）がランダムで決める */
 function runBattle(F){
   S.bid=(S.bid||0)+1;
-  S.phase="battle";S.faces=F;S.rolls=[{1:null,2:null}];S.stopped={1:false,2:false};S.stopReq=false;S.settled=0;S.battleDone=false;S.waiting=true;
+  S.phase="battle";S.faces=F;S.rolls=[{1:null,2:null}];S.stopped={1:false,2:false};S.stopReq=false;S.settled=0;S.shown={};S.battleDone=false;S.waiting=true;
   const me=S.me,op=oppOf(me);
   setDie($("dieMe"),F[me],null);setDie($("dieOpp"),F[op],null);
   $("dfMe").textContent=F[me]+"面";$("dfOpp").textContent=F[op]+"面";
@@ -604,46 +605,48 @@ function runBattle(F){
   render();spinLoop(S.bid);
 }
 function dieOf(p){return p===S.me?$("dieMe"):$("dieOpp")}
+/* 数字は約50msごとにランダムに変わる（順番ではないので狙えない）。タップした瞬間に出ていた数字がそのまま結果 */
 function spinLoop(bid){
   if(S.bid!==bid||S.phase!=="battle")return;
-  const F=S.faces,rr=f=>f>0?1+Math.floor(Math.random()*f):0;let any=false;
-  [1,2].forEach(p=>{if(S.stopped[p])return;any=true;const el=dieOf(p),v=el.querySelector("svg");
-    const a=(parseFloat((v.style.transform.match(/-?[\d.]+/)||[0])[0])||0)+36;v.style.transition="transform 80ms linear";v.style.transform="rotate("+a+"deg)";setDie(el,F[p],rr(F[p]))});
+  const F=S.faces;let any=false;S.shown=S.shown||{};
+  [1,2].forEach(p=>{if(S.stopped[p])return;any=true;const el=dieOf(p),f=F[p];
+    if(!(f>0)){S.shown[p]=0;setDie(el,f,0);return}   /* 0面は回らず0のまま */
+    let v=1+Math.floor(Math.random()*f);if(f>1&&v===S.shown[p])v=1+(v+Math.floor(Math.random()*(f-1)))%f;
+    S.shown[p]=v;const sv=el.querySelector("svg"),a=(parseFloat((sv.style.transform.match(/-?[\d.]+/)||[0])[0])||0)+36;
+    sv.style.transition="transform 50ms linear";sv.style.transform="rotate("+a+"deg)";setDie(el,f,v)});
   if(!any)return;
-  S.spinN=(S.spinN||0)+1;if(S.spinN%2)sfxTick();
-  later(()=>spinLoop(bid),80);
+  S.spinN=(S.spinN||0)+1;if(S.spinN%3===0)sfxTick();
+  later(()=>spinLoop(bid),50);
 }
+function shownOf(p){const f=S.faces[p];if(!(f>0))return 0;const v=S.shown&&S.shown[p];return v>=1&&v<=f?v:1+Math.floor(Math.random()*f)}
 function tapStop(){
-  if(S.phase!=="battle"||!S.faces||S.battleDone||S.stopped[S.me]||S.stopReq)return;
-  sfxPress();
-  if(S.mode==="pvp"&&!S.host){S.stopReq=true;$("dhMe").classList.remove("on");send({type:"stop",bid:S.bid});render();return}
-  hostStop(S.me,S.bid);
+  if(S.phase!=="battle"||!S.faces||S.battleDone||S.stopped[S.me])return;
+  const v=shownOf(S.me);sfxPress();
+  if(S.mode==="pvp"&&!S.host){applyStop(S.me,v);send({type:"stop",bid:S.bid,r:v});return}   /* 入室側も自分の画面ですぐ止まる */
+  hostStop(S.me,S.bid,v);
 }
-function hostStop(p,bid){
+function hostStop(p,bid,v){
   if(!isAuth()||S.bid!==bid||S.phase!=="battle"||!S.faces||S.stopped[p])return;
-  const f=S.faces[p],r=f>0?1+Math.floor(Math.random()*f):0;   /* 0面は必ず0 */
+  const f=S.faces[p];let r=f>0?(Number.isInteger(v)&&v>=1&&v<=f?v:shownOf(p)):0;   /* 0面は必ず0 */
   if(S.mode==="pvp")send({type:"dstop",p:p,r:r});
   applyStop(p,r);
 }
 function applyStop(p,r){
-  if(S.phase!=="battle"||!S.faces||S.stopped[p])return;
-  S.stopped[p]=true;S.rolls[0][p]=r;
-  if(p===S.me){S.stopReq=false;$("dhMe").classList.remove("on");$("dieMe").classList.remove("tap")}
-  render();
-  /* 止めたら少しだけ減速して止まる（約0.45秒） */
-  const el=dieOf(p),v=el.querySelector("svg"),F=S.faces[p],rr=()=>F>0?1+Math.floor(Math.random()*F):0,bid=S.bid;
-  const steps=[60,90,130,170];let k=0;
-  const step=()=>{
-    if(S.bid!==bid)return;
-    const a=parseFloat((v.style.transform.match(/-?[\d.]+/)||[0])[0])||0;
-    if(k>=steps.length){
-      v.style.transition="transform .25s ease-out";v.style.transform="rotate("+Math.round(a/360)*360+"deg)";
-      setDie(el,F,r);tone(200,0.12,"triangle",0.08);
-      if(++S.settled===2)settleBattle();return;
+  if(S.phase!=="battle"||!S.faces)return;
+  if(S.stopped[p]){   /* まれに自動停止と入室側のタップが重なった時は作成側の数字に合わせる */
+    if(!S.host&&S.rolls[0][p]!==r){
+      S.rolls[0][p]=r;setDie(dieOf(p),S.faces[p],r);
+      if(S.applied){const w=S.winner;if(w){S.totals[w]-=S.got;S.totals[oppOf(w)]+=S.got}S.applied=false;$("dieMe").classList.remove("win","lose");$("dieOpp").classList.remove("win","lose");settleBattle()}
     }
-    const dl=steps[k++];v.style.transition="transform "+dl+"ms ease-out";v.style.transform="rotate("+(a+36)+"deg)";setDie(el,F,rr());sfxTick();later(step,dl);
-  };
-  step();
+    return;
+  }
+  S.stopped[p]=true;S.rolls[0][p]=r;
+  if(p===S.me){$("dhMe").classList.remove("on");$("dieMe").classList.remove("tap")}
+  const el=dieOf(p),sv=el.querySelector("svg"),a=parseFloat((sv.style.transform.match(/-?[\d.]+/)||[0])[0])||0;
+  sv.style.transition="transform .12s ease-out";sv.style.transform="rotate("+Math.round(a/360)*360+"deg)";
+  setDie(el,S.faces[p],r);tone(200,0.12,"triangle",0.08);
+  render();
+  if(++S.settled===2)settleBattle();
 }
 function settleBattle(){
   const r=S.rolls[0],me=S.me;
@@ -701,7 +704,7 @@ function onNet(m,conn){
   if(m.type==="win"){if(S.host)return;applySnap(m.st);S.waiting=false;S.tickStart=performance.now();winFx();render();return}
   if(m.type==="res"){if(S.host)return;applySnap(m.st);S.waiting=true;applyEv(m.ev);if(!need(2))S.pressed[2]=false;render();return}
   if(m.type==="battle"){if(S.host)return;runBattle(m.faces);return}
-  if(m.type==="stop"){if(S.host&&(m.bid==null||m.bid===S.bid))hostStop(2,S.bid);return}
+  if(m.type==="stop"){if(S.host&&(m.bid==null||m.bid===S.bid))hostStop(2,S.bid,m.r);return}
   if(m.type==="dstop"){if(S.host)return;applyStop(m.p,m.r);return}
   if(m.type==="vote"){S.votes[m.who]=true;if(S.host&&S.votes[1]&&S.votes[2]){send({type:"goAgain"});goAgain()}return}
   if(m.type==="goAgain"){if(!S.host)goAgain();return}
