@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261018a">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261018a">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261018a">
+<meta name="draft-dice-rev" content="20261018b">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261018b">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261018b">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -125,8 +125,21 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .gsub.on{animation:gsub 1.2s ease-out}
 @keyframes gsub{0%{opacity:0}15%{opacity:1}75%{opacity:1}100%{opacity:0}}
 .rinfo{margin-top:10px;font-size:15px;font-weight:900;color:#e8c36a;letter-spacing:.06em;text-align:center;min-height:20px}
-.rinfo .warn{display:block;font-size:14px;color:#f4ead0;letter-spacing:.02em;margin-top:4px;min-height:18px}
-.rinfo .warn .ec{color:#ff8a96;margin-left:10px}.rinfo .warn .ec.z{color:#7dffb0}
+.stat{display:flex;gap:10px;justify-content:center;margin-top:10px}
+.stat.off{visibility:hidden}
+.pill{--c:#f0d27a;min-width:124px;padding:5px 12px 6px;border:2.5px solid var(--c);border-radius:14px;background:#0a1810e6;text-align:center;line-height:1.1;box-shadow:0 0 0 1px #0006,0 0 10px color-mix(in srgb,var(--c) 35%,transparent)}
+.pill small{display:block;font-size:12px;font-weight:900;color:#e8c36a;letter-spacing:.06em}
+.pill b{display:block;font-size:27px;font-weight:900;color:var(--c);font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;letter-spacing:.02em;margin-top:2px}
+.pill.h0{--c:#7dffb0}.pill.h1{--c:#ffe066}.pill.h2{--c:#ffab40}.pill.h3{--c:#ff7043}.pill.h4{--c:#ff3b3b}
+.pill.h4 b{text-shadow:0 0 8px #ff3b3b99}
+.pill.up{animation:pillUp .7s ease-out}
+.pill.down{animation:pillDown .7s ease-out}
+@keyframes pillUp{0%{transform:scale(1)}30%{transform:scale(1.16);box-shadow:0 0 22px var(--c)}100%{transform:scale(1)}}
+@keyframes pillDown{0%{transform:scale(1);filter:brightness(1.8)}35%{transform:scale(.9)}100%{transform:scale(1);filter:none}}
+.nextStep{margin-top:7px;min-height:18px;display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:800;color:#f4ead0cc}
+.nextStep.off{visibility:hidden}
+.nextStep i{width:9px;height:9px;border-radius:50%;border:1.5px solid #e8c36a;display:inline-block}
+.nextStep i.on{background:#e8c36a}
 .dice{display:none;gap:22px;align-items:flex-start;justify-content:center}
 .dice.on{display:flex}
 .dcol{display:flex;flex-direction:column;align-items:center;gap:6px}
@@ -254,7 +267,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 <div class="ruleHead">ー　被った　ー</div>
 <div class="ruleRow" style="flex-direction:column;gap:8px">
 <div class="ruleArt"><span class="rTag kaburi">被った</span></div>
-<div class="ruleTxt">2人が同じ数字で獲得を押すと<br><span class="ruleNo">どちらももらえない</span><br>ラウンドはそのまま続く</div>
+<div class="ruleTxt">2人が同じ数字で獲得を押すと<br><span class="ruleNo">どちらももらえない</span><br>数字と終わる確率は<span class="ruleGold">最初（1〜3・0%）</span>に戻る<br>ラウンドはそのまま続く</div>
 </div>
 <div class="ruleHead">ー　未獲得　ー</div>
 <div class="ruleRow" style="flex-direction:column;gap:8px">
@@ -283,7 +296,9 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
       <div class="dcol"><div class="dlab">相手</div><div class="die" id="dieOpp"><svg viewBox="0 0 100 100"><polygon/></svg><b>?</b></div><div class="dface" id="dfOpp"></div></div>
       <div class="dcol"><div class="dlab">自分</div><div class="die" id="dieMe"><svg viewBox="0 0 100 100"><polygon/></svg><b>?</b></div><div class="dface" id="dfMe"></div></div>
     </div>
-    <div class="rinfo" id="rinfo">ラウンド 1/3<span class="warn" id="warn"></span></div>
+    <div class="rinfo" id="rinfo">ラウンド 1/3</div>
+    <div class="stat" id="stat"><div class="pill" id="pRange"><small>出る数字</small><b id="vRange">1〜3</b></div><div class="pill h0" id="pEnd"><small>終わる確率</small><b id="vEnd">0%</b></div></div>
+    <div class="nextStep" id="nextStep"></div>
     <div class="fx" id="fx"><div class="t"></div><br><div class="s"></div></div>
   </div>
   <div class="side"><div class="picks" id="pkMe"></div><div class="who">自分</div></div>
@@ -462,7 +477,7 @@ function render(){
   $("gauge").classList.toggle("pressed",!!S.pressed[S.me]&&need(S.me)&&S.phase==="draft");
   const k=winK(),ep=endPct(k);
   $("rinfo").firstChild.textContent=battle?"サイコロ勝負":"ラウンド "+S.round+"/"+ROUNDS;
-  $("warn").innerHTML=(!battle&&S.phase==="draft")?'1〜'+rangeMax(k)+'<span class="ec'+(ep?'':' z')+'">終わる確率 '+ep+'%</span>':"";
+  paintStat(battle,k,ep);
   const g=$("grab");g.classList.remove("pressed");
   if(S.phase==="draft"){
     if(!need(S.me)){g.textContent="獲得";g.disabled=true}
@@ -471,6 +486,21 @@ function render(){
   }else if(battle){
     g.textContent=S.battleDone?"結果へ":"勝負中";g.disabled=!S.battleDone;
   }else{g.textContent="獲得";g.disabled=true}
+}
+/* 出る数字・終わる確率のバッジ。3回ごとに上がる時はパッと光る */
+function heat(ep){return ep<=0?0:ep<=6?1:ep<=12?2:ep<=18?3:4}
+function paintStat(battle,k,ep){
+  const on=!battle&&S.phase==="draft";
+  $("stat").classList.toggle("off",!on);$("nextStep").classList.toggle("off",!on);
+  if(!on){S.shownStage=0;return}
+  const st=Math.ceil(k/3),pr=$("pRange"),pe=$("pEnd");
+  $("vRange").textContent="1〜"+rangeMax(k);$("vEnd").textContent=ep+"%";
+  pe.className="pill h"+heat(ep);
+  if(S.shownStage&&st!==S.shownStage){const c=st>S.shownStage?"up":"down";[pr,pe].forEach(e=>{e.classList.remove("up","down");void e.offsetWidth;e.classList.add(c)})}
+  S.shownStage=st;
+  const left=3-((k-1)%3);
+  let dots="";for(let i=0;i<3;i++)dots+='<i'+(i<=(k-1)%3?' class="on"':'')+'></i>';
+  $("nextStep").innerHTML=dots+'<span>あと'+left+'回で 1〜'+(rangeMax(k)+3)+'・'+(ep+3)+'%</span>';
 }
 function numFx(cls){const el=$("num");el.classList.remove("pop","reset");void el.offsetWidth;if(cls)el.classList.add(cls)}
 
@@ -508,7 +538,8 @@ function resolveWindow(){
   S.rt++;
   let pause=ev.t==="none"?0:D.PAUSE_EV;
   /* 終わる確率: その3秒の獲得を先に決めてから判定 */
-  if((need(1)||need(2))&&Math.random()*100<endPct(k)){ev.ended=[1,2].filter(need);ev.ended.forEach(p=>S.acq[p].push(null))}
+  if(ev.t==="kaburi")S.rt=0;   /* 被ったら 1〜3・0% に戻る（この3秒の終わる判定はしない） */
+  else if((need(1)||need(2))&&Math.random()*100<endPct(k)){ev.ended=[1,2].filter(need);ev.ended.forEach(p=>S.acq[p].push(null))}
   if(!need(1)&&!need(2)){
     if(ev.ended)pause+=D.PAUSE_EV;
     S.rt=0;S.n=null;
@@ -532,7 +563,7 @@ function applyEv(ev){
     numFx("");d=900;
     if(ev.who===me)S.pressed[me]=false;
   }
-  else if(ev.t==="kaburi"){fx("kaburi","被った",ev.v+" はどちらももらえない");sfxKaburi();numFx("");d=900;S.pressed[me]=false}
+  else if(ev.t==="kaburi"){fx("kaburi","被った",ev.v+" はどちらももらえない　1〜3・0%に戻る");sfxKaburi();numFx("");d=900;S.pressed[me]=false}
   if(ev.ended){
     if(ev.ended.indexOf(me)>=0)S.pressed[me]=false;
     const mm=ev.ended.indexOf(me)>=0,om=ev.ended.indexOf(op)>=0;
