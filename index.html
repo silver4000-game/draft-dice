@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261018c">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261018c">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261018c">
+<meta name="draft-dice-rev" content="20261018d">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261018d">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261018d">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -127,9 +127,9 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .rinfo{margin-top:10px;font-size:15px;font-weight:900;color:#e8c36a;letter-spacing:.06em;text-align:center;min-height:20px}
 .stat{display:flex;gap:10px;justify-content:center;margin-top:16px}
 .stat.off{visibility:hidden}
-.pill{--c:#f0d27a;min-width:124px;padding:5px 12px 6px;border:2.5px solid var(--c);border-radius:14px;background:#0a1810e6;text-align:center;line-height:1.1;box-shadow:0 0 0 1px #0006,0 0 10px color-mix(in srgb,var(--c) 35%,transparent)}
-.pill small{display:block;font-size:12px;font-weight:900;color:#e8c36a;letter-spacing:.06em}
-.pill b{display:block;font-size:27px;font-weight:900;color:var(--c);font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;letter-spacing:.02em;margin-top:2px}
+.pill{--c:#f0d27a;min-width:106px;padding:4px 10px 5px;border:2.2px solid var(--c);border-radius:12px;background:#0a1810e6;text-align:center;line-height:1.1;box-shadow:0 0 0 1px #0006,0 0 10px color-mix(in srgb,var(--c) 35%,transparent)}
+.pill small{display:block;font-size:10.5px;font-weight:900;color:#e8c36a;letter-spacing:.06em}
+.pill b{display:block;font-size:23px;font-weight:900;color:var(--c);font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;letter-spacing:.02em;margin-top:2px}
 .pill.h0{--c:#7dffb0}.pill.h1{--c:#ffe066}.pill.h2{--c:#ffab40}.pill.h3{--c:#ff7043}.pill.h4{--c:#ff3b3b}
 .pill.h4 b{text-shadow:0 0 8px #ff3b3b99}
 .pill.up{animation:pillUp .7s ease-out}
@@ -306,7 +306,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 <script>
 const $=id=>document.getElementById(id);
 /* durations (ms) */
-const D={T:3000,PAUSE_EV:1100,PAUSE_RD:1600,START:1400,ROLL:1700};
+const D={T:3000,PAUSE_EV:1100,PAUSE_RD:1600,START:1400,ROLL:2500};
 const ROUNDS=3;
 let audioCtx=null;
 let gameGen=0;
@@ -548,9 +548,9 @@ function applyEv(ev){
   let d=0;
   if(ev.t==="take"){
     S.lastNew={i:S.acq[ev.who].length-1};
-    if(ev.who===me){fx("get","獲得！",ev.v+" をゲット");sfxGet()}
-    else if(S.acq[me][S.acq[ev.who].length-1]!=null){fx("auto","相手も獲得","相手が "+ev.v+" を獲得");sfxTaken()}
-    else{fx("taken","取られた","相手が "+ev.v+" を獲得"+(need(me)&&!(ev.ended&&ev.ended.indexOf(me)>=0)?"　まだ選べる":""));sfxTaken()}
+    if(ev.who===me){fx("get","獲得！");sfxGet()}
+    else if(S.acq[me][S.acq[ev.who].length-1]!=null){fx("auto","相手も獲得");sfxTaken()}
+    else{fx("taken","取られた");sfxTaken()}
     numFx("");d=900;
     if(ev.who===me)S.pressed[me]=false;
   }
@@ -558,7 +558,7 @@ function applyEv(ev){
   if(ev.ended){
     if(ev.ended.indexOf(me)>=0)S.pressed[me]=false;
     const mm=ev.ended.indexOf(me)>=0,om=ev.ended.indexOf(op)>=0;
-    const show=()=>{S.lastNew={i:ev.k?S.acq[me].length-1:0};fx("auto","ラウンド終了",mm&&om?"どちらも未獲得":mm?"自分は未獲得":"相手は未獲得");sfxTaken();numFx("");render()};
+    const show=()=>{S.lastNew={i:ev.k?S.acq[me].length-1:0};fx("auto","ラウンド終了");sfxTaken();numFx("");render()};
     if(d)later(show,d);else show();
     d+=900;
   }
@@ -596,19 +596,24 @@ function runBattle(F,rolls){
 function rollStep(i){
   const r=S.rolls[i],F=S.faces,me=S.me,op=oppOf(me);
   const dm=$("dieMe"),dop=$("dieOpp");
-  dm.className="die spin";dop.className="die spin";
-  const t0=performance.now();let delay=55;
+  dm.className="die";dop.className="die";
+  /* だんだん遅くなって止まる（間隔を少しずつのばす ease-out） */
+  const ds=[];let d=45,sum=0;while(sum<2500){ds.push(d);sum+=d;d*=1.12}
+  const sc=D.ROLL/sum,svgs=[dm,dop].map(e=>e.querySelector("svg"));let ang=0,k=0;
+  const rr=f=>f>0?1+Math.floor(Math.random()*f):0;
   const spin=()=>{
-    if(performance.now()-t0>=D.ROLL){
-      dm.className="die";dop.className="die";
+    if(k>=ds.length){
+      svgs.forEach(v=>{v.style.transition="transform .25s ease-out";v.style.transform="rotate("+Math.round(ang/360)*360+"deg)"});
       setDie(dm,F[me],r[me]);setDie(dop,F[op],r[op]);
       if(r[1]===r[2]){finishBattle(0,0);return}
       const w=r[1]>r[2]?1:2;
       (w===me?dm:dop).classList.add("win");(w===me?dop:dm).classList.add("lose");
       finishBattle(w,r[w]);return;
     }
-    const rr=f=>f>0?1+Math.floor(Math.random()*f):0;setDie(dm,F[me],rr(F[me]));setDie(dop,F[op],rr(F[op]));
-    sfxTick();delay=Math.min(240,delay*1.13);later(spin,delay);
+    const dl=ds[k++]*sc;ang+=36;
+    svgs.forEach(v=>{v.style.transition="transform "+Math.round(dl)+"ms linear";v.style.transform="rotate("+ang+"deg)"});
+    setDie(dm,F[me],rr(F[me]));setDie(dop,F[op],rr(F[op]));
+    sfxTick();later(spin,dl);
   };
   spin();
 }
