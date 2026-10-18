@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261018p">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261018p">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261018p">
+<meta name="draft-dice-rev" content="20261018q">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261018q">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261018q">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -106,6 +106,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .pk.got{border:2px solid #c8b89a;background:#f7f1e6;color:#1a1208}
 .pk.miss{border:2px solid #e8c36a44;background:#0a241c99;color:#e8c36a88;font-size:22px;font-family:inherit}
 .pk.got.new,.pk.miss.new{animation:pkPop .5s ease-out}
+#pkMe .pk.got,#pkMe .pk.miss{border:2.5px solid #6aa8ff}#pkOpp .pk.got,#pkOpp .pk.miss{border:2.5px solid #ff5a6a}   /* 自分=青・相手=赤の枠 */
 @keyframes pkPop{0%{transform:scale(.4)}60%{transform:scale(1.18)}100%{transform:scale(1)}}
 .plus{font-size:16px;font-weight:900;color:#e8c36a}
 .faces{min-width:64px;text-align:left;font-size:16px;font-weight:900;color:#e8c36a;white-space:nowrap}
@@ -150,6 +151,8 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 @keyframes dspin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 .die.win polygon{stroke:#f0d27a;stroke-width:6;filter:drop-shadow(0 0 8px #f0d27a)}
 .die.lose{filter:brightness(.42)}
+#dieMe polygon{stroke:#6aa8ff;stroke-width:5}#dieOpp polygon{stroke:#ff5a6a;stroke-width:5}   /* 自分=青・相手=赤の枠 */
+#dieMe.win polygon{stroke:#6aa8ff;stroke-width:6;filter:drop-shadow(0 0 8px #f0d27a)}#dieOpp.win polygon{stroke:#ff5a6a;stroke-width:6;filter:drop-shadow(0 0 8px #f0d27a)}
 .dface{font-size:12px;font-weight:800;opacity:.85}
 #dieMe.tap{cursor:pointer}
 .dhint{font-size:14px;font-weight:900;color:#e8c36a;white-space:nowrap;visibility:hidden;animation:hintBlink 1s ease-in-out infinite}
