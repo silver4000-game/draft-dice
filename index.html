@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261018o">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261018o">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261018o">
+<meta name="draft-dice-rev" content="20261018p">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261018p">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261018p">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -205,7 +205,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .rWho{font-size:11px;font-weight:900;color:#e8c36a;text-align:center;width:100%}
 .rStages{display:flex;gap:14px;justify-content:center}.rStage{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:900;line-height:1.3;text-align:center}.rStage .rg{color:#f4ead0;font-size:13px}.rStage .re{color:#ff8a96}.rStage .re.z{color:#7dffb0}
 .rTag{font-size:13px;font-weight:900;padding:2px 8px;border:2px solid currentColor;border-radius:8px;background:#0a1810}
-.rTag.taken{color:#ff5a6a}.rTag.kaburi{color:#ffb347}.rTag.get{color:#7dffb0}
+.rTag.bonus{color:#e8c36a}.rTag.taken{color:#ff5a6a}.rTag.kaburi{color:#ffb347}.rTag.get{color:#7dffb0}
 
 #ask{display:none;position:fixed;inset:0;background:#000c;z-index:100;align-items:center;justify-content:center;flex-direction:column;gap:12px}
 #ask.on{display:flex}
@@ -276,6 +276,11 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 <div class="ruleArt"><span class="rTag taken">取れなかった</span><span class="ruleArr">→</span><span class="rPk miss">―</span></div>
 <div class="ruleTxt">獲得する前にラウンドが終わると<br><span class="ruleNo">未獲得</span>（0として数える）<br>0面のサイコロは<span class="ruleNo">必ず0</span></div>
 </div>
+<div class="ruleHead">ー　ゾロ目ボーナス　ー</div>
+<div class="ruleRow" style="flex-direction:column;gap:8px">
+<div class="ruleArt"><span class="rPk">2</span><span class="ruleArr">＋</span><span class="rPk">2</span><span class="ruleArr">＋</span><span class="rPk">2</span><span class="ruleArr">→</span><span class="rTag bonus">6% 固定</span></div>
+<div class="ruleTxt">3つとも同じ数字なら<br>自分だけ<span class="ruleGold">ボーナスラウンド</span>へ<br>2秒ごとに数字が変わる<br>終わる確率は<span class="ruleNo">ゾロ目の合計％で固定</span></div>
+</div>
 <div class="ruleHead">ー　例　ー</div>
 <div class="ruleRow" style="flex-direction:column;gap:6px">
 <div class="rWho">相手</div>
@@ -312,7 +317,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 <script>
 const $=id=>document.getElementById(id);
 /* durations (ms) */
-const D={T1:2400,T2:2700,PAUSE_EV:1100,PAUSE_RD:1600,START:1400,ROLL:2500,AUTOSTOP:10000};
+const D={T1:2400,T2:2700,TB:2000,PAUSE_EV:1100,PAUSE_RD:1600,START:1400,ROLL:2500,AUTOSTOP:10000};
 const ROUNDS=3;
 let audioCtx=null;
 let gameGen=0;
@@ -351,7 +356,10 @@ function sfxLose(){[392,330,262].forEach((f,i)=>later(()=>tone(f,0.25,"triangle"
 const S={mode:null,me:1,host:true,round:1,n:1,win:0,rt:0,acq:{1:[],2:[]},pressed:{1:false,2:false},phase:"idle",waiting:true,tickStart:0,
   totals:{1:0,2:0},matchNo:1,votes:{},faces:null,rolls:null,battleDone:false,applied:false,winner:0,got:0,cpuT:5,peer:null,conn:null,lastNew:null};
 const oppOf=p=>p===1?2:1;
-function need(p){return S.acq[p].length<S.round}
+function need(p){return S.bonus?(p===S.bonus.p&&S.acq[p].length<4):S.acq[p].length<S.round}
+/* ゾロ目: 3ラウンドの数字が3つとも同じ（―は数えない） */
+function zorome(p){const a=S.acq[p];return a.length>=3&&a[0]!=null&&a[0]===a[1]&&a[1]===a[2]}
+function slotsOf(p){return zorome(p)?4:3}
 function sumOf(p){return S.acq[p].reduce((a,b)=>a+(b||0),0)}
 function pickTxt(v){return v==null?"―":String(v)}
 function isAuth(){return S.mode==="cpu"||S.host}
@@ -456,10 +464,10 @@ requestAnimationFrame(gaugeLoop);
 function paintDiff(){const d=S.totals[S.me]||0;const sc=$("sc");sc.textContent=d>0?"+"+d:d===0?"±0":String(d);sc.className="diff "+(d>0?"plus":d<0?"minus":"zero")}
 function paintPicks(id,p){
   const box=$(id);let h="";
-  for(let i=0;i<ROUNDS;i++){
+  for(let i=0;i<slotsOf(p);i++){
     const has=i<S.acq[p].length,v=S.acq[p][i];
     if(i)h+='<span class="plus">＋</span>';
-    const cur=S.phase==="draft"&&i===S.round-1&&!has;
+    const cur=S.phase==="draft"&&i===S.round-1&&!has&&(!S.bonus||S.bonus.p===p);
     const isNew=S.lastNew&&S.lastNew.i===i&&has;
     h+='<div class="pk'+(has?(v==null?" miss":" got"):"")+(cur?" cur":"")+(isNew?" new":"")+'">'+(has?pickTxt(v):"")+'</div>';
   }
@@ -476,7 +484,7 @@ function render(){
   $("num").textContent=S.endShow?"終了":S.n==null?"?":S.n;$("num").classList.toggle("end",!!S.endShow);
   $("gauge").classList.toggle("pressed",!!S.pressed[S.me]&&need(S.me)&&S.phase==="draft");
   const k=winK(),ep=endPct(k);
-  $("rinfo").firstChild.textContent=battle?"サイコロ勝負":"";$("rinfo").style.display=battle?"":"none";
+  const bon=!battle&&S.phase==="draft"&&S.bonus;$("rinfo").firstChild.textContent=battle?"サイコロ勝負":bon?"ボーナスラウンド（"+(S.bonus.p===S.me?"自分":"相手")+"）":"";$("rinfo").style.display=battle||bon?"":"none";
   paintStat(battle,k,ep);
   const g=$("grab");g.classList.remove("pressed");
   if(S.phase==="draft"){
@@ -494,7 +502,7 @@ function paintStat(battle,k,ep){
   $("stat").classList.toggle("off",!on);$("stat").style.display=battle?"none":"";
   if(!on){S.shownStage=0;return}
   const st=Math.ceil(k/3),pr=$("pRange"),pe=$("pEnd");
-  $("vRange").textContent="1〜"+rangeMax(k);$("vEnd").textContent=ep+"%";
+  $("vRange").textContent="1〜"+rangeMax(k);$("vEnd").textContent=ep+"%"+(S.bonus?" 固定":"");
   pe.className="pill h"+heat(ep);
   if(S.shownStage&&st!==S.shownStage){const c=st>S.shownStage?"up":"down";[pr,pe].forEach(e=>{e.classList.remove("up","down");void e.offsetWidth;e.classList.add(c)})}
   S.shownStage=st;
@@ -502,8 +510,8 @@ function paintStat(battle,k,ep){
 function numFx(cls){const el=$("num");el.classList.remove("pop","reset");void el.offsetWidth;if(cls)el.classList.add(cls)}
 
 /* ---------- engine (CPU mode or online host) ---------- */
-function snap(){return{n:S.n,win:S.win,round:S.round,rt:S.rt,acq:{1:S.acq[1].slice(),2:S.acq[2].slice()},p2:!!S.pressed[2],phase:S.phase}}
-function resetDraft(){S.endShow=false;S.round=1;S.n=null;S.win=0;S.rt=0;S.acq={1:[],2:[]};S.pressed={1:false,2:false};S.phase="draft";S.waiting=true;S.faces=null;S.rolls=null;S.battleDone=false;S.applied=false;S.winner=0;S.got=0;S.votes={};S.lastNew=null;
+function snap(){return{n:S.n,win:S.win,round:S.round,rt:S.rt,acq:{1:S.acq[1].slice(),2:S.acq[2].slice()},p2:!!S.pressed[2],phase:S.phase,bonus:S.bonus?{p:S.bonus.p,pct:S.bonus.pct}:null}}
+function resetDraft(){S.endShow=false;S.bonus=null;S.bonusQ=[];S.round=1;S.n=null;S.win=0;S.rt=0;S.acq={1:[],2:[]};S.pressed={1:false,2:false};S.phase="draft";S.waiting=true;S.faces=null;S.rolls=null;S.battleDone=false;S.applied=false;S.winner=0;S.got=0;S.votes={};S.lastNew=null;
   setDie($("dieOpp"),6,null);setDie($("dieMe"),6,null);$("dieOpp").className="die";$("dieMe").className="die";$("dfOpp").textContent="";$("dfMe").textContent="";$("dhMe").classList.remove("on");S.stopped={1:false,2:false};S.stopReq=false}
 function startMatch(){
   resetDraft();fxHide();
@@ -512,10 +520,10 @@ function startMatch(){
   banner("ドラフト開始");
   if(isAuth())later(()=>{cpuRoundInit();beginWindow()},D.START);
 }
-function winDur(k){return k<=3?D.T1:D.T2}       /* 1〜3回目（1〜3・0%）は2.4秒、4回目からは2.7秒。被った後も1回目から */
+function winDur(k){return S.bonus?D.TB:k<=3?D.T1:D.T2}       /* 1〜3回目（1〜3・0%）は2.4秒、4回目からは2.7秒。被った後も1回目から */
 function winK(){return S.rt+1}                 /* このラウンドの何回目か */
 function rangeMax(k){return 3*Math.ceil(k/3)}    /* 1〜3回目:3, 4〜6回目:6, 7〜9回目:9 ... */
-function endPct(k){return (Math.ceil(k/3)-1)*5}  /* 1〜3回目:0%, 4〜6回目:5%, 7〜9回目:10% ... */
+function endPct(k){return S.bonus?S.bonus.pct:(Math.ceil(k/3)-1)*5}  /* 1〜3回目:0%, 4〜6回目:5%, 7〜9回目:10% ... */
 function beginWindow(){
   if(S.phase!=="draft")return;
   S.win++;S.waiting=false;S.tickStart=performance.now();
@@ -541,10 +549,16 @@ function resolveWindow(){
   if(!need(1)&&!need(2)){
     if(ev.ended)pause+=D.PAUSE_EV;
     S.rt=0;S.n=null;
-    if(S.round>=ROUNDS){ev.end=true;S.phase="battle"}
+    if(S.round>=ROUNDS){
+      /* 3ラウンド後: ゾロ目の人はボーナスラウンド（2人ともなら合計が小さい方から、同じなら作成側から） */
+      if(!S.bonus&&S.round===ROUNDS)S.bonusQ=[1,2].filter(zorome).sort((a,b)=>sumOf(a)-sumOf(b)||a-b);
+      const nx=S.bonusQ.shift();
+      if(nx){S.round=ROUNDS+1;S.bonus={p:nx,pct:sumOf(nx)};ev.bonus=nx;pause+=D.PAUSE_RD;S.pressed={1:false,2:false};cpuBonusInit()}
+      else{S.bonus=null;ev.end=true;S.phase="battle"}
+    }
     else{S.round++;ev.next=S.round;pause+=D.PAUSE_RD;cpuRoundInit()}
   }
-  if(ev.t==="take"&&!ev.next&&!ev.end&&!ev.ended)pause=0;   /* 片方だけ先に獲得した時は止めずにそのまま次の回へ */
+  if(ev.t==="take"&&!ev.next&&!ev.end&&!ev.ended&&!ev.bonus)pause=0;   /* 片方だけ先に獲得した時は止めずにそのまま次の回へ */
   S.waiting=true;
   if(S.mode==="pvp")send({type:"res",ev:ev,st:snap()});
   applyEv(ev);render();
@@ -569,12 +583,20 @@ function applyEv(ev){
     d+=900;
   }
   if(ev.next)later(()=>banner("ラウンド "+ev.next),d?d-200:0);
+  if(ev.bonus)later(()=>banner("ボーナスラウンド"),d?d-200:0);
   if(ev.end)later(()=>banner("サイコロ勝負"),d?d-200:700);
 }
 /* CPU AI: 数字の幅も終わる確率も3回ごとに大きくなる。待てば大きい数字が出やすいが、未獲得のリスクも上がる */
 function cpuRoundInit(){const r=Math.random();S.cpuT=r<0.2?5:r<0.45?6:r<0.7?7:r<0.9?8:9}
+/* CPUのボーナスラウンド: 終わる確率が固定なので、期待値が一番高くなる取り方を先に計算しておく */
+function cpuBonusInit(){
+  if(!S.bonus)return;const p=S.bonus.pct/100,K=400,V=new Array(K+2).fill(0);
+  for(let k=K;k>=1;k--){const M=rangeMax(k),c=(1-p)*V[k+1];let e=0;for(let n=1;n<=M;n++)e+=Math.max(n,c);V[k]=e/M}
+  S.cpuBT=k=>k>K?0:(1-p)*V[k+1];
+}
 function cpuThink(){
   if(S.mode!=="cpu"||!need(2)||S.pressed[2]||S.n==null)return;
+  if(S.bonus){if(S.n>=S.cpuBT(winK())){const w=S.win;later(()=>{if(S.phase==="draft"&&!S.waiting&&S.win===w&&need(2))S.pressed[2]=true},winDur(1)*(0.1+Math.random()*0.7))}return}
   const n=S.n,k=winK(),M=rangeMax(k),E=endPct(k);
   let T=S.cpuT;
   const diff=sumOf(1)-sumOf(2);
@@ -618,7 +640,7 @@ function spinLoop(bid){
   S.spinN=(S.spinN||0)+1;if(S.spinN%3===0)sfxTick();
   later(()=>spinLoop(bid),50);
 }
-function shownOf(p){const f=S.faces[p];if(!(f>0))return 0;const v=S.shown&&S.shown[p];return v>=1&&v<=f?v:1+Math.floor(Math.random()*f)}
+function shownOf(p){if(!S.faces||S.phase!=="battle")return 0;const f=S.faces[p];if(!(f>0))return 0;const v=S.shown&&S.shown[p];return v>=1&&v<=f?v:1+Math.floor(Math.random()*f)}
 function tapStop(){
   if(S.phase!=="battle"||!S.faces||S.battleDone||S.stopped[S.me])return;
   const v=shownOf(S.me);sfxPress();
@@ -689,7 +711,7 @@ $("grab").onclick=()=>{
 /* ---------- online ---------- */
 function send(a){if(S.conn&&S.conn.open)S.conn.send(a)}
 function applySnap(st){
-  S.n=st.n;S.win=st.win;S.round=st.round;S.rt=st.rt;S.acq={1:st.acq[1].slice(),2:st.acq[2].slice()};S.phase=st.phase;
+  S.n=st.n;S.win=st.win;S.round=st.round;S.rt=st.rt;S.acq={1:st.acq[1].slice(),2:st.acq[2].slice()};S.phase=st.phase;S.bonus=st.bonus||null;
   if(st.p2)S.pressed[2]=true;
 }
 function onNet(m,conn){
