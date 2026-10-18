@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261018l">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261018l">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261018l">
+<meta name="draft-dice-rev" content="20261018m">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261018m">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261018m">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -119,7 +119,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .gauge.pressed .bg{stroke:#0d3a2a}
 .num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:Cinzel,serif;font-size:84px;font-weight:900;color:#f4ead0;line-height:1}
 .num.pop{animation:numPop .35s ease-out}
-.num.end{font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;font-size:52px;letter-spacing:.06em;color:#ff8a96;text-shadow:0 2px 10px #0008}
+.num.end{font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;font-size:52px;letter-spacing:.06em;padding-left:.15em;color:#ff8a96;text-shadow:0 2px 10px #0008}
 .num.reset{color:#ff8a96;animation:numShake .45s ease-out}
 @keyframes numPop{0%{transform:scale(.7)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
 @keyframes numShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
@@ -151,6 +151,10 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .die.win polygon{stroke:#f0d27a;stroke-width:6;filter:drop-shadow(0 0 8px #f0d27a)}
 .die.lose{filter:brightness(.42)}
 .dface{font-size:12px;font-weight:800;opacity:.85}
+#dieMe.tap{cursor:pointer}
+.dhint{font-size:14px;font-weight:900;color:#e8c36a;white-space:nowrap;visibility:hidden;animation:hintBlink 1s ease-in-out infinite}
+.dhint.on{visibility:visible}
+@keyframes hintBlink{0%,100%{opacity:1}50%{opacity:.35}}
 .fx{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:20;text-align:center;pointer-events:none;display:none;white-space:nowrap}
 .fx.on{display:block;animation:fxPop 1.5s ease-out forwards}
 .fx .t{font-size:46px;font-weight:900;letter-spacing:.08em;padding:8px 22px;border:3px solid currentColor;border-radius:16px;background:#0a1810ee;display:inline-block}
@@ -236,12 +240,12 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 <section id="rules"><h1>ルール</h1><div class="rules-body">
 <div class="ruleHead" style="margin-top:6px">ー　流れ　ー</div>
 <div class="ruleSteps">
-<div class="ruleStep"><span class="ruleNum">1</span><div class="ruleStepBody">2.5秒ごとに数字が<span class="ruleGold">ランダムに変わる</span></div></div>
-<div class="ruleStep"><span class="ruleNum">2</span><div class="ruleStepBody"><span class="ruleGold">獲得</span>を押すと、2.5秒たった時の数字をもらえる<br>（1ラウンドに1回）</div></div>
+<div class="ruleStep"><span class="ruleNum">1</span><div class="ruleStepBody">2.75秒ごとに数字が<span class="ruleGold">ランダムに変わる</span></div></div>
+<div class="ruleStep"><span class="ruleNum">2</span><div class="ruleStepBody"><span class="ruleGold">獲得</span>を押すと、2.75秒たった時の数字をもらえる<br>（1ラウンドに1回）</div></div>
 <div class="ruleStep"><span class="ruleNum">3</span><div class="ruleStepBody">ラウンドは<span class="ruleNo">終わる確率</span>で急に終わる<br>それまでに獲得しないと<span class="ruleNo">未獲得</span></div></div>
 <div class="ruleStep"><span class="ruleNum">4</span><div class="ruleStepBody">これを<span class="ruleGold">3ラウンド</span>くり返す</div></div>
 <div class="ruleStep"><span class="ruleNum">5</span><div class="ruleStepBody">もらった数字の合計が<span class="ruleGold">サイコロの面の数</span>になる<br>（未獲得は0）</div></div>
-<div class="ruleStep"><span class="ruleNum">6</span><div class="ruleStepBody">サイコロをふって<span class="ruleGold">目の大きい方</span>が勝ち<br>出た目×100ポイント<span class="ruleYes">獲得</span></div></div>
+<div class="ruleStep"><span class="ruleNum">6</span><div class="ruleStepBody">サイコロを<span class="ruleGold">タップで止めて</span><br><span class="ruleGold">目の大きい方</span>が勝ち<br>出た目×100ポイント<span class="ruleYes">獲得</span></div></div>
 </div>
 <div class="ruleHead">ー　数字　ー</div>
 <div class="ruleRow" style="flex-direction:column;gap:8px">
@@ -292,7 +296,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
     <div class="gauge" id="gauge"><svg viewBox="0 0 200 200"><circle class="bg" cx="100" cy="100" r="86"/><circle class="fg" id="gfg" cx="100" cy="100" r="86"/></svg><div class="num" id="num">1</div><div class="gsub" id="gsub">リセット</div><div class="fx" id="fx"><div class="t"></div><br><div class="s"></div></div></div>
     <div class="dice" id="dice">
       <div class="dcol"><div class="dlab">相手</div><div class="die" id="dieOpp"><svg viewBox="0 0 100 100"><polygon/></svg><b>?</b></div><div class="dface" id="dfOpp"></div></div>
-      <div class="dcol"><div class="dlab">自分</div><div class="die" id="dieMe"><svg viewBox="0 0 100 100"><polygon/></svg><b>?</b></div><div class="dface" id="dfMe"></div></div>
+      <div class="dcol"><div class="dlab">自分</div><div class="die" id="dieMe"><svg viewBox="0 0 100 100"><polygon/></svg><b>?</b></div><div class="dface" id="dfMe"></div><div class="dhint" id="dhMe">タップで止める</div></div>
     </div>
     <div class="rinfo" id="rinfo">ラウンド 1/3</div>
     <div class="stat" id="stat"><div class="pill" id="pRange"><small>出る数字</small><b id="vRange">1〜3</b></div><div class="pill h0" id="pEnd"><small>終わる確率</small><b id="vEnd">0%</b></div></div>
@@ -308,7 +312,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 <script>
 const $=id=>document.getElementById(id);
 /* durations (ms) */
-const D={T:2500,PAUSE_EV:1100,PAUSE_RD:1600,START:1400,ROLL:2500};
+const D={T:2750,PAUSE_EV:1100,PAUSE_RD:1600,START:1400,ROLL:2500,AUTOSTOP:10000};
 const ROUNDS=3;
 let audioCtx=null;
 let gameGen=0;
@@ -480,7 +484,7 @@ function render(){
     else if(S.pressed[S.me]){g.textContent="予約中";g.disabled=true;g.classList.add("pressed")}
     else{g.textContent="獲得";g.disabled=!!S.waiting}
   }else if(battle){
-    g.textContent=S.battleDone?"結果へ":"勝負中";g.disabled=!S.battleDone;
+    const mine=S.stopped&&S.stopped[S.me]||S.stopReq;g.textContent=S.battleDone?"結果へ":mine?"相手待ち":"ストップ";g.disabled=!S.battleDone&&!!mine;
   }else{g.textContent="獲得";g.disabled=true}
 }
 /* 出る数字・終わる確率のバッジ。3回ごとに上がる時はパッと光る */
@@ -500,7 +504,7 @@ function numFx(cls){const el=$("num");el.classList.remove("pop","reset");void el
 /* ---------- engine (CPU mode or online host) ---------- */
 function snap(){return{n:S.n,win:S.win,round:S.round,rt:S.rt,acq:{1:S.acq[1].slice(),2:S.acq[2].slice()},p2:!!S.pressed[2],phase:S.phase}}
 function resetDraft(){S.endShow=false;S.round=1;S.n=null;S.win=0;S.rt=0;S.acq={1:[],2:[]};S.pressed={1:false,2:false};S.phase="draft";S.waiting=true;S.faces=null;S.rolls=null;S.battleDone=false;S.applied=false;S.winner=0;S.got=0;S.votes={};S.lastNew=null;
-  setDie($("dieOpp"),6,null);setDie($("dieMe"),6,null);$("dieOpp").className="die";$("dieMe").className="die";$("dfOpp").textContent="";$("dfMe").textContent=""}
+  setDie($("dieOpp"),6,null);setDie($("dieMe"),6,null);$("dieOpp").className="die";$("dieMe").className="die";$("dfOpp").textContent="";$("dfMe").textContent="";$("dhMe").classList.remove("on");S.stopped={1:false,2:false};S.stopReq=false}
 function startMatch(){
   resetDraft();fxHide();
   $("again").textContent="もう1度";$("again").style.display="";
@@ -508,7 +512,7 @@ function startMatch(){
   banner("ドラフト開始");
   if(isAuth())later(()=>{cpuRoundInit();beginWindow()},D.START);
 }
-function winK(){return S.rt+1}                 /* このラウンドの何回目の2.5秒か */
+function winK(){return S.rt+1}                 /* このラウンドの何回目の2.75秒か */
 function rangeMax(k){return 3*Math.ceil(k/3)}    /* 1〜3回目:3, 4〜6回目:6, 7〜9回目:9 ... */
 function endPct(k){return (Math.ceil(k/3)-1)*5}  /* 1〜3回目:0%, 4〜6回目:5%, 7〜9回目:10% ... */
 function beginWindow(){
@@ -530,8 +534,8 @@ function resolveWindow(){
   S.pressed={1:false,2:false};
   S.rt++;
   let pause=ev.t==="none"?0:D.PAUSE_EV;
-  /* 終わる確率: その2.5秒の獲得を先に決めてから判定 */
-  if(ev.t==="kaburi")S.rt=0;   /* 被ったら 1〜3・0% に戻る（この2.5秒の終わる判定はしない） */
+  /* 終わる確率: その2.75秒の獲得を先に決めてから判定 */
+  if(ev.t==="kaburi")S.rt=0;   /* 被ったら 1〜3・0% に戻る（この2.75秒の終わる判定はしない） */
   else if((need(1)||need(2))&&Math.random()*100<endPct(k)){ev.ended=[1,2].filter(need);ev.ended.forEach(p=>S.acq[p].push(null))}
   if(!need(1)&&!need(2)){
     if(ev.ended)pause+=D.PAUSE_EV;
@@ -539,7 +543,7 @@ function resolveWindow(){
     if(S.round>=ROUNDS){ev.end=true;S.phase="battle"}
     else{S.round++;ev.next=S.round;pause+=D.PAUSE_RD;cpuRoundInit()}
   }
-  if(ev.t==="take"&&!ev.next&&!ev.end&&!ev.ended)pause=0;   /* 片方だけ先に獲得した時は止めずにそのまま次の2.5秒へ */
+  if(ev.t==="take"&&!ev.next&&!ev.end&&!ev.ended)pause=0;   /* 片方だけ先に獲得した時は止めずにそのまま次の2.75秒へ */
   S.waiting=true;
   if(S.mode==="pvp")send({type:"res",ev:ev,st:snap()});
   applyEv(ev);render();
@@ -581,49 +585,72 @@ function cpuThink(){
 /* dice battle */
 function startBattle(){
   if(!isAuth())return;
-  const F={1:sumOf(1),2:sumOf(2)},rolls=[];
-  const rl=f=>f>0?1+Math.floor(Math.random()*f):0;
-  rolls.push({1:rl(F[1]),2:rl(F[2])});   /* 1回だけ。同じ目は引き分け */
-  const first=Math.random()<0.5?1:2, extra=Math.round(800+Math.random()*400);   /* 先に止まるサイコロと、もう片方が遅れる時間 */
-  if(S.mode==="pvp")send({type:"battle",faces:F,rolls:rolls,first:first,extra:extra});
-  runBattle(F,rolls,first,extra);
+  const F={1:sumOf(1),2:sumOf(2)};
+  if(S.mode==="pvp")send({type:"battle",faces:F});
+  runBattle(F);
+  const bid=S.bid;
+  if(S.mode==="cpu")later(()=>hostStop(2,bid),1000+Math.random()*2000);   /* CPUは1〜3秒でタップ */
+  later(()=>{hostStop(1,bid);hostStop(2,bid)},D.AUTOSTOP);                  /* 長い間タップしない時は自動で止める */
 }
-function runBattle(F,rolls,first,extra){
-  S.first=first||1;S.extra=extra||1000;
-  S.phase="battle";S.faces=F;S.rolls=rolls;S.battleDone=false;S.waiting=true;
+/* サイコロ勝負: 自分のサイコロはタップで止める。目は止めた瞬間に作成側（CPU戦は自分）がランダムで決める */
+function runBattle(F){
+  S.bid=(S.bid||0)+1;
+  S.phase="battle";S.faces=F;S.rolls=[{1:null,2:null}];S.stopped={1:false,2:false};S.stopReq=false;S.settled=0;S.battleDone=false;S.waiting=true;
   const me=S.me,op=oppOf(me);
   setDie($("dieMe"),F[me],null);setDie($("dieOpp"),F[op],null);
   $("dfMe").textContent=F[me]+"面";$("dfOpp").textContent=F[op]+"面";
-  render();rollStep(0);
+  ["dieMe","dieOpp"].forEach(id=>{const el=$(id);el.className="die";el.querySelector("svg").style.transform="rotate(0deg)"});
+  $("dieMe").classList.add("tap");$("dhMe").classList.add("on");
+  render();spinLoop(S.bid);
 }
-function rollStep(i){
-  const r=S.rolls[i],F=S.faces,me=S.me;
-  const first=S.first||1,rr=f=>f>0?1+Math.floor(Math.random()*f):0;
-  let done=0;
-  const settle=()=>{
-    if(r[1]===r[2]){finishBattle(0,0);return}
-    const w=r[1]>r[2]?1:2,dm=$("dieMe"),dop=$("dieOpp");
-    (w===me?dm:dop).classList.add("win");(w===me?dop:dm).classList.add("lose");
-    finishBattle(w,r[w]);
+function dieOf(p){return p===S.me?$("dieMe"):$("dieOpp")}
+function spinLoop(bid){
+  if(S.bid!==bid||S.phase!=="battle")return;
+  const F=S.faces,rr=f=>f>0?1+Math.floor(Math.random()*f):0;let any=false;
+  [1,2].forEach(p=>{if(S.stopped[p])return;any=true;const el=dieOf(p),v=el.querySelector("svg");
+    const a=(parseFloat((v.style.transform.match(/-?[\d.]+/)||[0])[0])||0)+36;v.style.transition="transform 80ms linear";v.style.transform="rotate("+a+"deg)";setDie(el,F[p],rr(F[p]))});
+  if(!any)return;
+  S.spinN=(S.spinN||0)+1;if(S.spinN%2)sfxTick();
+  later(()=>spinLoop(bid),80);
+}
+function tapStop(){
+  if(S.phase!=="battle"||!S.faces||S.battleDone||S.stopped[S.me]||S.stopReq)return;
+  sfxPress();
+  if(S.mode==="pvp"&&!S.host){S.stopReq=true;$("dhMe").classList.remove("on");send({type:"stop",bid:S.bid});render();return}
+  hostStop(S.me,S.bid);
+}
+function hostStop(p,bid){
+  if(!isAuth()||S.bid!==bid||S.phase!=="battle"||!S.faces||S.stopped[p])return;
+  const f=S.faces[p],r=f>0?1+Math.floor(Math.random()*f):0;   /* 0面は必ず0 */
+  if(S.mode==="pvp")send({type:"dstop",p:p,r:r});
+  applyStop(p,r);
+}
+function applyStop(p,r){
+  if(S.phase!=="battle"||!S.faces||S.stopped[p])return;
+  S.stopped[p]=true;S.rolls[0][p]=r;
+  if(p===S.me){S.stopReq=false;$("dhMe").classList.remove("on");$("dieMe").classList.remove("tap")}
+  render();
+  /* 止めたら少しだけ減速して止まる（約0.45秒） */
+  const el=dieOf(p),v=el.querySelector("svg"),F=S.faces[p],rr=()=>F>0?1+Math.floor(Math.random()*F):0,bid=S.bid;
+  const steps=[60,90,130,170];let k=0;
+  const step=()=>{
+    if(S.bid!==bid)return;
+    const a=parseFloat((v.style.transform.match(/-?[\d.]+/)||[0])[0])||0;
+    if(k>=steps.length){
+      v.style.transition="transform .25s ease-out";v.style.transform="rotate("+Math.round(a/360)*360+"deg)";
+      setDie(el,F,r);tone(200,0.12,"triangle",0.08);
+      if(++S.settled===2)settleBattle();return;
+    }
+    const dl=steps[k++];v.style.transition="transform "+dl+"ms ease-out";v.style.transform="rotate("+(a+36)+"deg)";setDie(el,F,rr());sfxTick();later(step,dl);
   };
-  /* だんだん遅くなって止まる（間隔を少しずつのばす ease-out）。片方は先に止まり、もう片方は少し遅れて止まる */
-  const run=(p,total)=>{
-    const el=p===me?$("dieMe"):$("dieOpp"),v=el.querySelector("svg");el.className="die";
-    const ds=[];let d=45,sum=0;while(sum<2500){ds.push(d);sum+=d;d*=1.12}
-    const sc=total/sum;let ang=0,k=0;
-    const tick=()=>{
-      if(k>=ds.length){
-        v.style.transition="transform .25s ease-out";v.style.transform="rotate("+Math.round(ang/360)*360+"deg)";
-        setDie(el,F[p],r[p]);tone(200,0.12,"triangle",0.08);
-        if(++done===2)settle();return;
-      }
-      const dl=ds[k++]*sc;ang+=36;
-      v.style.transition="transform "+Math.round(dl)+"ms linear";v.style.transform="rotate("+ang+"deg)";
-      setDie(el,F[p],rr(F[p]));sfxTick();later(tick,dl);
-    };
-    tick();
-  };
-  run(first,D.ROLL);run(oppOf(first),D.ROLL+(S.extra||1000));
+  step();
+}
+function settleBattle(){
+  const r=S.rolls[0],me=S.me;
+  if(r[1]===r[2]){finishBattle(0,0);return}   /* 同じ目は引き分け */
+  const w=r[1]>r[2]?1:2;
+  dieOf(w).classList.add("win");dieOf(oppOf(w)).classList.add("lose");
+  finishBattle(w,r[w]);
 }
 function finishBattle(w,roll){
   if(S.applied)return;S.applied=true;
@@ -649,7 +676,7 @@ function goAgain(){if(S.phase!=="result")return;S.matchNo++;S.votes={};startMatc
 
 /* ---------- input ---------- */
 $("grab").onclick=()=>{
-  if(S.phase==="battle"){showResult();return}
+  if(S.phase==="battle"){if(S.battleDone)showResult();else tapStop();return}
   if(S.phase!=="draft"||S.waiting||!need(S.me)||S.pressed[S.me])return;
   S.pressed[S.me]=true;sfxPress();
   if(S.mode==="pvp"&&!S.host)send({type:"press",w:S.win,round:S.round});
@@ -673,7 +700,9 @@ function onNet(m,conn){
   if(m.type==="press"){if(S.host&&S.phase==="draft"&&need(2)&&(m.round==null||m.round===S.round))S.pressed[2]=true;return}
   if(m.type==="win"){if(S.host)return;applySnap(m.st);S.waiting=false;S.tickStart=performance.now();winFx();render();return}
   if(m.type==="res"){if(S.host)return;applySnap(m.st);S.waiting=true;applyEv(m.ev);if(!need(2))S.pressed[2]=false;render();return}
-  if(m.type==="battle"){if(S.host)return;runBattle(m.faces,m.rolls,m.first,m.extra);return}
+  if(m.type==="battle"){if(S.host)return;runBattle(m.faces);return}
+  if(m.type==="stop"){if(S.host&&(m.bid==null||m.bid===S.bid))hostStop(2,S.bid);return}
+  if(m.type==="dstop"){if(S.host)return;applyStop(m.p,m.r);return}
   if(m.type==="vote"){S.votes[m.who]=true;if(S.host&&S.votes[1]&&S.votes[2]){send({type:"goAgain"});goAgain()}return}
   if(m.type==="goAgain"){if(!S.host)goAgain();return}
 }
@@ -747,6 +776,7 @@ $("mk").onclick=()=>{const c=$("code").value.trim().replace(/\s+/g,"");if([...c]
 $("jn").onclick=()=>{const c=$("code").value.trim().replace(/\s+/g,"");if([...c].length<3){$("roomSt").textContent="3文字以上";return}S.host=false;S.me=2;boot(false,c)};
 $("again").onclick=()=>{if(S.mode!=="pvp"){goAgain();return}if(S.votes[S.me])return;S.votes[S.me]=true;$("again").textContent="相手待ち";send({type:"vote",who:S.me});if(S.host&&S.votes[1]&&S.votes[2]){send({type:"goAgain"});goAgain()}};
 $("home").onclick=goHome;
+$("dieMe").onclick=()=>tapStop();
 $("retry").onclick=()=>{const p=$("chatPanel");if(p)p.classList.remove("on");$("ask").classList.add("on")};
 $("askYes").onclick=goHome;
 $("askNo").onclick=()=>$("ask").classList.remove("on");
