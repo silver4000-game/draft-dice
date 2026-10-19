@@ -181,8 +181,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .cKeys{display:grid;grid-template-columns:repeat(3,64px);gap:8px;justify-content:center}
 .cKeys button{min-width:0;min-height:0;width:64px;height:44px;padding:0;font-size:20px;border-radius:10px}
 .cKeys button:disabled{opacity:.35}
-.cDice{display:flex;gap:22px;justify-content:center;align-items:flex-start}
-.cDice .die{width:100px;height:100px}.cDice .die b{font-size:38px}
+.cDice{display:flex;gap:22px;justify-content:center;align-items:flex-start}.cDice .die{width:100px;height:100px}.cDice .die b{font-size:38px}.cDice .cFace{font-size:16px;font-weight:900;color:#e8c36a;margin-top:2px;letter-spacing:.04em}.cDice .dhint{margin-top:2px;font-size:13px}
 .die.cMe polygon{stroke:#6aa8ff;stroke-width:5}.die.cOpp polygon{stroke:#ff5a6a;stroke-width:5}
 .die.cMe.win polygon{stroke:#6aa8ff;stroke-width:6;filter:drop-shadow(0 0 8px #f0d27a)}.die.cOpp.win polygon{stroke:#ff5a6a;stroke-width:6;filter:drop-shadow(0 0 8px #f0d27a)}
 .cCard{display:flex;flex-direction:column;align-items:center;justify-content:center;width:80px;height:97px;border:2px solid #c8b89a;border-radius:12px;background:#f7f1e6;box-shadow:0 2px 6px #0005;margin-bottom:4px}   /* 獲得した数字の枠と同じ白いカード */
@@ -805,8 +804,8 @@ function paintCon(){
       '<div class="cWait">'+(mp?"相手が選んでいます…":"")+'</div><div class="cHint">使った面の数だけ 最後のサイコロの面が減る</div>';
   }else if(c.stage==="dice"){
     h='<div class="cCard"><b>'+c.v+'</b></div><div class="cDice">'+
-      '<div class="dcol"><div class="dlab">相手 '+c.F[op]+'面</div><div class="die cOpp" id="cdOpp"><svg viewBox="0 0 100 100"><polygon/></svg><b>?</b></div></div>'+
-      '<div class="dcol"><div class="dlab">自分 '+c.F[me]+'面</div><div class="die cMe tap" id="cdMe"><svg viewBox="0 0 100 100"><polygon/></svg><b>?</b></div><div class="dhint" id="cdHint">タップで止める</div></div></div><div class="cRes" id="cRes"></div>';
+      '<div class="dcol"><div class="die cOpp" id="cdOpp"><svg viewBox="0 0 100 100"><polygon/></svg><b>?</b></div><div class="cFace" id="cfOpp">'+c.F[op]+'面</div></div>'+
+      '<div class="dcol"><div class="die cMe tap" id="cdMe"><svg viewBox="0 0 100 100"><polygon/></svg><b>?</b></div><div class="cFace" id="cfMe">'+c.F[me]+'面</div><div class="dhint" id="cdHint">タップで止める</div></div></div><div class="cRes" id="cRes"></div>';
   }else if(c.stage==="done"){
     h='<div class="cTitle">'+(c.w===me?"相手が譲った":"譲った")+'</div><div class="cNum">'+c.v+'</div><div class="cSub">'+(c.w===me?"自分がもらう":"&nbsp;")+'</div>';   /* 自分が譲った時の「相手がもらう」は出さない（行は残してレイアウトを動かさない） */
   }
@@ -833,7 +832,7 @@ function conDicePaint(){
   const c=S.con;if(!c||c.stage!=="dice")return;const me=S.me,op=oppOf(me),dm=$("cdMe"),dO=$("cdOpp"),rs=$("cRes"),hn=$("cdHint");if(!dm||!dO||!rs)return;
   [[me,dm],[op,dO]].forEach(([p,el])=>{if(c.cur[p]!=null)setDie(el,c.F[p],c.cur[p])});
   const live=!c.tie&&!c.w&&c.cur[me]==null,mine=live&&conCan(me);dm.classList.toggle("tap",mine);
-  if(hn){hn.textContent=mine?"タップで止める":"相手が先に止める";hn.classList.toggle("on",live);hn.classList.toggle("wait",live&&!mine)}
+  if(hn){const fs=firstStop(c.F);hn.textContent=fs===0?"タップで止める":(mine?"自分から止める":"相手から止める");hn.classList.toggle("on",live);hn.classList.toggle("wait",live&&!mine)}   /* 同じ面は従来どおり「タップで止める」。最終勝負のヒント文言は変えない */
   dm.classList.remove("win","lose");dO.classList.remove("win","lose");
   if(c.w){dm.classList.add(c.w===me?"win":"lose");dO.classList.add(c.w===me?"lose":"win")}
   const key=c.att+"|"+(c.tie?1:0)+"|"+c.w;
