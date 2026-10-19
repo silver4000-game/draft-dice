@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261019n">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261019n">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261019n">
+<meta name="draft-dice-rev" content="20261019o">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261019o">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261019o">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -571,7 +571,7 @@ function paintStat(battle,k,ep){
   $("stat").classList.toggle("off",!on);$("stat").style.display=battle?"none":"";
   if(!on){S.shownStage=0;return}
   const st=Math.ceil(k/3),pr=$("pRange"),pe=$("pEnd");
-  $("vRange").textContent="1〜"+rangeMax(k);$("vEnd").textContent=ep+"%"+(S.bonus?" 固定":"");
+  $("vRange").textContent=rangeLo()+"〜"+rangeHi(k);$("vEnd").textContent=ep+"%"+(S.bonus?" 固定":"");
   pe.className="pill h"+heat(ep);
   if(S.shownStage&&st!==S.shownStage){const c=st>S.shownStage?"up":"down";[pr,pe].forEach(e=>{e.classList.remove("up","down");void e.offsetWidth;e.classList.add(c)})}
   S.shownStage=st;
@@ -592,11 +592,13 @@ function startMatch(){
 function winDur(k){return S.bonus?D.TB:k<=3?D.T1:D.T2}       /* 1〜3回目（1〜3・0%）は2.4秒、4回目からは2.7秒。被った後も1回目から */
 function winK(){return S.rt+1}                 /* このラウンドの何回目か */
 function rangeMax(k){return 3*Math.ceil(k/3)}    /* 1〜3回目:3, 4〜6回目:6, 7〜9回目:9 ... */
+function rangeLo(){return S.bonus?3:1}           /* ボーナスラウンドは最小3 */
+function rangeHi(k){return S.bonus?3+rangeMax(k):rangeMax(k)}   /* ボーナス: 3〜6, 3〜9, 3〜12 ...（3回ごとに＋3） */
 function endPct(k){return S.bonus?S.bonus.pct:(Math.ceil(k/3)-1)*5}  /* 1〜3回目:0%, 4〜6回目:5%, 7〜9回目:10% ... */
 function beginWindow(){
   if(S.phase!=="draft")return;
   S.win++;S.waiting=false;S.tickStart=performance.now();
-  S.n=1+Math.floor(Math.random()*rangeMax(winK()));
+  {const lo=rangeLo(),hi=rangeHi(winK());S.n=lo+Math.floor(Math.random()*(hi-lo+1))}
   if(S.mode==="pvp")send({type:"win",st:snap()});
   cpuThink();winFx();render();
   later(resolveWindow,winDur(winK()));
@@ -665,7 +667,7 @@ function cpuRoundInit(){const r=Math.random();S.cpuT=r<0.2?5:r<0.45?6:r<0.7?7:r<
 /* CPUのボーナスラウンド: 終わる確率が固定なので、期待値が一番高くなる取り方を先に計算しておく */
 function cpuBonusInit(){
   if(!S.bonus)return;const p=S.bonus.pct/100,K=400,V=new Array(K+2).fill(0);
-  for(let k=K;k>=1;k--){const M=rangeMax(k),c=(1-p)*V[k+1];let e=0;for(let n=1;n<=M;n++)e+=Math.max(n,c);V[k]=e/M}
+  for(let k=K;k>=1;k--){const lo=3,M=3+rangeMax(k),c=(1-p)*V[k+1];let e=0;for(let n=lo;n<=M;n++)e+=Math.max(n,c);V[k]=e/(M-lo+1)}
   S.cpuBT=k=>k>K?0:(1-p)*V[k+1];
 }
 function cpuThink(){
