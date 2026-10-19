@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261019j">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261019j">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261019j">
+<meta name="draft-dice-rev" content="20261019k">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261019k">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261019k">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -110,7 +110,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 @keyframes pkPop{0%{transform:scale(.4)}60%{transform:scale(1.18)}100%{transform:scale(1)}}
 .plus{font-size:16px;font-weight:900;color:#e8c36a}
 .faces{min-width:64px;text-align:left;font-size:16px;font-weight:900;color:#e8c36a;white-space:nowrap}
-.faces b{font-size:22px;color:#fff}
+.faces b{font-size:28px;color:#fff}
 .pk.minus{color:#e10600}   /* マイナスカード: 取り合い勝負で使った面（1回ごとに1枚・赤い数字） */
 .picks.n5{gap:4px}.picks.n5 .pk{width:40px;height:52px;font-size:23px}.picks.n5 .plus{font-size:14px}.picks.n5 .faces{min-width:56px}
 .picks.n6{gap:2px}.picks.n6 .pk{width:33px;height:41px;font-size:19px;border-radius:8px}.picks.n6 .plus{font-size:13px}.picks.n6 .faces{min-width:54px}.picks.n6 .faces b{font-size:20px}
@@ -522,7 +522,7 @@ function paintPicks(id,p){
   }
   const pen=S.pen&&S.pen[p]||0,ml=(S.penL&&S.penL[p])||[];
   if(pen>0)h+='<span class="plus mns">－</span><div class="pk got minus">'+pen+'</div>';   /* マイナスのカードは1枚だけ（取り合いで使った面の合計） */
-  h+='<span class="faces">＝<b>'+Math.max(0,sumOf(p)-pen)+'</b>面</span>';
+  h+='<span class="faces">＝<b>'+Math.max(0,sumOf(p)-pen)+'</b></span>';
   const nc=slotsOf(p)+(pen>0?1:0);box.classList.remove("n5","n6","n7");if(nc>=5)box.classList.add("n"+Math.min(7,nc));
   box.innerHTML=h;
 }
