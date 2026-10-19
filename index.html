@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261019h">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261019h">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261019h">
+<meta name="draft-dice-rev" content="20261019i">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261019i">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261019i">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -521,9 +521,9 @@ function paintPicks(id,p){
     h+='<div class="pk'+(has?(v==null?" miss":" got"):"")+(cur?" cur":"")+(isNew?" new":"")+'">'+(has?pickTxt(v):"")+'</div>';
   }
   const pen=S.pen&&S.pen[p]||0,ml=(S.penL&&S.penL[p])||[];
-  ml.forEach(m=>{h+='<span class="plus mns">－</span><div class="pk got minus">'+m+'</div>'});   /* プラスのカードの後ろにマイナスのカード（取り合い1回ごと） */
+  if(pen>0)h+='<span class="plus mns">－</span><div class="pk got minus">'+pen+'</div>';   /* マイナスのカードは1枚だけ（取り合いで使った面の合計） */
   h+='<span class="faces">＝<b>'+Math.max(0,sumOf(p)-pen)+'</b>面</span>';
-  const nc=slotsOf(p)+ml.length;box.classList.remove("n5","n6","n7");if(nc>=5)box.classList.add("n"+Math.min(7,nc));
+  const nc=slotsOf(p)+(pen>0?1:0);box.classList.remove("n5","n6","n7");if(nc>=5)box.classList.add("n"+Math.min(7,nc));
   box.innerHTML=h;
 }
 function render(){
