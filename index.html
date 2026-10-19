@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261019s">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261019s">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261019s">
+<meta name="draft-dice-rev" content="20261019t">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261019t">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261019t">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -100,6 +100,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .board{flex:1;width:100%;border-radius:14px;margin:8px 0;background:radial-gradient(ellipse at center,#146047,#0a3328);border:3px solid #0a241c;display:flex;flex-direction:column;align-items:center;justify-content:space-between;position:relative;padding:12px 6px;overflow:hidden}
 .side{display:flex;flex-direction:column;align-items:center;gap:6px}
 .who{font-size:13px;font-weight:900;color:#e8c36a;letter-spacing:.1em}
+.board .who{visibility:hidden}   /* 盤の「相手」「自分」は出さない（場所はそのまま残して列を動かさない） */
 .picks{display:flex;align-items:center;gap:6px}
 .pk{width:46px;height:56px;border:2px dashed #e8c36a66;border-radius:10px;background:#0a241c55;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;color:#f4ead0;font-family:Cinzel,serif}
 .pk.cur{border-style:solid;border-color:#e8c36a;box-shadow:0 0 10px #e8c36a66}
@@ -351,7 +352,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 <section id="game">
 <div class="topbar"><div><b id="oppName">1戦目</b></div><div><button id="retry" type="button">やり直し</button></div></div>
 <div class="board">
-  <div class="side"><div class="who">相手</div><div class="picks" id="pkOpp"></div></div>
+  <div class="side"><div class="who" aria-hidden="true">相手</div><div class="picks" id="pkOpp"></div></div>
   <div class="center">
     <div class="gauge" id="gauge"><svg viewBox="0 0 200 200"><circle class="bg" cx="100" cy="100" r="86"/><circle class="fg" id="gfg" cx="100" cy="100" r="86"/><defs><mask id="rbMask" maskUnits="userSpaceOnUse" x="-20" y="-20" width="240" height="240"><circle id="rbM" cx="100" cy="100" r="86" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round"/></mask></defs><g class="rb" id="rbRing" mask="url(#rbMask)"></g></svg><div class="num" id="num">1</div><div class="gsub" id="gsub">リセット</div><div class="fx" id="fx"><div class="t"></div><br><div class="s"></div></div></div>
     <div class="dice" id="dice">
@@ -361,7 +362,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
     <div class="rinfo" id="rinfo">ラウンド 1/3</div>
     <div class="stat" id="stat"><div class="pill" id="pRange"><small>出る数字</small><b id="vRange">1〜3</b></div><div class="pill h0" id="pEnd"><small>終わる確率</small><b id="vEnd">0%</b></div></div>
   </div>
-  <div class="side"><div class="picks" id="pkMe"></div><div class="who">自分</div></div>
+  <div class="side"><div class="picks" id="pkMe"></div><div class="who" aria-hidden="true">自分</div></div>
   <div class="banner" id="banner"></div>
 </div>
 <div class="acts"><div class="tot"><span class="diff zero" id="sc">±0</span></div><button class="gold" id="grab" disabled>獲得</button></div>
