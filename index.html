@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261019l">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261019l">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261019l">
+<meta name="draft-dice-rev" content="20261019m">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261019m">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261019m">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -111,7 +111,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .plus{font-size:16px;font-weight:900;color:#e8c36a}
 .faces{min-width:64px;text-align:left;font-size:16px;font-weight:900;color:#e8c36a;white-space:nowrap}
 .faces b{font-size:28px;color:#fff}
-.faces .fv{position:relative;display:inline-block;top:-6px}.faces .fv b{display:block;line-height:1}.faces .fv i{position:absolute;left:50%;top:100%;transform:translateX(-50%);margin-top:1px;font-size:12px;line-height:1;font-style:normal;font-weight:900;color:#e8c36a}   /* 面は数字の下に小さく（横幅は増やさない） */
+.faces .fv{position:relative;display:inline-block;top:-13px;min-width:26px;text-align:center}.faces .fv b{display:block;line-height:1}.faces .fv i{position:absolute;left:50%;top:100%;transform:translateX(-50%);margin-top:0;font-size:26px;line-height:1;font-style:normal;font-weight:900;color:#e8c36a}   /* 面は数字の下にほぼ同じ大きさで（横幅は増やさない） */
 .pk.minus{color:#e10600}   /* マイナスカード: 取り合い勝負で使った面（1回ごとに1枚・赤い数字） */
 .picks.n5{gap:4px}.picks.n5 .pk{width:40px;height:52px;font-size:23px}.picks.n5 .plus{font-size:14px}.picks.n5 .faces{min-width:56px}
 .picks.n6{gap:2px}.picks.n6 .pk{width:33px;height:41px;font-size:19px;border-radius:8px}.picks.n6 .plus{font-size:13px}.picks.n6 .faces{min-width:54px}.picks.n6 .faces b{font-size:20px}
