@@ -559,7 +559,7 @@ function render(){
   paintDiff();
   paintPicks("pkOpp",oppOf(S.me));paintPicks("pkMe",S.me);S.lastNew=null;layoutTotals();
   const battle=(S.phase==="battle"&&!!S.faces)||S.phase==="result";  /* サイコロ勝負が始まるまではゲージと演出を出したまま */
-  $("gauge").style.display=battle?"none":"";
+  $("gauge").style.display=(battle||S.con)?"none":"";   /* 取り合い中は盤の範囲/確率を隠してサイコロ下の「○面」と重ならないように */
   paintCon();
   $("dice").classList.toggle("on",battle);
   {const live=S.phase==="battle"&&!!S.faces&&!S.battleDone&&!S.stopped[S.me],can=live&&canStop(S.me),h=$("dhMe");   /* 止められる時は「タップで止める」、相手が先の時は「相手が先に止める」 */
