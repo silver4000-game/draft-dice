@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261019m">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261019m">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261019m">
+<meta name="draft-dice-rev" content="20261019n">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261019n">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261019n">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -241,6 +241,51 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .rTag{font-size:13px;font-weight:900;padding:2px 8px;border:2px solid currentColor;border-radius:8px;background:#0a1810}
 .rTag.bonus{color:#e8c36a}.rTag.taken{color:#ff5a6a}.rTag.kaburi{color:#ffb347}.rTag.get{color:#7dffb0}
 
+/* RX-RULES */
+.xRow{display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:nowrap}
+.xk{flex:none;width:30px;height:38px;box-sizing:border-box;border-radius:7px;background:#f7f1e6;border:2px solid #6aa8ff;color:#1a1208;display:inline-flex;align-items:center;justify-content:center;font-family:Cinzel,serif;font-weight:900;font-size:18px}
+.xk.op{border-color:#ff5a6a}.xk.minus{color:#e10600}
+.xk.miss{background:#0a241c99;color:#e8c36a88;font-family:inherit;font-size:15px}
+.xp{font-size:13px;font-weight:900;color:#e8c36a}
+.xt{display:inline-flex;align-items:flex-start;font-size:13px;font-weight:900;color:#e8c36a;margin-left:2px}
+.xv{display:inline-flex;flex-direction:column;align-items:center;line-height:1;min-width:20px}.xv b{font-size:20px;color:#fff;line-height:1}.xv i{font-style:normal;font-size:18px;line-height:1;color:#e8c36a}
+.xCol{display:inline-flex;flex-direction:column;align-items:center;gap:4px}
+.xH{display:inline-flex;flex-direction:column;align-items:center;gap:2px}
+.xDl{font-size:11px;font-weight:800;color:#f4ead0;opacity:.9;white-space:nowrap}
+.xCap{font-size:11px;font-weight:900;color:#e8c36a;white-space:nowrap}
+.xVs{font-weight:900;color:#e8c36a;font-size:14px}
+.xPt{font-size:13px;font-weight:900;padding:2px 8px;border-radius:8px;border:2px solid currentColor;background:#0a1810;white-space:nowrap}.xPt.plus{color:#6aa8ff}.xPt.minus{color:#ff5a6a}.xPt.zero{color:#e8c36a}
+.rD.me polygon{stroke:#6aa8ff}.rD.op polygon{stroke:#ff5a6a}.rD.win polygon{filter:drop-shadow(0 0 4px #f0d27a)}.rD.zero b{color:#1a1208}
+.xSec{font-size:11px;color:#f4ead0}.xE{font-size:12px}.xDots{align-self:center;color:#e8c36a;font-weight:900}
+.rStages{align-items:flex-start}
+.xBtn{display:inline-flex;align-items:center;justify-content:center;height:30px;padding:0 10px;border-radius:9px;border:1.5px solid #e8c36a;background:linear-gradient(#4a3210,#2c1c08);color:#e8c36a;font-weight:900;font-size:13px;white-space:nowrap;box-sizing:border-box}
+.xBtn.gold{background:linear-gradient(#f0d27a,#c9a03a);color:#1a1208;border:0}.xBtn.res{background:linear-gradient(#7dffb0,#2fae6a);color:#062014;border:0}
+.xBtn.sm{height:24px;padding:0 6px;font-size:11px;border-radius:7px}
+.rG.end b{font-family:inherit;font-size:12px;color:#ff8a96}
+.xEq{font-weight:900;color:#e8c36a;font-size:14px}
+.xModal{background:#000c;border:1px solid #e8c36a55;border-radius:12px;padding:8px 14px;display:flex;flex-direction:column;align-items:center;gap:5px;align-self:center}
+.xmT{font-weight:900;color:#e8c36a;font-size:15px}.xmS{font-size:11px;color:#e8c36a;font-weight:800}
+.xCard{width:38px;height:46px;box-sizing:border-box;border:2px solid #c8b89a;border-radius:8px;background:#f7f1e6;color:#1a1208;display:inline-flex;align-items:center;justify-content:center;font-family:Cinzel,serif;font-weight:900;font-size:24px}
+.xBtns{display:flex;gap:8px;justify-content:center}
+.xTbl{display:flex;flex-direction:column;gap:6px;width:100%}
+.xTr{display:flex;align-items:center;gap:4px}
+.xTd{font-size:12px;font-weight:800;line-height:1.35;text-align:left;color:#f4ead0}
+.xSm{font-size:11px;opacity:.8;font-weight:700}
+.xPad{display:flex;flex-direction:column;align-items:center;gap:6px}
+.xDisp{width:126px;height:32px;box-sizing:border-box;border:2px solid #e8c36a;border-radius:8px;background:#0a1810e6;display:flex;align-items:center;justify-content:flex-end;gap:3px;padding:0 8px}.xDisp b{font-family:Cinzel,serif;font-size:22px;color:#fff;line-height:1}.xDisp span{font-size:12px;font-weight:900;color:#e8c36a}
+.xKeys{display:grid;grid-template-columns:repeat(3,38px);gap:5px}
+.xKey{height:26px;border:1.5px solid #e8c36a;border-radius:7px;background:linear-gradient(#4a3210,#2c1c08);color:#e8c36a;font-weight:900;font-size:13px;display:flex;align-items:center;justify-content:center}
+.xKeys span:empty{border:0;background:none}
+.xWho{font-size:11px;font-weight:900;color:#e8c36a}
+.xLegend{display:flex;flex-wrap:wrap;gap:6px 10px;justify-content:center;font-size:11px;font-weight:800;color:#f4ead0}.xLegend span{display:inline-flex;align-items:center;gap:3px}.xLegend .xk{width:20px;height:26px;font-size:12px;border-radius:5px}
+.xBlue,.xRed{font-size:12px;font-weight:900;padding:6px 12px;border-radius:7px;background:#f7f1e6;color:#1a1208}.xBlue{border:2.5px solid #6aa8ff}.xRed{border:2.5px solid #ff5a6a}
+.xPill{--c:#f0d27a;padding:3px 8px;border:2px solid var(--c);border-radius:10px;background:#0a1810e6;text-align:center;line-height:1.1}.xPill small{display:block;font-size:9px;font-weight:900;color:#e8c36a}.xPill b{display:block;font-size:14px;font-weight:900;color:var(--c)}
+.xRes{background:#1a140c;border:2px solid #e8c36a;border-radius:12px;padding:8px 10px;text-align:center;min-width:120px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.xrT{font-size:20px;font-weight:900;color:#ffb347;letter-spacing:.08em}.xrK{font-size:11px;font-weight:800;color:#e8c36a}.xrV{font-size:18px;font-weight:900;color:#6aa8ff;line-height:1.1}.xrS{font-size:10px;color:#e8c36a;margin:6px 0}
+.xRes .xBtns{margin-top:4px;gap:5px}
+/* /RX-RULES */
+
+
 #ask{display:none;position:fixed;inset:0;background:#000c;z-index:100;align-items:center;justify-content:center;flex-direction:column;gap:12px}
 #ask.on{display:flex}
 #chatBtn{position:fixed;z-index:80;min-height:46px;min-width:88px;font-size:15px;font-weight:800;padding:0 14px;border:2px solid #e8c36a;background:linear-gradient(#4a3210,#2c1c08);color:#e8c36a;border-radius:12px;display:none}
@@ -273,61 +318,30 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 
 <section id="rules"><h1>ルール</h1><div class="rules-body">
 <div class="ruleHead" style="margin-top:6px">ー　流れ　ー</div>
-<div class="ruleSteps">
-<div class="ruleStep"><span class="ruleNum">1</span><div class="ruleStepBody">最初の3回は2.4秒、そのあとは2.7秒ごとに<br>数字が<span class="ruleGold">ランダムに変わる</span></div></div>
-<div class="ruleStep"><span class="ruleNum">2</span><div class="ruleStepBody"><span class="ruleGold">獲得</span>を押すと、円がいっぱいになった時の数字をもらえる<br>（1ラウンドに1回）</div></div>
-<div class="ruleStep"><span class="ruleNum">3</span><div class="ruleStepBody">ラウンドは<span class="ruleNo">終わる確率</span>で急に終わる<br>それまでに獲得しないと<span class="ruleNo">未獲得</span></div></div>
-<div class="ruleStep"><span class="ruleNum">4</span><div class="ruleStepBody">これを<span class="ruleGold">3ラウンド</span>くり返す</div></div>
-<div class="ruleStep"><span class="ruleNum">5</span><div class="ruleStepBody">もらった数字の合計が<span class="ruleGold">サイコロの面の数</span>になる<br>（未獲得は0）</div></div>
-<div class="ruleStep"><span class="ruleNum">6</span><div class="ruleStepBody">サイコロを<span class="ruleGold">タップで止めて</span><br><span class="ruleGold">目の大きい方</span>が勝ち<br>出た目×100ポイント<span class="ruleYes">獲得</span></div></div>
-</div>
+<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="xCol"><div class="xRow"><span class="xk me ">5</span><span class="xp">＋</span><span class="xk me ">3</span><span class="xp">＋</span><span class="xk me ">8</span><span class="xp">－</span><span class="xk me minus">4</span><span class="xt">＝<span class="xv"><b>12</b><i>面</i></span></span></div><span class="ruleArr">↓</span><span class="xH"><span class="rD me"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 83.9,16.1 98.0,50.0 83.9,83.9 50.0,98.0 16.1,83.9 2.0,50.0 16.1,16.1"/></svg><b>9</b></span><span class="xDl">12面</span></span></div><div class="ruleTxt"><span class="ruleGold">3ラウンド</span>　数字を<span class="ruleGold">1つずつ</span>とる<br>合計 － マイナス ＝ <span class="ruleGold">サイコロの面</span></div></div>
+<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt"><span class="xCol"><span class="rD me win"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 83.9,16.1 98.0,50.0 83.9,83.9 50.0,98.0 16.1,83.9 2.0,50.0 16.1,16.1"/></svg><b>12</b></span><span class="xCap">自分 12</span></span><span class="xVs">VS</span><span class="xCol"><span class="rD op lose"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 83.9,16.1 98.0,50.0 83.9,83.9 50.0,98.0 16.1,83.9 2.0,50.0 16.1,16.1"/></svg><b>6</b></span><span class="xCap">相手 6</span></span></div><div class="ruleArt"><span class="xPt plus">勝ち ＋1200</span><span class="xPt minus">負け －1200</span></div><div class="ruleTxt"><span class="ruleGold">目が大きい方</span>が勝ち<br>勝った人の目×100 を<span class="ruleYes">もらう</span><br>負けた人は 同じだけ<span class="ruleNo">へる</span></div></div>
 <div class="ruleHead">ー　数字　ー</div>
-<div class="ruleRow" style="flex-direction:column;gap:8px">
-<div class="rStages">
-<div class="rStage"><span>1〜3回目</span><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#e8c36a" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>2</b></span><span class="rg">1〜3</span><span class="re z">終わる確率 0%</span></div>
-<div class="rStage"><span>4〜6回目</span><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#e8c36a" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>5</b></span><span class="rg">1〜6</span><span class="re">終わる確率 5%</span></div>
-<div class="rStage"><span>7〜9回目</span><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#e8c36a" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>8</b></span><span class="rg">1〜9</span><span class="re">終わる確率 10%</span></div>
-</div>
-<div class="ruleTxt">3回ごとに 数字は<span class="ruleGold">大きく</span>なり<br>終わる確率も<span class="ruleNo">＋5%</span>ずつ上がる</div>
-</div>
+<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="rStages"><div class="rStage"><span>1〜3回目</span><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#e8c36a" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>2</b></span><span class="rg">1〜3</span><span class="xSec">2.4秒</span><span class="xE" style="color:#7dffb0">0%</span></div><div class="rStage"><span>4〜6回目</span><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#e8c36a" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>5</b></span><span class="rg">1〜6</span><span class="xSec">2.7秒</span><span class="xE" style="color:#ffe066">5%</span></div><div class="rStage"><span>7〜9回目</span><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#e8c36a" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>8</b></span><span class="rg">1〜9</span><span class="xSec">2.7秒</span><span class="xE" style="color:#ffe066">10%</span></div><span class="xDots">…</span></div><div class="ruleTxt">円が1周するごとに 数字が1つ出る<br>3回ごとに 数字は<span class="ruleGold">＋3</span>　終わる確率は<span class="ruleNo">＋5%</span><br>上限なし（<span class="ruleNo">61回目</span>には必ず終わる）</div></div>
 <div class="ruleHead">ー　獲得　ー</div>
-<div class="ruleRow" style="flex-direction:column;gap:8px">
-<div class="ruleArt"><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#7dffb0" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="100.53"/></svg><b>5</b></span><span class="rBtn">獲得</span><span class="ruleArr">→</span><span class="rPk">5</span></div>
-<div class="ruleTxt">押すと<span class="ruleGold">円がいっぱいになった時</span>の数字がもらえる<br>2人とも獲得したら<span class="ruleGold">次のラウンド</span>へ</div>
-</div>
-<div class="ruleHead">ー　相手獲得　ー</div>
-<div class="ruleRow" style="flex-direction:column;gap:8px">
-<div class="ruleArt"><span class="rTag taken">相手獲得</span></div>
-<div class="ruleTxt">相手が先に獲得しても<br>自分は<span class="ruleYes">まだ選べる</span></div>
-</div>
-<div class="ruleHead">ー　被った　ー</div>
-<div class="ruleRow" style="flex-direction:column;gap:8px">
-<div class="ruleArt"><span class="rTag kaburi">被った</span></div>
-<div class="ruleTxt">2人が同じ数字で獲得を押すと<br><span class="ruleGold">取り合い勝負</span>になる<br>2人とも譲ったら<span class="ruleNo">どちらももらえない</span><br>数字と終わる確率は<span class="ruleGold">最初（1〜3・0%）</span>に戻る<br>ラウンドはそのまま続く</div>
-</div>
-<div class="ruleHead">ー　取り合い勝負　ー</div>
-<div class="ruleRow" style="flex-direction:column;gap:8px">
-<div class="ruleArt"><span class="rBtn" style="background:linear-gradient(#4a3210,#2c1c08);color:#e8c36a;border:1.5px solid #e8c36a">ゆずる</span><span class="rBtn">取り合う</span></div>
-<div class="ruleTxt">かぶったら <span class="ruleGold">勝負する</span>か <span class="ruleGold">譲る</span>か選ぶ<br>譲ったら 相手がその数字をもらう<br>どちらも勝負なら <span class="ruleGold">好きな面のサイコロ</span>で勝負<br>負けた人は そのラウンド<span class="ruleNo">未獲得</span><br>使った面の数だけ <span class="ruleNo">最後のサイコロの面が減る</span></div>
-</div>
-<div class="ruleHead">ー　未獲得　ー</div>
-<div class="ruleRow" style="flex-direction:column;gap:8px">
-<div class="ruleArt"><span class="rTag taken">取れなかった</span><span class="ruleArr">→</span><span class="rPk miss">―</span></div>
-<div class="ruleTxt">獲得する前にラウンドが終わると<br><span class="ruleNo">未獲得</span>（0として数える）<br>0面のサイコロは<span class="ruleNo">必ず0</span></div>
-</div>
+<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt"><span class="xBtn gold">獲得</span><span class="ruleArr">→</span><span class="xBtn res">予約中</span><span class="ruleArr">→</span><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#7dffb0" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>5</b></span><span class="ruleArr">→</span><span class="xk me ">5</span></div><div class="ruleTxt">円が<span class="ruleGold">いっぱいになった時</span>の数字がもらえる<br>取り消しはできない　<span class="ruleGold">1ラウンドに1つ</span></div></div>
+<div class="ruleHead">ー　終了　ー</div>
+<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt"><span class="rG end"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#e8c36a" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>終了</b></span><span class="ruleArr">→</span><span class="xk miss me">―</span><span class="xEq">＝ 0</span></div><div class="ruleTxt">終わる確率で ラウンドが<span class="ruleNo">急に終わる</span><br>まだとっていない人は <span class="ruleNo">「―」</span>（0）</div></div>
+<div class="ruleHead">ー　取り合い　ー</div>
+<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="xModal"><div class="xmT">被った！</div><span class="xCard">7</span><div class="xBtns"><span class="xBtn">ゆずる</span><span class="xBtn gold">取り合う</span></div><div class="xmS">残り 10秒</div></div><div class="ruleTxt">2人が<span class="ruleGold">同じ回</span>に獲得すると 選ぶ<br>10秒で選ぶ（選ばないと<span class="ruleGold">ゆずる</span>）</div></div>
+<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="xTbl"><div class="xTr"><span class="xBtn sm">ゆずる</span><span class="xBtn sm">ゆずる</span><span class="ruleArr">→</span><span class="xTd">だれも もらえない<br><span class="xSm">1〜3・0% にもどる</span></span></div><div class="xTr"><span class="xBtn sm gold">取り合う</span><span class="xBtn sm">ゆずる</span><span class="ruleArr">→</span><span class="xTd">取り合う人が もらう<br><span class="xSm">ゆずった人は あとでとれる</span></span></div><div class="xTr"><span class="xBtn sm gold">取り合う</span><span class="xBtn sm gold">取り合う</span><span class="ruleArr">→</span><span class="xTd">サイコロで 勝負<br><span class="xSm">↓</span></span></div></div></div>
+<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt"><div class="xPad"><div class="xDisp"><b>15</b><span>面</span></div><div class="xKeys"><span class="xKey">1</span><span class="xKey">2</span><span class="xKey">3</span><span class="xKey">4</span><span class="xKey">5</span><span class="xKey">6</span><span class="xKey">7</span><span class="xKey">8</span><span class="xKey">9</span><span class="xKey">C</span><span class="xKey">0</span><span></span></div><span class="xBtn gold">決定</span></div></div><div class="ruleTxt">面の数を えらぶ（<span class="ruleGold">1〜99</span>・15秒）<br>時間切れ ＝ 入れた数（空なら1）</div></div>
+<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="xCol"><span class="xCard">7</span><div class="ruleArt" style="gap:22px"><span class="xCol"><span class="xCap">相手 8面</span><span class="rD op lose"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,26.0 91.6,74.0 50.0,98.0 8.4,74.0 8.4,26.0"/></svg><b>3</b></span></span><span class="xCol"><span class="xCap">自分 15面</span><span class="rD me win"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 83.9,16.1 98.0,50.0 83.9,83.9 50.0,98.0 16.1,83.9 2.0,50.0 16.1,16.1"/></svg><b>11</b></span></span></div></div><div class="ruleTxt"><span class="ruleGold">目が大きい方</span>が勝ち<br>同じ目は ふりなおし（3回同じなら<span class="ruleGold">抽選</span>）</div></div>
+<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="xCol"><span class="xWho">相手</span><div class="xRow"><span class="xk miss op">―</span><span class="xp">－</span><span class="xk op minus">8</span></div><div class="xRow"><span class="xk me ">7</span><span class="xp">－</span><span class="xk me minus">15</span></div><span class="xWho">自分</span></div><div class="ruleTxt">勝った人が 数字をもらう<br>負けた人は そのラウンド<span class="ruleNo">「―」</span><br><span class="ruleNo">2人とも</span> 使った面が<span class="ruleNo">マイナス</span>になる</div></div>
 <div class="ruleHead">ー　ゾロ目ボーナス　ー</div>
-<div class="ruleRow" style="flex-direction:column;gap:8px">
-<div class="ruleArt"><span class="rPk">2</span><span class="ruleArr">＋</span><span class="rPk">2</span><span class="ruleArr">＋</span><span class="rPk">2</span><span class="ruleArr">→</span><span class="rTag bonus">6% 固定</span></div>
-<div class="ruleTxt">3つとも同じ数字なら<br>自分だけ<span class="ruleGold">ボーナスラウンド</span>へ<br>2秒ごとに数字が変わる<br>終わる確率は<span class="ruleNo">ゾロ目の合計％で固定</span></div>
-</div>
-<div class="ruleHead">ー　例　ー</div>
-<div class="ruleRow" style="flex-direction:column;gap:6px">
-<div class="rWho">相手</div>
-<div class="ruleArt"><span class="rPk miss">―</span><span class="ruleArr">＋</span><span class="rPk">8</span><span class="ruleArr">＋</span><span class="rPk miss">―</span><span class="ruleArr">＝</span><span class="rD lose"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,26.0 91.6,74.0 50.0,98.0 8.4,74.0 8.4,26.0"/></svg><b>5</b></span><span class="ruleGold" style="font-size:12px">8面</span></div>
-<div class="ruleArt"><span class="rPk">3</span><span class="ruleArr">＋</span><span class="rPk miss">―</span><span class="ruleArr">＋</span><span class="rPk">4</span><span class="ruleArr">＝</span><span class="rD win"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,26.0 91.6,74.0 50.0,98.0 8.4,74.0 8.4,26.0"/></svg><b>6</b></span><span class="ruleGold" style="font-size:12px">7面</span></div>
-<div class="rWho">自分</div>
-<div class="ruleTxt" style="margin-top:4px">8面と7面のサイコロで勝負<br>出た目が 5 と 6 なので自分の勝ち<br>6×100＝<span class="ruleYes">600ポイント</span>獲得</div>
-</div>
+<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt"><span class="xk me ">2</span><span class="xp">＋</span><span class="xk me ">2</span><span class="xp">＋</span><span class="xk me ">2</span><span class="ruleArr">→</span><span class="rG"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><path d="M90.00 50.00A40 40 0 0 1 88.45 61.03" fill="none" stroke="hsl(0,95%,62%)" stroke-width="10"/><path d="M89.39 56.95A40 40 0 0 1 85.95 67.53" fill="none" stroke="hsl(10,95%,62%)" stroke-width="10"/><path d="M87.59 63.68A40 40 0 0 1 82.36 73.51" fill="none" stroke="hsl(20,95%,62%)" stroke-width="10"/><path d="M84.64 70.00A40 40 0 0 1 77.79 78.77" fill="none" stroke="hsl(30,95%,62%)" stroke-width="10"/><path d="M80.64 75.71A40 40 0 0 1 72.37 83.16" fill="none" stroke="hsl(40,95%,62%)" stroke-width="10"/><path d="M75.71 80.64A40 40 0 0 1 66.27 86.54" fill="none" stroke="hsl(50,95%,62%)" stroke-width="10"/><path d="M70.00 84.64A40 40 0 0 1 59.68 88.81" fill="none" stroke="hsl(60,95%,62%)" stroke-width="10"/><path d="M63.68 87.59A40 40 0 0 1 52.79 89.90" fill="none" stroke="hsl(70,95%,62%)" stroke-width="10"/><path d="M56.95 89.39A40 40 0 0 1 45.82 89.78" fill="none" stroke="hsl(80,95%,62%)" stroke-width="10"/><path d="M50.00 90.00A40 40 0 0 1 38.97 88.45" fill="none" stroke="hsl(90,95%,62%)" stroke-width="10"/><path d="M43.05 89.39A40 40 0 0 1 32.47 85.95" fill="none" stroke="hsl(100,95%,62%)" stroke-width="10"/><path d="M36.32 87.59A40 40 0 0 1 26.49 82.36" fill="none" stroke="hsl(110,95%,62%)" stroke-width="10"/><path d="M30.00 84.64A40 40 0 0 1 21.23 77.79" fill="none" stroke="hsl(120,95%,62%)" stroke-width="10"/><path d="M24.29 80.64A40 40 0 0 1 16.84 72.37" fill="none" stroke="hsl(130,95%,62%)" stroke-width="10"/><path d="M19.36 75.71A40 40 0 0 1 13.46 66.27" fill="none" stroke="hsl(140,95%,62%)" stroke-width="10"/><path d="M15.36 70.00A40 40 0 0 1 11.19 59.68" fill="none" stroke="hsl(150,95%,62%)" stroke-width="10"/><path d="M12.41 63.68A40 40 0 0 1 10.10 52.79" fill="none" stroke="hsl(160,95%,62%)" stroke-width="10"/><path d="M10.61 56.95A40 40 0 0 1 10.22 45.82" fill="none" stroke="hsl(170,95%,62%)" stroke-width="10"/><path d="M10.00 50.00A40 40 0 0 1 11.55 38.97" fill="none" stroke="hsl(180,95%,62%)" stroke-width="10"/><path d="M10.61 43.05A40 40 0 0 1 14.05 32.47" fill="none" stroke="hsl(190,95%,62%)" stroke-width="10"/><path d="M12.41 36.32A40 40 0 0 1 17.64 26.49" fill="none" stroke="hsl(200,95%,62%)" stroke-width="10"/><path d="M15.36 30.00A40 40 0 0 1 22.21 21.23" fill="none" stroke="hsl(210,95%,62%)" stroke-width="10"/><path d="M19.36 24.29A40 40 0 0 1 27.63 16.84" fill="none" stroke="hsl(220,95%,62%)" stroke-width="10"/><path d="M24.29 19.36A40 40 0 0 1 33.73 13.46" fill="none" stroke="hsl(230,95%,62%)" stroke-width="10"/><path d="M30.00 15.36A40 40 0 0 1 37.64 11.96" fill="none" stroke="hsl(240,95%,62%)" stroke-width="10"/></svg><b>3</b></span><span class="xPill" style="--c:#ffe066"><small>終わる確率</small><b>6% 固定</b></span></div><div class="ruleTxt">3つとも同じ数字（―はダメ）なら<br><span class="ruleGold">自分だけ ラウンド4</span>（2秒ごと）<br>終わる確率は <span class="ruleNo">合計％で固定</span><br><span class="xSm">2人ともなら 合計が小さい方から<br>（同じなら 部屋を作った人から）</span></div></div>
+<div class="ruleHead">ー　カードの見方　ー</div>
+<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="xCol"><div class="xRow"><span class="xk me ">9</span><span class="xp">＋</span><span class="xk me ">8</span><span class="xp">＋</span><span class="xk miss me">―</span><span class="xp">－</span><span class="xk me minus">5</span><span class="xt">＝<span class="xv"><b>12</b><i>面</i></span></span></div><div class="xLegend"><span><span class="xk me ">9</span>＝とった数字</span><span><span class="xk miss me">―</span>＝0</span><span><span class="xk me minus">5</span>＝マイナス</span></div></div><div class="ruleTxt">マイナスは<span class="ruleGold">1枚だけ</span>（取り合いで使った面の合計）<br>0ならマイナスは出ない<br>＝の右が<span class="ruleGold">サイコロの面</span>（0より下にならない）</div></div>
+<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt"><span class="xBlue">自分</span><span class="xRed">相手</span></div><div class="ruleTxt">自分のカードは<span style="color:#6aa8ff;font-weight:900">青</span>　相手は<span style="color:#ff5a6a;font-weight:900">赤</span></div></div>
+<div class="ruleHead">ー　サイコロ勝負　ー</div>
+<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt" style="gap:22px"><span class="xCol"><span class="xCap">相手</span><span class="rD op lose"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 83.9,16.1 98.0,50.0 83.9,83.9 50.0,98.0 16.1,83.9 2.0,50.0 16.1,16.1"/></svg><b>6</b></span><span class="xDl">15面</span></span><span class="xCol"><span class="xCap">自分</span><span class="rD me win"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 83.9,16.1 98.0,50.0 83.9,83.9 50.0,98.0 16.1,83.9 2.0,50.0 16.1,16.1"/></svg><b>12</b></span><span class="xDl">24面−5＝19面</span></span></div><div class="ruleTxt">数字は<span class="ruleGold">0.05秒ごと</span>に ランダムに変わる<br><span class="ruleGold">タップで止める</span>（10秒で自動で止まる）</div></div>
+<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt"><span class="xCol"><span class="rD op"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,74.0 8.4,74.0"/></svg><b>4</b></span><span class="xCap">相手</span></span><span class="xEq">＝</span><span class="xCol"><span class="rD me"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,26.0 91.6,74.0 50.0,98.0 8.4,74.0 8.4,26.0"/></svg><b>4</b></span><span class="xCap">自分</span></span><span class="ruleArr">→</span><span class="xPt zero">引き分け ±0</span></div><div class="ruleArt"><span class="xCol"><span class="rD op zero"><svg viewBox="0 0 100 100"><polygon points="85.4,85.4 14.6,85.4 14.6,14.6 85.4,14.6"/></svg><b>0</b></span><span class="xCap">0面</span></span><span class="ruleArr">→</span><span class="xTd">回らない　いつも 0</span></div><div class="ruleTxt">同じ目は<span class="ruleGold">引き分け</span>（ふりなおしなし・0点）</div></div>
+<div class="ruleHead">ー　結果　ー</div>
+<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt"><div class="xRes"><div class="xrT">Win</div><div class="xrK">今回</div><div class="xrV">+1200</div><div class="xrK">今までの通算</div><div class="xrV">+1500</div><div class="xBtns"><span class="xBtn sm">もう1度</span><span class="xBtn sm">やめる</span></div></div><div class="xRes cut"><div class="xrT" style="color:#ff5a6a">切断</div><div class="xrS">相手との接続が切れました</div><div class="xBtns"><span class="xBtn sm">やめる</span></div></div></div><div class="ruleTxt">Win / Lose / Draw と 点数<br><span class="ruleGold">通算</span>は ページを読みこみ直すと<span class="ruleNo">0</span><br>対人戦で切れたら「切断」（もう1度なし）</div></div>
 </div><button id="rulesBack">戻る</button></section>
 
 <section id="room"><h1>部屋</h1><p class="hint">合言葉は3文字以上</p><input id="code" maxlength="8" placeholder="あいことば" /><div class="row" style="margin-top:10px"><button id="mk">部屋を作る</button><button id="jn">入る</button></div><p class="hint" id="roomSt"></p><button id="roomBack" style="margin-top:14px">戻る</button></section>
