@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261019p">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261019p">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261019p">
+<meta name="draft-dice-rev" content="20261019q">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261019q">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261019q">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -160,9 +160,9 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 #dieMe polygon{stroke:#6aa8ff;stroke-width:5}#dieOpp polygon{stroke:#ff5a6a;stroke-width:5}   /* 自分=青・相手=赤の枠 */
 #dieMe.win polygon{stroke:#6aa8ff;stroke-width:6;filter:drop-shadow(0 0 8px #f0d27a)}#dieOpp.win polygon{stroke:#ff5a6a;stroke-width:6;filter:drop-shadow(0 0 8px #f0d27a)}
 .dface{font-size:12px;font-weight:800;opacity:.85}
-#dieMe.tap{cursor:pointer}
+#dieMe.tap,#cdMe.tap{cursor:pointer}
 .dhint{font-size:14px;font-weight:900;color:#e8c36a;white-space:nowrap;visibility:hidden;animation:hintBlink 1s ease-in-out infinite}
-.dhint.on{visibility:visible}
+.dhint.on{visibility:visible}.dhint.wait{animation:none;opacity:.75;color:#f4ead0;font-size:13px}
 @keyframes hintBlink{0%,100%{opacity:1}50%{opacity:.35}}
 /* 取り合い勝負 */
 .con{display:none;position:fixed;inset:0;background:#000c;z-index:100;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center}   /* やり直しの確認と同じ暗い全画面 */
@@ -501,7 +501,7 @@ function fx(kind,t,s){const el=$("fx");el.className="fx "+kind;el.querySelector(
 function fxHide(){const el=$("fx");if(el)el.className="fx"}
 
 /* polygon die shape: more faces -> more sides */
-function polySides(n){return n<=4?3:n<=6?4:n<=10?6:n<=20?8:10}
+function polySides(n){return 6}   /* サイコロはすべて六角形（前は面の数で三角〜十角） */
 function polyPts(n){const k=polySides(n),pts=[];const rot=k===4?Math.PI/4:-Math.PI/2;const r=k===4?50:48;for(let i=0;i<k;i++){const a=rot+i*2*Math.PI/k;pts.push((50+r*Math.cos(a)).toFixed(1)+","+(50+r*Math.sin(a)).toFixed(1))}return pts.join(" ")}
 function setDie(el,faces,val){el.querySelector("polygon").setAttribute("points",polyPts(faces||6));el.querySelector("b").textContent=val==null?"?":val}
 
@@ -542,14 +542,26 @@ function paintPicks(id,p){
   const nc=slotsOf(p)+(pen>0?1:0);box.classList.remove("n5","n6","n7");if(nc>=5)box.classList.add("n"+Math.min(7,nc));
   box.innerHTML=h;
 }
+/* 合計（N／面）は ＝の右端と盤の右端のまん中に置く（＝とカードは動かさない） */
+function layoutTotals(){
+  const bd=document.querySelector("#game .board");if(!bd||!$("game").classList.contains("on"))return;
+  const b=bd.getBoundingClientRect();if(!b.width)return;const right=b.left+bd.clientLeft+bd.clientWidth;
+  ["pkOpp","pkMe"].forEach(id=>{const f=$(id).querySelector(".faces"),fv=f&&f.querySelector(".fv");if(!fv||!f.firstChild)return;
+    fv.style.left="0px";const rg=document.createRange();rg.selectNodeContents(f.firstChild);const eq=rg.getBoundingClientRect().right;
+    const r=fv.getBoundingClientRect();fv.style.left=Math.round(((eq+right)/2-(r.left+r.width/2))*10)/10+"px"});
+}
+addEventListener("resize",()=>{try{layoutTotals()}catch(e){}});
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{try{layoutTotals()}catch(e){}});
 function render(){
   $("oppName").textContent=S.matchNo+"戦目";
   paintDiff();
-  paintPicks("pkOpp",oppOf(S.me));paintPicks("pkMe",S.me);S.lastNew=null;
+  paintPicks("pkOpp",oppOf(S.me));paintPicks("pkMe",S.me);S.lastNew=null;layoutTotals();
   const battle=(S.phase==="battle"&&!!S.faces)||S.phase==="result";  /* サイコロ勝負が始まるまではゲージと演出を出したまま */
   $("gauge").style.display=battle?"none":"";
   paintCon();
   $("dice").classList.toggle("on",battle);
+  {const t=S.phase==="battle"&&!!S.faces&&!S.battleDone?battleTurn():0,h=$("dhMe");   /* 自分の番は「タップで止める」、相手が先の時は「相手が先に止める」 */
+   h.textContent=t===S.me?"タップで止める":"相手が先に止める";h.classList.toggle("on",!!t&&!S.stopped[S.me]);h.classList.toggle("wait",!!t&&t!==S.me);$("dieMe").classList.toggle("tap",t===S.me)}
   $("num").textContent=S.endShow?"終了":S.n==null?"?":S.n;$("num").classList.toggle("end",!!S.endShow);
   $("gauge").classList.toggle("bonus",!!S.bonus&&S.phase==="draft");
   $("gauge").classList.toggle("pressed",!!S.pressed[S.me]&&need(S.me)&&S.phase==="draft");
@@ -562,7 +574,7 @@ function render(){
     else if(S.pressed[S.me]){g.textContent="予約中";g.disabled=true;g.classList.add("pressed")}
     else{g.textContent="獲得";g.disabled=!!S.waiting}
   }else if(battle){
-    const mine=S.stopped&&S.stopped[S.me]||S.stopReq;g.textContent=S.battleDone?"結果へ":mine?"相手待ち":"ストップ";g.disabled=!S.battleDone&&!!mine;
+    const mine=S.stopped&&S.stopped[S.me]||S.stopReq||battleTurn()!==S.me;g.textContent=S.battleDone?"結果へ":mine?"相手待ち":"ストップ";g.disabled=!S.battleDone&&!!mine;
   }else{g.textContent="獲得";g.disabled=true}
 }
 /* 出る数字・終わる確率のバッジ。3回ごとに上がる時はパッと光る */
@@ -693,7 +705,7 @@ function startContest(v,k){
 }
 function sendCon(){   /* 相手の選んだ面は送らない（サイコロが出る時に初めて送る） */
   if(S.mode!=="pvp"||!S.host||!S.con)return;const c=S.con;
-  send({type:"con",c:{id:c.id,v:c.v,k:c.k,stage:c.stage,left:c.dl?Math.max(0,c.dl-performance.now()):0,w:c.w||0,F:c.stage==="dice"?c.F:null,rolls:c.stage==="dice"?c.rolls:null,lot:!!c.lot}});
+  send({type:"con",c:{id:c.id,v:c.v,k:c.k,stage:c.stage,left:c.dl?Math.max(0,c.dl-performance.now()):0,w:c.w||0,F:c.stage==="dice"?c.F:null,att:c.att||0,cur:c.stage==="dice"?{1:c.cur[1],2:c.cur[2]}:null,tie:!!c.tie,lot:!!c.lot}});
 }
 function hostConChoice(p,ch,id){
   const c=S.con;if(!isAuth()||!c||c.id!==id||c.stage!=="choice"||c.choice[p]||(ch!=="fight"&&ch!=="yield"))return;
@@ -726,19 +738,43 @@ function hostConPick(p,n,id){
 function conResolvePick(){
   const c=S.con;if(!c||c.stage!=="pick")return;
   const F={1:c.pick[1]||(S.me===1?entVal():1)||1,2:c.pick[2]||1};
-  const R=[];let w=0;
-  for(let i=0;i<3&&!w;i++){const r={1:1+Math.floor(Math.random()*F[1]),2:1+Math.floor(Math.random()*F[2])};R.push(r);if(r[1]!==r[2])w=r[1]>r[2]?1:2}
-  if(!w){w=Math.random()<0.5?1:2;c.lot=true}   /* 3回続けて同じ目なら抽選 */
-  c.stage="dice";c.F=F;c.rolls=R;c.w=w;c.dl=0;sendCon();render();
-  const id=c.id;playConDice();
-  later(()=>{if(S.con&&S.con.id===id){S.pen[1]+=F[1];S.pen[2]+=F[2];S.penL[1].push(F[1]);S.penL[2].push(F[2]);conGive(w,true)}},conDiceDur(R));
+  c.stage="dice";c.F=F;c.rolls=[];c.att=0;c.cur={1:null,2:null};c.tie=false;c.w=0;c.lot=false;c.dl=0;sendCon();render();
+  conDiceStart();armConStops();
+}
+/* 取り合いのサイコロ: 最後のサイコロ勝負と同じくタップで止める（CPUは1〜3秒・10秒で自動停止）。目はタップした瞬間に出ていた数字 */
+function conTurn(){const c=S.con;if(!c||c.stage!=="dice"||c.tie||c.w||!c.cur)return 0;const f=firstStop(c.F);return c.cur[f]==null?f:c.cur[oppOf(f)]==null?oppOf(f):0}   /* 面の少ない方が先（同じなら1P） */
+function armConStops(){
+  const c=S.con;if(!isAuth()||!c||c.stage!=="dice")return;const id=c.id,att=c.att,p=conTurn();if(!p)return;
+  if(S.mode==="cpu"&&p===2)later(()=>hostConStop(2,id,att,conShown(2)),1000+Math.random()*2000);
+  later(()=>hostConStop(p,id,att,conShown(p)),D.AUTOSTOP);
+}
+function conShown(p){const c=S.con;if(!c||!c.F)return 1;const f=c.F[p],v=c.shown&&c.shown[p];return v>=1&&v<=f?v:1+Math.floor(Math.random()*f)}
+function hostConStop(p,id,att,v){
+  const c=S.con;if(!isAuth()||!c||c.id!==id||c.stage!=="dice"||c.att!==att||c.tie||c.w||c.cur[p]!=null||conTurn()!==p)return;
+  const f=c.F[p];v=Math.round(+v);if(!(v>=1&&v<=f))v=conShown(p);
+  c.cur[p]=v;tone(200,0.12,"triangle",0.08);
+  if(c.cur[1]!=null&&c.cur[2]!=null){
+    const r={1:c.cur[1],2:c.cur[2]};c.rolls.push(r);
+    if(r[1]!==r[2])c.w=r[1]>r[2]?1:2;
+    else if(c.att>=2){c.w=Math.random()<0.5?1:2;c.lot=true}   /* 3回続けて同じ目なら抽選 */
+    else c.tie=true;
+  }
+  sendCon();conDicePaint();
+  if(!c.tie&&!c.w)armConStops();   /* 先の人が止まったら次の人の番 */
+  if(c.tie){later(()=>{if(S.con&&S.con.id===id&&S.con.att===att){c.att++;c.cur={1:null,2:null};c.tie=false;sendCon();conDicePaint();armConStops()}},CON.TIE+600)}
+  else if(c.w){const w=c.w,F=c.F;later(()=>{if(S.con&&S.con.id===id){S.pen[1]+=F[1];S.pen[2]+=F[2];S.penL[1].push(F[1]);S.penL[2].push(F[2]);conGive(w,true)}},500+CON.SHOW+400)}
+}
+function conTap(){
+  const c=S.con,me=S.me;if(!c||c.stage!=="dice"||c.tie||c.w||c.cur[me]!=null||conTurn()!==me)return;
+  const v=conShown(me);sfxPress();
+  if(isAuth()){hostConStop(me,c.id,c.att,v);return}
+  c.cur[me]=v;tone(200,0.12,"triangle",0.08);send({type:"cstop",id:c.id,att:c.att,r:v});conDicePaint();   /* 入室側も自分の画面ですぐ止まる */
 }
 function conGive(w,fought){   /* 勝負で負けた人はそのラウンド未獲得（―）。譲った時は今まで通り後で獲得できる */
   const c=S.con;S.con=null;S.acq[w].push(c.v);const ev={t:"take",v:c.v,k:c.k,who:w,con:true};
   if(fought){const l=oppOf(w);if(need(l)){S.acq[l].push(null);ev.lost=l}}
   settleWindow(ev);
 }
-function conDiceDur(R){return CON.SPIN1+(R.length-1)*(CON.TIE+CON.SPIN2)+CON.SHOW}
 /* 入力 */
 function conChoose(ch){
   const c=S.con;if(!c||c.stage!=="choice"||c.choice[S.me])return;
@@ -755,7 +791,7 @@ function paintCon(){
   const el=$("con"),c=S.con,battle=(S.phase==="battle"&&!!S.faces)||S.phase==="result";
   if(!c||battle){if(S.conKey){el.innerHTML="";S.conKey=""}el.classList.remove("on");return}
   const me=S.me,op=oppOf(me);
-  const key=[c.id,c.stage,c.choice[me],c.pick[me],c.ent,c.w].join("|");
+  const key=[c.id,c.stage,c.choice[me],c.pick[me],c.ent,c.stage==="dice"?0:c.w].join("|");
   el.classList.add("on");if(key===S.conKey)return;S.conKey=key;
   let h="";
   if(c.stage==="choice"){const mc=c.choice[me];
@@ -770,36 +806,41 @@ function paintCon(){
   }else if(c.stage==="dice"){
     h='<div class="cCard"><b>'+c.v+'</b></div><div class="cDice">'+
       '<div class="dcol"><div class="dlab">相手 '+c.F[op]+'面</div><div class="die cOpp" id="cdOpp"><svg viewBox="0 0 100 100"><polygon/></svg><b>?</b></div></div>'+
-      '<div class="dcol"><div class="dlab">自分 '+c.F[me]+'面</div><div class="die cMe" id="cdMe"><svg viewBox="0 0 100 100"><polygon/></svg><b>?</b></div></div></div><div class="cRes" id="cRes"></div>';
+      '<div class="dcol"><div class="dlab">自分 '+c.F[me]+'面</div><div class="die cMe tap" id="cdMe"><svg viewBox="0 0 100 100"><polygon/></svg><b>?</b></div><div class="dhint" id="cdHint">タップで止める</div></div></div><div class="cRes" id="cRes"></div>';
   }else if(c.stage==="done"){
     h='<div class="cTitle">'+(c.w===me?"相手が譲った":"譲った")+'</div><div class="cNum">'+c.v+'</div><div class="cSub">'+(c.w===me?"自分":"相手")+'がもらう</div>';
   }
   el.innerHTML=h;
-  if(c.stage==="dice"){setDie($("cdOpp"),c.F[op],null);setDie($("cdMe"),c.F[me],null)}
+  if(c.stage==="dice"){setDie($("cdOpp"),c.F[op],null);setDie($("cdMe"),c.F[me],null);conDicePaint()}
 }
 $("con").onclick=e=>{
+  if(e.target.closest("#cdMe")){conTap();return}
   const b=e.target.closest("button");if(!b||b.disabled||!S.con)return;
   if(b.dataset.c)conChoose(b.dataset.c);
   else if(b.dataset.k){const c=S.con,k=b.dataset.k;if(c.stage!=="pick"||c.pick[S.me])return;   /* 2けたまで。先頭の0は入らない */
     if(k==="C")c.ent="";else if((c.ent||"").length<2&&!(k==="0"&&!c.ent))c.ent=(c.ent||"")+k;render()}
   else if(b.dataset.go){if(entVal())conPick(entVal())}
 };
-/* 取り合いのサイコロ: 自動で回って約1.5秒で止まる。同じ目ならもう一度 */
-function playConDice(){
-  const c=S.con;if(!c||c.stage!=="dice")return;
-  const id=c.id,me=S.me,op=oppOf(me),R=c.rolls,ok=()=>S.con&&S.con.id===id&&S.con.stage==="dice";
-  let spinning=false,tick=0;
-  const loop=()=>{if(!ok()||!spinning)return;[[me,"cdMe"],[op,"cdOpp"]].forEach(([p,eid])=>{const el=$(eid);if(el)setDie(el,c.F[p],1+Math.floor(Math.random()*c.F[p]))});if(++tick%3===0)sfxTick();later(loop,60)};
-  const step=i=>{
-    spinning=true;$("cRes").textContent="";$("cRes").className="cRes";loop();
-    later(()=>{if(!ok())return;spinning=false;const r=R[i];setDie($("cdMe"),c.F[me],r[me]);setDie($("cdOpp"),c.F[op],r[op]);tone(200,0.12,"triangle",0.08);
-      if(i<R.length-1){$("cRes").textContent="同じ目　もう一度";later(()=>{if(ok())step(i+1)},CON.TIE);return}
-      const w=c.w;$("cdMe").classList.add(w===me?"win":"lose");$("cdOpp").classList.add(w===me?"lose":"win");
-      const rs=$("cRes");rs.textContent=(c.lot?"抽選で ":"")+(w===me?"勝ち":"負け");rs.className="cRes "+(w===me?"w":"l");
-      if(w===me)sfxWinJ();else sfxLose();
-    },i?CON.SPIN2:CON.SPIN1);
-  };
-  step(0);
+/* 取り合いのサイコロの表示: 止まっていない方は約50msごとにランダムな目。止まった目・同じ目・勝ち負けを出す */
+function conDiceStart(){
+  const c=S.con;if(!c||c.stage!=="dice")return;const id=c.id;c.shown={};let tick=0;
+  const loop=()=>{const c=S.con;if(!c||c.id!==id||c.stage!=="dice")return;let any=false;
+    if(!c.tie&&!c.w)[1,2].forEach(p=>{if(c.cur[p]!=null)return;any=true;const f=c.F[p];let v=1+Math.floor(Math.random()*f);if(f>1&&v===c.shown[p])v=1+(v+Math.floor(Math.random()*(f-1)))%f;c.shown[p]=v;const el=$(p===S.me?"cdMe":"cdOpp");if(el)setDie(el,f,v)});
+    if(any&&++tick%3===0)sfxTick();later(loop,50)};
+  loop();
+}
+function conDicePaint(){
+  const c=S.con;if(!c||c.stage!=="dice")return;const me=S.me,op=oppOf(me),dm=$("cdMe"),dO=$("cdOpp"),rs=$("cRes"),hn=$("cdHint");if(!dm||!dO||!rs)return;
+  [[me,dm],[op,dO]].forEach(([p,el])=>{if(c.cur[p]!=null)setDie(el,c.F[p],c.cur[p])});
+  const t=conTurn(),mine=t===me;dm.classList.toggle("tap",mine);
+  if(hn){hn.textContent=mine?"タップで止める":"相手が先に止める";hn.classList.toggle("on",!!t&&c.cur[me]==null);hn.classList.toggle("wait",!!t&&!mine)}
+  dm.classList.remove("win","lose");dO.classList.remove("win","lose");
+  if(c.w){dm.classList.add(c.w===me?"win":"lose");dO.classList.add(c.w===me?"lose":"win")}
+  const key=c.att+"|"+(c.tie?1:0)+"|"+c.w;
+  if(c.w){rs.textContent=(c.lot?"抽選で ":"")+(c.w===me?"勝ち":"負け");rs.className="cRes "+(c.w===me?"w":"l");if(c.fxKey!==key){c.fxKey=key;if(c.w===me)sfxWinJ();else sfxLose()}}
+  else if(c.tie){rs.textContent="同じ目　もう一度";rs.className="cRes"}
+  else if(c.cur[me]!=null){rs.textContent="相手待ち";rs.className="cRes"}
+  else{rs.textContent="";rs.className="cRes"}
 }
 
 /* dice battle */
@@ -808,9 +849,16 @@ function startBattle(){
   const F={1:Math.max(0,sumOf(1)-S.pen[1]),2:Math.max(0,sumOf(2)-S.pen[2])};   /* 取り合い勝負で使った面を引く（0より下にはならない） */
   if(S.mode==="pvp")send({type:"battle",faces:F});
   runBattle(F);
-  const bid=S.bid;
-  if(S.mode==="cpu")later(()=>hostStop(2,bid,shownOf(2)),1000+Math.random()*2000);   /* CPUは1〜3秒でタップ */
-  later(()=>{hostStop(1,bid,shownOf(1));hostStop(2,bid,shownOf(2))},D.AUTOSTOP);                  /* 長い間タップしない時は自動で止める */
+  armBattleStop(firstStop(F));
+}
+/* 止める順番: 面の少ない方が先。同じなら作成側（1P）が先。先の人が止まってから次の人が止められる */
+function firstStop(F){return F[2]<F[1]?2:1}
+function battleTurn(){if(!S.faces)return 0;const f=firstStop(S.faces);return !S.stopped[f]?f:!S.stopped[oppOf(f)]?oppOf(f):0}
+function armBattleStop(p){
+  if(!isAuth()||!p)return;const bid=S.bid;
+  if(!(S.faces[p]>0)){later(()=>hostStop(p,bid,0),600);return}   /* 0面は回らないのですぐ止まる */
+  if(S.mode==="cpu"&&p===2)later(()=>hostStop(2,bid,shownOf(2)),1000+Math.random()*2000);   /* CPUは1〜3秒でタップ */
+  later(()=>hostStop(p,bid,shownOf(p)),D.AUTOSTOP);                  /* 長い間タップしない時は自動で止める */
 }
 /* サイコロ勝負: 自分のサイコロはタップで止める。目は止めた瞬間に作成側（CPU戦は自分）がランダムで決める */
 function runBattle(F){
@@ -821,7 +869,6 @@ function runBattle(F){
   const lab=p=>S.pen&&S.pen[p]?sumOf(p)+"面−"+S.pen[p]+"＝"+F[p]+"面":F[p]+"面";
   $("dfMe").textContent=lab(me);$("dfOpp").textContent=lab(op);
   ["dieMe","dieOpp"].forEach(id=>{const el=$(id);el.className="die";el.querySelector("svg").style.transform="rotate(0deg)"});
-  $("dieMe").classList.add("tap");$("dhMe").classList.add("on");
   render();spinLoop(S.bid);
 }
 function dieOf(p){return p===S.me?$("dieMe"):$("dieOpp")}
@@ -840,16 +887,17 @@ function spinLoop(bid){
 }
 function shownOf(p){if(!S.faces||S.phase!=="battle")return 0;const f=S.faces[p];if(!(f>0))return 0;const v=S.shown&&S.shown[p];return v>=1&&v<=f?v:1+Math.floor(Math.random()*f)}
 function tapStop(){
-  if(S.phase!=="battle"||!S.faces||S.battleDone||S.stopped[S.me])return;
+  if(S.phase!=="battle"||!S.faces||S.battleDone||S.stopped[S.me]||battleTurn()!==S.me)return;
   const v=shownOf(S.me);sfxPress();
   if(S.mode==="pvp"&&!S.host){applyStop(S.me,v);send({type:"stop",bid:S.bid,r:v});return}   /* 入室側も自分の画面ですぐ止まる */
   hostStop(S.me,S.bid,v);
 }
 function hostStop(p,bid,v){
-  if(!isAuth()||S.bid!==bid||S.phase!=="battle"||!S.faces||S.stopped[p])return;
+  if(!isAuth()||S.bid!==bid||S.phase!=="battle"||!S.faces||S.stopped[p]||battleTurn()!==p)return;
   const f=S.faces[p];let r=f>0?(Number.isInteger(v)&&v>=1&&v<=f?v:shownOf(p)):0;   /* 0面は必ず0 */
   if(S.mode==="pvp")send({type:"dstop",p:p,r:r});
   applyStop(p,r);
+  armBattleStop(battleTurn());
 }
 function applyStop(p,r){
   if(S.phase!=="battle"||!S.faces)return;
@@ -861,7 +909,6 @@ function applyStop(p,r){
     return;
   }
   S.stopped[p]=true;S.rolls[0][p]=r;
-  if(p===S.me){$("dhMe").classList.remove("on");$("dieMe").classList.remove("tap")}
   const el=dieOf(p),sv=el.querySelector("svg"),a=parseFloat((sv.style.transform.match(/-?[\d.]+/)||[0])[0])||0;
   sv.style.transition="transform .12s ease-out";sv.style.transform="rotate("+Math.round(a/360)*360+"deg)";
   setDie(el,S.faces[p],r);tone(200,0.12,"triangle",0.08);
@@ -927,6 +974,7 @@ function onNet(m,conn){
   if(m.type==="battle"){if(S.host)return;runBattle(m.faces);return}
   if(m.type==="cch"){if(S.host)hostConChoice(2,m.c,m.id);return}
   if(m.type==="cpk"){if(S.host)hostConPick(2,m.n,m.id);return}
+  if(m.type==="cstop"){if(S.host)hostConStop(2,m.id,m.att,m.r);return}
   if(m.type==="con"){if(S.host)return;guestCon(m.c);return}
   if(m.type==="stop"){if(S.host&&(m.bid==null||m.bid===S.bid))hostStop(2,S.bid,m.r);return}
   if(m.type==="dstop"){if(S.host)return;applyStop(m.p,m.r);return}
@@ -938,9 +986,12 @@ function guestCon(m){
   let c=S.con;const fresh=!c||c.id!==m.id;
   if(fresh){c=S.con={id:m.id,v:m.v,k:m.k,stage:null,choice:{1:null,2:null},pick:{1:null,2:null},sel:1};S.waiting=true;S.pressed[S.me]=false;S.n=m.v;sfxKaburi()}
   const prev=c.stage;c.stage=m.stage;c.w=m.w||0;c.lot=!!m.lot;c.dl=m.left?performance.now()+m.left:0;
-  if(m.F)c.F=m.F;if(m.rolls)c.rolls=m.rolls;
+  if(m.F)c.F=m.F;
+  if(c.stage==="dice"){const keep=c.att===(m.att||0)&&c.cur&&c.cur[S.me]!=null&&m.cur&&m.cur[S.me]==null?c.cur[S.me]:null;   /* 自分で止めた目は作成側の返事が来るまでそのまま */
+    c.att=m.att||0;c.tie=!!m.tie;c.cur=m.cur?{1:m.cur[1],2:m.cur[2]}:{1:null,2:null};if(keep!=null)c.cur[S.me]=keep}
   render();
-  if(prev!==c.stage){if(c.stage==="pick"){c.ent="";render();conPickTimer()}else if(c.stage==="dice")playConDice()}
+  if(prev!==c.stage){if(c.stage==="pick"){c.ent="";render();conPickTimer()}else if(c.stage==="dice")conDiceStart()}
+  if(c.stage==="dice")conDicePaint();
 }
 function watchConn(conn){
   const epoch=S.netEpoch||0;let opened=false;
