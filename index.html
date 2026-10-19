@@ -111,8 +111,8 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 @keyframes pkPop{0%{transform:scale(.4)}60%{transform:scale(1.18)}100%{transform:scale(1)}}
 .plus{font-size:16px;font-weight:900;color:#e8c36a}
 .faces{min-width:64px;text-align:left;font-size:16px;font-weight:900;color:#e8c36a;white-space:nowrap}
-.faces b{font-size:28px;color:#fff}
-.faces .fv{position:relative;display:inline-block;top:-14.5px;min-width:26px;text-align:center}.faces .fv b{display:block;line-height:1}.faces .fv i{position:absolute;left:50%;top:100%;transform:translateX(-50%);margin-top:3px;font-size:26px;line-height:1;font-style:normal;font-weight:900;color:#e8c36a}   /* 面は数字の下にほぼ同じ大きさで（横幅は増やさない） */
+.faces b{font-size:33px;color:#fff}   /* was 28px; +約18% */
+.faces .fv{position:relative;display:inline-block;top:-16px;min-width:30px;text-align:center}.faces .fv b{display:block;line-height:1}.faces .fv i{position:absolute;left:50%;top:100%;transform:translateX(-50%);margin-top:3px;font-size:26px;line-height:1;font-style:normal;font-weight:900;color:#e8c36a}   /* 面は同じ26px・3pxギャップ */
 .pk.minus{color:#e10600}   /* マイナスカード: 取り合い勝負で使った面（1回ごとに1枚・赤い数字） */
 .picks.n5{gap:4px}.picks.n5 .pk{width:40px;height:52px;font-size:23px}.picks.n5 .plus{font-size:14px}.picks.n5 .faces{min-width:56px}
 .picks.n6{gap:2px}.picks.n6 .pk{width:33px;height:41px;font-size:19px;border-radius:8px}.picks.n6 .plus{font-size:13px}.picks.n6 .faces{min-width:54px}.picks.n6 .faces b{font-size:20px}
@@ -146,8 +146,10 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .pill.down{animation:pillDown .7s ease-out}
 @keyframes pillUp{0%{transform:scale(1)}30%{transform:scale(1.16);box-shadow:0 0 22px var(--c)}100%{transform:scale(1)}}
 @keyframes pillDown{0%{transform:scale(1);filter:brightness(1.8)}35%{transform:scale(.9)}100%{transform:scale(1);filter:none}}
-.dice{display:none;gap:22px;align-items:flex-start;justify-content:center}
+.dice{display:none;flex-direction:column;align-items:center;gap:0}
 .dice.on{display:flex}
+.diceRow{display:flex;gap:22px;align-items:flex-start;justify-content:center}
+.dice > .dhint{margin-top:2px}   /* 2ダイス中央下・縦は面の直下 */
 .dcol{display:flex;flex-direction:column;align-items:center;gap:6px}
 .dlab{font-size:13px;font-weight:900;color:#e8c36a}
 .die{width:120px;height:120px;position:relative}
@@ -160,7 +162,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .die.lose{filter:brightness(.42)}
 #dieMe polygon{stroke:#6aa8ff;stroke-width:5}#dieOpp polygon{stroke:#ff5a6a;stroke-width:5}   /* 自分=青・相手=赤の枠 */
 #dieMe.win polygon{stroke:#6aa8ff;stroke-width:6;filter:drop-shadow(0 0 8px #f0d27a)}#dieOpp.win polygon{stroke:#ff5a6a;stroke-width:6;filter:drop-shadow(0 0 8px #f0d27a)}
-.dface{font-size:12px;font-weight:800;opacity:.85}
+.dface{font-size:16px;font-weight:900;color:#e8c36a;opacity:1;letter-spacing:.04em}   /* 取り合いの .cFace に合わせる */
 #dieMe.tap,#cdMe.tap{cursor:pointer}
 .dhint{font-size:14px;font-weight:900;color:#e8c36a;white-space:nowrap;visibility:hidden;animation:hintBlink 1s ease-in-out infinite}
 .dhint.on{visibility:visible}.dhint.wait{animation:none;opacity:.75;color:#f4ead0;font-size:13px}
@@ -357,8 +359,11 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
   <div class="center">
     <div class="gauge" id="gauge"><svg viewBox="0 0 200 200"><circle class="bg" cx="100" cy="100" r="86"/><circle class="fg" id="gfg" cx="100" cy="100" r="86"/><defs><mask id="rbMask" maskUnits="userSpaceOnUse" x="-20" y="-20" width="240" height="240"><circle id="rbM" cx="100" cy="100" r="86" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round"/></mask></defs><g class="rb" id="rbRing" mask="url(#rbMask)"></g></svg><div class="num" id="num">1</div><div class="gsub" id="gsub">リセット</div><div class="fx" id="fx"><div class="t"></div><br><div class="s"></div></div></div>
     <div class="dice" id="dice">
-      <div class="dcol"><div class="dlab">相手</div><div class="die" id="dieOpp"><svg viewBox="0 0 100 100"><polygon/></svg><b>?</b></div><div class="dface" id="dfOpp"></div></div>
-      <div class="dcol"><div class="dlab">自分</div><div class="die" id="dieMe"><svg viewBox="0 0 100 100"><polygon/></svg><b>?</b></div><div class="dface" id="dfMe"></div><div class="dhint" id="dhMe">タップで止める</div></div>
+      <div class="diceRow">
+        <div class="dcol"><div class="dlab">相手</div><div class="die" id="dieOpp"><svg viewBox="0 0 100 100"><polygon/></svg><b>?</b></div><div class="dface" id="dfOpp"></div></div>
+        <div class="dcol"><div class="dlab">自分</div><div class="die" id="dieMe"><svg viewBox="0 0 100 100"><polygon/></svg><b>?</b></div><div class="dface" id="dfMe"></div></div>
+      </div>
+      <div class="dhint" id="dhMe">タップで止める</div>
     </div>
     <div class="rinfo" id="rinfo">ラウンド 1/3</div>
     <div class="stat" id="stat"><div class="pill" id="pRange"><small>出る数字</small><b id="vRange">1〜3</b></div><div class="pill h0" id="pEnd"><small>終わる確率</small><b id="vEnd">0%</b></div></div>
@@ -568,7 +573,7 @@ function render(){
   $("gauge").classList.toggle("bonus",!!S.bonus&&S.phase==="draft");
   $("gauge").classList.toggle("pressed",!!S.pressed[S.me]&&need(S.me)&&S.phase==="draft");
   const k=winK(),ep=endPct(k);
-  const bon=!battle&&S.phase==="draft"&&S.bonus;$("rinfo").firstChild.textContent=battle?"サイコロ勝負":bon?"ボーナスラウンド（"+(S.bonus.p===S.me?"自分":"相手")+"）":"";$("rinfo").style.display=battle||bon?"":"none";
+  const bon=!battle&&S.phase==="draft"&&S.bonus;$("rinfo").firstChild.textContent=bon?"ボーナスラウンド（"+(S.bonus.p===S.me?"自分":"相手")+"）":"";$("rinfo").style.display=bon?"":"none";   /* 最終勝負の「サイコロ勝負」表示は出さない */
   paintStat(battle,k,ep);
   const g=$("grab");g.classList.remove("pressed");
   if(S.phase==="draft"){
