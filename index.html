@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261019g">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261019g">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261019g">
+<meta name="draft-dice-rev" content="20261019h">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261019h">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261019h">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -111,10 +111,10 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .plus{font-size:16px;font-weight:900;color:#e8c36a}
 .faces{min-width:64px;text-align:left;font-size:16px;font-weight:900;color:#e8c36a;white-space:nowrap}
 .faces b{font-size:22px;color:#fff}
-.pk.minus{color:#e10600}.pk.minus.first{margin-left:6px}   /* マイナスカード: 取り合い勝負で使った面（1回ごとに1枚・赤い数字） */
+.pk.minus{color:#e10600}.plus.mns{color:#e10600}   /* マイナスカード: 取り合い勝負で使った面（1回ごとに1枚・赤い数字） */
 .picks.n5{gap:4px}.picks.n5 .pk{width:40px;height:52px;font-size:23px}.picks.n5 .plus{font-size:14px}.picks.n5 .faces{min-width:56px}
-.picks.n6{gap:3px}.picks.n6 .pk{width:36px;height:46px;font-size:21px;border-radius:8px}.picks.n6 .plus{font-size:13px}.picks.n6 .faces{min-width:54px}.picks.n6 .faces b{font-size:20px}
-.picks.n7{gap:3px}.picks.n7 .pk{width:32px;height:42px;font-size:19px;border-radius:8px}.picks.n7 .plus{font-size:12px}.picks.n7 .faces{min-width:50px;font-size:14px}.picks.n7 .faces b{font-size:19px}.picks.n7 .pk.minus.first{margin-left:5px}   /* カードが多い時だけ小さく */
+.picks.n6{gap:2px}.picks.n6 .pk{width:33px;height:41px;font-size:19px;border-radius:8px}.picks.n6 .plus{font-size:13px}.picks.n6 .faces{min-width:54px}.picks.n6 .faces b{font-size:20px}
+.picks.n7{gap:2px}.picks.n7 .pk{width:28px;height:35px;font-size:17px;border-radius:7px}.picks.n7 .plus{font-size:12px}.picks.n7 .faces{min-width:50px;font-size:14px}.picks.n7 .faces b{font-size:19px}   /* カードが多い時だけ小さく */
 .center{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;min-height:0}
 .gauge{width:190px;height:190px;position:relative}
 .gauge svg{width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
@@ -521,7 +521,7 @@ function paintPicks(id,p){
     h+='<div class="pk'+(has?(v==null?" miss":" got"):"")+(cur?" cur":"")+(isNew?" new":"")+'">'+(has?pickTxt(v):"")+'</div>';
   }
   const pen=S.pen&&S.pen[p]||0,ml=(S.penL&&S.penL[p])||[];
-  ml.forEach((m,i)=>{h+='<div class="pk got minus'+(i?"":" first")+'">'+m+'</div>'});   /* プラスのカードの後ろにマイナスのカード（取り合い1回ごと） */
+  ml.forEach(m=>{h+='<span class="plus mns">－</span><div class="pk got minus">'+m+'</div>'});   /* プラスのカードの後ろにマイナスのカード（取り合い1回ごと） */
   h+='<span class="faces">＝<b>'+Math.max(0,sumOf(p)-pen)+'</b>面</span>';
   const nc=slotsOf(p)+ml.length;box.classList.remove("n5","n6","n7");if(nc>=5)box.classList.add("n"+Math.min(7,nc));
   box.innerHTML=h;
