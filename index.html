@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261019t">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261019t">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261019t">
+<meta name="draft-dice-rev" content="20261019u">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261019u">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261019u">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -289,6 +289,8 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 
 
 
+
+
 #ask{display:none;position:fixed;inset:0;background:#000c;z-index:100;align-items:center;justify-content:center;flex-direction:column;gap:12px}
 #ask.on{display:flex}
 #chatBtn{position:fixed;z-index:80;min-height:46px;min-width:88px;font-size:15px;font-weight:800;padding:0 14px;border:2px solid #e8c36a;background:linear-gradient(#4a3210,#2c1c08);color:#e8c36a;border-radius:12px;display:none}
@@ -330,9 +332,9 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 <div class="ruleHead">ー　終了　ー</div>
 <div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt"><span class="rG end"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#e8c36a" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>終了</b></span><span class="ruleArr">→</span><span class="xk miss me">―</span><span class="xEq">＝ 0</span></div><div class="ruleTxt">終わる確率で ラウンドが<span class="ruleNo">急に終わる</span><br>まだとっていない人は <span class="ruleNo">「―」</span>（0）</div></div>
 <div class="ruleHead">ー　取り合い　ー</div>
-<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="xModal"><div class="xmT">被った！</div><span class="xCard">7</span><div class="xBtns"><span class="xBtn">ゆずる</span><span class="xBtn gold">取り合う</span></div><div class="xmS">残り 10秒</div></div><div class="ruleTxt">2人が<span class="ruleGold">同じ回</span>に獲得すると 選ぶ<br>10秒で選ぶ（選ばないと<span class="ruleGold">ゆずる</span>）</div></div>
+<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="xModal"><div class="xmT">被った！</div><span class="xCard">7</span><div class="xBtns"><span class="xBtn">ゆずる</span><span class="xBtn gold">取り合う</span></div></div><div class="ruleTxt">2人が<span class="ruleGold">同じ回</span>に獲得すると 選ぶ</div></div>
 <div class="ruleRow" style="flex-direction:column;gap:8px"><div class="xTbl"><div class="xTr"><span class="xBtn sm">ゆずる</span><span class="xBtn sm">ゆずる</span><span class="ruleArr">→</span><span class="xTd">だれも もらえない<br><span class="xSm">1〜3・0% にもどる</span></span></div><div class="xTr"><span class="xBtn sm gold">取り合う</span><span class="xBtn sm">ゆずる</span><span class="ruleArr">→</span><span class="xTd">取り合う人が もらう<br><span class="xSm">ゆずった人は あとでとれる</span></span></div><div class="xTr"><span class="xBtn sm gold">取り合う</span><span class="xBtn sm gold">取り合う</span><span class="ruleArr">→</span><span class="xTd">サイコロで 勝負<br><span class="xSm">↓</span></span></div></div></div>
-<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt"><div class="xPad"><div class="xDisp"><b>15</b><span>面</span></div><div class="xKeys"><span class="xKey">1</span><span class="xKey">2</span><span class="xKey">3</span><span class="xKey">4</span><span class="xKey">5</span><span class="xKey">6</span><span class="xKey">7</span><span class="xKey">8</span><span class="xKey">9</span><span class="xKey">C</span><span class="xKey">0</span><span></span></div><span class="xBtn gold">決定</span></div></div><div class="ruleTxt">面の数を えらぶ（<span class="ruleGold">1〜99</span>・15秒）<br>時間切れ ＝ 入れた数（空なら1）</div></div>
+<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt"><div class="xPad"><div class="xDisp"><b>15</b><span>面</span></div><div class="xKeys"><span class="xKey">1</span><span class="xKey">2</span><span class="xKey">3</span><span class="xKey">4</span><span class="xKey">5</span><span class="xKey">6</span><span class="xKey">7</span><span class="xKey">8</span><span class="xKey">9</span><span class="xKey">C</span><span class="xKey">0</span><span></span></div><span class="xBtn gold">決定</span></div></div><div class="ruleTxt">面の数を えらぶ（<span class="ruleGold">1〜99</span>）</div></div>
 <div class="ruleRow" style="flex-direction:column;gap:8px"><div class="xCol"><span class="xCard">7</span><div class="ruleArt" style="gap:22px"><span class="xCol"><span class="xCap">相手 8面</span><span class="rD op lose"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,26.0 91.6,74.0 50.0,98.0 8.4,74.0 8.4,26.0"/></svg><b>3</b></span></span><span class="xCol"><span class="xCap">自分 15面</span><span class="rD me win"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 83.9,16.1 98.0,50.0 83.9,83.9 50.0,98.0 16.1,83.9 2.0,50.0 16.1,16.1"/></svg><b>11</b></span></span></div></div><div class="ruleTxt"><span class="ruleGold">目が大きい方</span>が勝ち<br>同じ目は ふりなおし（3回同じなら<span class="ruleGold">抽選</span>）</div></div>
 <div class="ruleRow" style="flex-direction:column;gap:8px"><div class="xCol"><span class="xWho">相手</span><div class="xRow"><span class="xk miss op">―</span><span class="xp">－</span><span class="xk op minus">8</span></div><div class="xRow"><span class="xk me ">7</span><span class="xp">－</span><span class="xk me minus">15</span></div><span class="xWho">自分</span></div><div class="ruleTxt">勝った人が 数字をもらう<br>負けた人は そのラウンド<span class="ruleNo">「―」</span><br><span class="ruleNo">2人とも</span> 使った面が<span class="ruleNo">マイナス</span>になる</div></div>
 <div class="ruleHead">ー　ゾロ目ボーナス　ー</div>
@@ -341,7 +343,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 <div class="ruleRow" style="flex-direction:column;gap:8px"><div class="xCol"><div class="xRow"><span class="xk me ">9</span><span class="xp">＋</span><span class="xk me ">8</span><span class="xp">＋</span><span class="xk miss me">―</span><span class="xp">－</span><span class="xk me minus">5</span><span class="xt">＝<span class="xv"><b>12</b><i>面</i></span></span></div><div class="xLegend"><span><span class="xk me ">9</span>＝とった数字</span><span><span class="xk miss me">―</span>＝0</span><span><span class="xk me minus">5</span>＝マイナス</span></div></div><div class="ruleTxt">マイナスは<span class="ruleGold">1枚だけ</span>（取り合いで使った面の合計）<br>0ならマイナスは出ない<br>＝の右が<span class="ruleGold">サイコロの面</span>（0より下にならない）</div></div>
 <div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt"><span class="xBlue">自分</span><span class="xRed">相手</span></div><div class="ruleTxt">自分のカードは<span style="color:#6aa8ff;font-weight:900">青</span>　相手は<span style="color:#ff5a6a;font-weight:900">赤</span></div></div>
 <div class="ruleHead">ー　サイコロ勝負　ー</div>
-<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt" style="gap:22px"><span class="xCol"><span class="xCap">相手</span><span class="rD op lose"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 83.9,16.1 98.0,50.0 83.9,83.9 50.0,98.0 16.1,83.9 2.0,50.0 16.1,16.1"/></svg><b>6</b></span><span class="xDl">15面</span></span><span class="xCol"><span class="xCap">自分</span><span class="rD me win"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 83.9,16.1 98.0,50.0 83.9,83.9 50.0,98.0 16.1,83.9 2.0,50.0 16.1,16.1"/></svg><b>12</b></span><span class="xDl">24面−5＝19面</span></span></div><div class="ruleTxt">数字は<span class="ruleGold">0.05秒ごと</span>に ランダムに変わる<br><span class="ruleGold">タップで止める</span>（10秒で自動で止まる）</div></div>
+<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt" style="gap:22px"><span class="xCol"><span class="xCap">相手</span><span class="rD op lose"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 83.9,16.1 98.0,50.0 83.9,83.9 50.0,98.0 16.1,83.9 2.0,50.0 16.1,16.1"/></svg><b>6</b></span><span class="xDl">15面</span></span><span class="xCol"><span class="xCap">自分</span><span class="rD me win"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 83.9,16.1 98.0,50.0 83.9,83.9 50.0,98.0 16.1,83.9 2.0,50.0 16.1,16.1"/></svg><b>12</b></span><span class="xDl">24面−5＝19面</span></span></div><div class="ruleTxt">数字は<span class="ruleGold">0.05秒ごと</span>に ランダムに変わる<br><span class="ruleGold">タップで止める</span></div></div>
 <div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt"><span class="xCol"><span class="rD op"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,74.0 8.4,74.0"/></svg><b>4</b></span><span class="xCap">相手</span></span><span class="xEq">＝</span><span class="xCol"><span class="rD me"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,26.0 91.6,74.0 50.0,98.0 8.4,74.0 8.4,26.0"/></svg><b>4</b></span><span class="xCap">自分</span></span><span class="ruleArr">→</span><span class="xPt zero">引き分け ±0</span></div><div class="ruleArt"><span class="xCol"><span class="rD op zero"><svg viewBox="0 0 100 100"><polygon points="85.4,85.4 14.6,85.4 14.6,14.6 85.4,14.6"/></svg><b>0</b></span><span class="xCap">0面</span></span><span class="ruleArr">→</span><span class="xTd">回らない　いつも 0</span></div><div class="ruleTxt">同じ目は<span class="ruleGold">引き分け</span>（ふりなおしなし・0点）</div></div>
 <div class="ruleHead">ー　結果　ー</div>
 <div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt"><div class="xRes"><div class="xrT">Win</div><div class="xrK">今回</div><div class="xrV">+1200</div><div class="xrK">今までの通算</div><div class="xrV">+1500</div><div class="xBtns"><span class="xBtn sm">もう1度</span><span class="xBtn sm">やめる</span></div></div><div class="xRes cut"><div class="xrT" style="color:#ff5a6a">切断</div><div class="xrS">相手との接続が切れました</div><div class="xBtns"><span class="xBtn sm">やめる</span></div></div></div><div class="ruleTxt">Win / Lose / Draw と 点数<br><span class="ruleGold">通算</span>は ページを読みこみ直すと<span class="ruleNo">0</span><br>対人戦で切れたら「切断」（もう1度なし）</div></div>
@@ -521,7 +523,6 @@ $("rbM").setAttribute("stroke-dasharray",GC.toFixed(2));
 function gaugeLoop(){
   requestAnimationFrame(gaugeLoop);
   if(!$("game").classList.contains("on"))return;
-  if(S.con&&S.con.dl&&(S.con.stage==="choice"||S.con.stage==="pick")){const t=$("conT");if(t)t.textContent="残り "+Math.max(0,Math.ceil((S.con.dl-performance.now())/1000))+"秒"}
   let f=0;
   if(S.phase==="draft"&&!S.waiting)f=Math.max(0,Math.min(1,(performance.now()-S.tickStart)/winDur(winK())));
   const off=(GC*(1-f)).toFixed(2);$("gfg").setAttribute("stroke-dashoffset",off);$("rbM").setAttribute("stroke-dashoffset",off);
@@ -699,10 +700,9 @@ function cpuThink(){
 /* ---------- 取り合い勝負（被った時） ---------- */
 const CON={CHOICE:10000,PICK:15000,GRACE:1200,SPIN1:1500,SPIN2:1000,TIE:900,SHOW:1300,YIELD:1100,MAXN:99};
 function startContest(v,k){
-  S.con={id:++S.conId,v:v,k:k,stage:"choice",dl:performance.now()+CON.CHOICE,choice:{1:null,2:null},pick:{1:null,2:null},ent:""};
+  S.con={id:++S.conId,v:v,k:k,stage:"choice",dl:0,choice:{1:null,2:null},pick:{1:null,2:null},ent:""};
   S.waiting=true;S.n=v;sendCon();sfxKaburi();render();
-  const id=S.con.id;
-  later(()=>{if(S.con&&S.con.id===id&&S.con.stage==="choice")conResolveChoice()},CON.CHOICE);   /* 10秒選ばなければ譲る */
+  const id=S.con.id;   /* 取り合いに制限時間なし（人が選ぶまで待つ。CPUは従来どおり自動で選ぶ） */
   if(S.mode==="cpu"){const M=rangeMax(k),c=v>=Math.ceil(M*0.6)?"fight":"yield";later(()=>hostConChoice(2,c,id),1200+Math.random()*1300)}
 }
 function sendCon(){   /* 相手の選んだ面は送らない（サイコロが出る時に初めて送る） */
@@ -716,9 +716,9 @@ function hostConChoice(p,ch,id){
 function conResolveChoice(){
   const c=S.con;if(!c||c.stage!=="choice")return;
   const f1=c.choice[1]==="fight",f2=c.choice[2]==="fight";
-  if(f1&&f2){   /* 2人とも勝負 → 面を選ぶ */
-    c.stage="pick";c.dl=performance.now()+CON.PICK;c.ent="";sendCon();render();conPickTimer();
-    const id=c.id;later(()=>{if(S.con&&S.con.id===id&&S.con.stage==="pick")conResolvePick()},CON.PICK+CON.GRACE);
+  if(f1&&f2){   /* 2人とも勝負 → 面を選ぶ（制限時間なし） */
+    c.stage="pick";c.dl=0;c.ent="";sendCon();render();
+    const id=c.id;
     if(S.mode==="cpu"){const n=Math.max(1,Math.min(c.v,3+Math.floor(Math.random()*6)));later(()=>hostConPick(2,n,id),1500+Math.random()*2500)}
     return;
   }
@@ -726,11 +726,9 @@ function conResolveChoice(){
     c.stage="done";c.w=f1?1:2;c.dl=0;sendCon();render();
     const id=c.id,w=c.w;later(()=>{if(S.con&&S.con.id===id)conGive(w)},CON.YIELD);return;
   }
-  S.con=null;settleWindow({t:"kaburi",v:c.v,k:c.k});   /* 2人とも譲った（または選ばなかった）→ 今までの被ったと同じ */
+  S.con=null;settleWindow({t:"kaburi",v:c.v,k:c.k});   /* 2人とも譲った → 今までの被ったと同じ */
 }
-function conPickTimer(){   /* 15秒たったら今の表示の数で決定（空や0なら1） */
-  const c=S.con,id=c.id;later(()=>{if(S.con&&S.con.id===id&&S.con.stage==="pick"&&!S.con.pick[S.me])conPick(entVal()||1)},CON.PICK);
-}
+function conPickTimer(){   /* 取り合いの面選びは制限時間なし（人が決定するまで待つ） */ }
 function entVal(){const v=parseInt(S.con&&S.con.ent||"",10);return v>=1&&v<=CON.MAXN?v:0}
 function hostConPick(p,n,id){
   const c=S.con;if(!isAuth()||!c||c.id!==id||c.stage!=="pick"||c.pick[p])return;
@@ -743,13 +741,12 @@ function conResolvePick(){
   c.stage="dice";c.F=F;c.rolls=[];c.att=0;c.cur={1:null,2:null};c.tie=false;c.w=0;c.lot=false;c.dl=0;sendCon();render();
   conDiceStart();armConStops();
 }
-/* 取り合いのサイコロ: 最後のサイコロ勝負と同じくタップで止める（CPUは1〜3秒・10秒で自動停止）。目はタップした瞬間に出ていた数字 */
+/* 取り合いのサイコロ: タップで止める（制限時間なし。CPUだけ従来どおり1〜3秒で止める）。目はタップした瞬間に出ていた数字 */
 function conCan(p){const c=S.con;if(!c||c.stage!=="dice"||c.tie||c.w||!c.cur||c.cur[p]!=null)return false;const f=firstStop(c.F);return !f||p===f||c.cur[f]!=null}   /* 面の少ない方が先。同じ面なら順番なし */
 function armConStops(ps){
   const c=S.con;if(!isAuth()||!c||c.stage!=="dice")return;const id=c.id,att=c.att;
   if(!ps){const f=firstStop(c.F);ps=f?[f]:[1,2]}
-  ps.forEach(p=>{if(S.mode==="cpu"&&p===2)later(()=>hostConStop(2,id,att,conShown(2)),1000+Math.random()*2000);
-    later(()=>hostConStop(p,id,att,conShown(p)),D.AUTOSTOP)});
+  ps.forEach(p=>{if(S.mode==="cpu"&&p===2)later(()=>hostConStop(2,id,att,conShown(2)),1000+Math.random()*2000)});   /* 人はタップするまで止まらない（最終勝負の10秒自動停止は別） */
 }
 function conShown(p){const c=S.con;if(!c||!c.F)return 1;const f=c.F[p],v=c.shown&&c.shown[p];return v>=1&&v<=f?v:1+Math.floor(Math.random()*f)}
 function hostConStop(p,id,att,v){
@@ -800,18 +797,18 @@ function paintCon(){
   if(c.stage==="choice"){const mc=c.choice[me];
     h='<div class="cTitle">被った！</div><div class="cNum">'+c.v+'</div><div class="cSub">この数字をどうする？</div>'+
       '<div class="cBtns"><button class="'+(mc==="yield"?"sel":"")+'" data-c="yield"'+(mc?" disabled":"")+'>ゆずる</button><button class="gold'+(mc==="fight"?" sel":"")+'" data-c="fight"'+(mc?" disabled":"")+'>取り合う</button></div>'+
-      '<div class="cWait">'+(mc?"相手を待っています…":"")+'</div><div class="cT" id="conT"></div>';
+      '<div class="cWait">'+(mc?"相手を待っています…":"")+'</div>';
   }else if(c.stage==="pick"){const mp=c.pick[me],ent=mp?String(mp):(c.ent||""),dis=mp?" disabled":"";let g="";
     ["1","2","3","4","5","6","7","8","9","C","0"].forEach(k=>{g+='<button data-k="'+k+'"'+dis+'>'+k+'</button>'});   /* 上から 1 2 3 / 4 5 6 / 7 8 9 / C 0（9の下は空き） */
     h='<div class="cSub">'+c.v+' の取り合い　面を選ぶ（相手には見えない）</div><div class="cDisp"><b>'+(ent||"&nbsp;")+'</b><span>面</span></div><div class="cKeys">'+g+'</div>'+
       '<div class="cBtns"><button class="gold" data-go="1"'+(mp||!entVal()?" disabled":"")+'>決定</button></div>'+
-      '<div class="cWait">'+(mp?"相手が選んでいます…":"")+'</div><div class="cT" id="conT"></div><div class="cHint">使った面の数だけ 最後のサイコロの面が減る</div>';
+      '<div class="cWait">'+(mp?"相手が選んでいます…":"")+'</div><div class="cHint">使った面の数だけ 最後のサイコロの面が減る</div>';
   }else if(c.stage==="dice"){
     h='<div class="cCard"><b>'+c.v+'</b></div><div class="cDice">'+
       '<div class="dcol"><div class="dlab">相手 '+c.F[op]+'面</div><div class="die cOpp" id="cdOpp"><svg viewBox="0 0 100 100"><polygon/></svg><b>?</b></div></div>'+
       '<div class="dcol"><div class="dlab">自分 '+c.F[me]+'面</div><div class="die cMe tap" id="cdMe"><svg viewBox="0 0 100 100"><polygon/></svg><b>?</b></div><div class="dhint" id="cdHint">タップで止める</div></div></div><div class="cRes" id="cRes"></div>';
   }else if(c.stage==="done"){
-    h='<div class="cTitle">'+(c.w===me?"相手が譲った":"譲った")+'</div><div class="cNum">'+c.v+'</div><div class="cSub">'+(c.w===me?"自分":"相手")+'がもらう</div>';
+    h='<div class="cTitle">'+(c.w===me?"相手が譲った":"譲った")+'</div><div class="cNum">'+c.v+'</div><div class="cSub">'+(c.w===me?"自分がもらう":"&nbsp;")+'</div>';   /* 自分が譲った時の「相手がもらう」は出さない（行は残してレイアウトを動かさない） */
   }
   el.innerHTML=h;
   if(c.stage==="dice"){setDie($("cdOpp"),c.F[op],null);setDie($("cdMe"),c.F[me],null);conDicePaint()}
@@ -859,9 +856,8 @@ function firstStop(F){return F[1]===F[2]?0:F[2]<F[1]?2:1}
 function canStop(p){if(!S.faces||S.phase!=="battle"||S.battleDone||S.stopped[p])return false;const f=firstStop(S.faces);return !f||p===f||!!S.stopped[f]}
 function armBattleStop(p){
   if(!isAuth()||!p)return;const bid=S.bid;
-  if(!(S.faces[p]>0)){later(()=>hostStop(p,bid,0),600);return}   /* 0面は回らないのですぐ止まる */
-  if(S.mode==="cpu"&&p===2)later(()=>hostStop(2,bid,shownOf(2)),1000+Math.random()*2000);   /* CPUは1〜3秒でタップ */
-  later(()=>hostStop(p,bid,shownOf(p)),D.AUTOSTOP);                  /* 長い間タップしない時は自動で止める */
+  if(!(S.faces[p]>0)){later(()=>hostStop(p,bid,0),600);return}   /* 0面は回らないのですぐ止まる（選択ではない） */
+  if(S.mode==="cpu"&&p===2)later(()=>hostStop(2,bid,shownOf(2)),1000+Math.random()*2000);   /* CPUは1〜3秒でタップ。人はタップするまで止まらない */
 }
 /* サイコロ勝負: 自分のサイコロはタップで止める。目は止めた瞬間に作成側（CPU戦は自分）がランダムで決める */
 function runBattle(F){
@@ -993,7 +989,7 @@ function guestCon(m){
   if(c.stage==="dice"){const keep=c.att===(m.att||0)&&c.cur&&c.cur[S.me]!=null&&m.cur&&m.cur[S.me]==null?c.cur[S.me]:null;   /* 自分で止めた目は作成側の返事が来るまでそのまま */
     c.att=m.att||0;c.tie=!!m.tie;c.cur=m.cur?{1:m.cur[1],2:m.cur[2]}:{1:null,2:null};if(keep!=null)c.cur[S.me]=keep}
   render();
-  if(prev!==c.stage){if(c.stage==="pick"){c.ent="";render();conPickTimer()}else if(c.stage==="dice")conDiceStart()}
+  if(prev!==c.stage){if(c.stage==="pick"){c.ent="";render()}else if(c.stage==="dice")conDiceStart()}
   if(c.stage==="dice")conDicePaint();
 }
 function watchConn(conn){
