@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261019f">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261019f">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261019f">
+<meta name="draft-dice-rev" content="20261019g">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261019g">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261019g">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -111,8 +111,10 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .plus{font-size:16px;font-weight:900;color:#e8c36a}
 .faces{min-width:64px;text-align:left;font-size:16px;font-weight:900;color:#e8c36a;white-space:nowrap}
 .faces b{font-size:22px;color:#fff}
-.pk.penS{font-size:21px;color:#c0303c;letter-spacing:-.02em;margin-left:4px}   /* 取り合い勝負で使った面（最後のサイコロから引く）の枠 */
-.picks.tight{gap:4px}.picks.tight .pk{width:40px;height:52px;font-size:23px}.picks.tight .pk.penS{font-size:18px}.picks.tight .plus{font-size:14px}.picks.tight .faces{min-width:56px}   /* 枠が5つの時だけ少し小さく */
+.pk.minus{color:#e10600}.pk.minus.first{margin-left:6px}   /* マイナスカード: 取り合い勝負で使った面（1回ごとに1枚・赤い数字） */
+.picks.n5{gap:4px}.picks.n5 .pk{width:40px;height:52px;font-size:23px}.picks.n5 .plus{font-size:14px}.picks.n5 .faces{min-width:56px}
+.picks.n6{gap:3px}.picks.n6 .pk{width:36px;height:46px;font-size:21px;border-radius:8px}.picks.n6 .plus{font-size:13px}.picks.n6 .faces{min-width:54px}.picks.n6 .faces b{font-size:20px}
+.picks.n7{gap:3px}.picks.n7 .pk{width:32px;height:42px;font-size:19px;border-radius:8px}.picks.n7 .plus{font-size:12px}.picks.n7 .faces{min-width:50px;font-size:14px}.picks.n7 .faces b{font-size:19px}.picks.n7 .pk.minus.first{margin-left:5px}   /* カードが多い時だけ小さく */
 .center{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;min-height:0}
 .gauge{width:190px;height:190px;position:relative}
 .gauge svg{width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
@@ -181,7 +183,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .cDice .die{width:100px;height:100px}.cDice .die b{font-size:38px}
 .die.cMe polygon{stroke:#6aa8ff;stroke-width:5}.die.cOpp polygon{stroke:#ff5a6a;stroke-width:5}
 .die.cMe.win polygon{stroke:#6aa8ff;stroke-width:6;filter:drop-shadow(0 0 8px #f0d27a)}.die.cOpp.win polygon{stroke:#ff5a6a;stroke-width:6;filter:drop-shadow(0 0 8px #f0d27a)}
-.cCard{display:flex;flex-direction:column;align-items:center;justify-content:center;width:84px;height:92px;border:2px solid #c8b89a;border-radius:12px;background:#f7f1e6;box-shadow:0 2px 6px #0005;margin-bottom:4px}   /* 獲得した数字の枠と同じ白いカード */
+.cCard{display:flex;flex-direction:column;align-items:center;justify-content:center;width:80px;height:97px;border:2px solid #c8b89a;border-radius:12px;background:#f7f1e6;box-shadow:0 2px 6px #0005;margin-bottom:4px}   /* 獲得した数字の枠と同じ白いカード */
 .cCard small{font-size:11px;font-weight:900;color:#6b5a3e;letter-spacing:.08em}.cCard b{font-family:Cinzel,serif;font-size:46px;font-weight:900;color:#1a1208;line-height:1}
 .cRes{font-size:22px;font-weight:900;min-height:30px;color:#e8c36a}.cRes.w{color:#ffb347}.cRes.l{color:#7a8cff}
 .cHint{font-size:11px;font-weight:800;color:#e8c36a;opacity:.75}
@@ -391,7 +393,7 @@ function sfxWinJ(){[523,659,784,1046].forEach((f,i)=>later(()=>tone(f,0.28,"squa
 function sfxLose(){[392,330,262].forEach((f,i)=>later(()=>tone(f,0.25,"triangle",0.06),i*150))}
 
 const S={mode:null,me:1,host:true,round:1,n:1,win:0,rt:0,acq:{1:[],2:[]},pressed:{1:false,2:false},phase:"idle",waiting:true,tickStart:0,
-  totals:{1:0,2:0},matchNo:1,votes:{},faces:null,rolls:null,battleDone:false,applied:false,winner:0,got:0,cpuT:5,peer:null,conn:null,lastNew:null,pen:{1:0,2:0},con:null,conId:0};
+  totals:{1:0,2:0},matchNo:1,votes:{},faces:null,rolls:null,battleDone:false,applied:false,winner:0,got:0,cpuT:5,peer:null,conn:null,lastNew:null,pen:{1:0,2:0},penL:{1:[],2:[]},con:null,conId:0};
 const oppOf=p=>p===1?2:1;
 function need(p){return S.bonus?(p===S.bonus.p&&S.acq[p].length<4):S.acq[p].length<S.round}
 /* ゾロ目: 3ラウンドの数字が3つとも同じ（―は数えない） */
@@ -518,10 +520,10 @@ function paintPicks(id,p){
     const isNew=S.lastNew&&S.lastNew.i===i&&has;
     h+='<div class="pk'+(has?(v==null?" miss":" got"):"")+(cur?" cur":"")+(isNew?" new":"")+'">'+(has?pickTxt(v):"")+'</div>';
   }
-  const pen=S.pen&&S.pen[p]||0;
-  if(pen)h+='<div class="pk got penS">−'+pen+'</div>';   /* 使った面は自分の枠の後ろに −N の枠で出す（ある時だけ） */
+  const pen=S.pen&&S.pen[p]||0,ml=(S.penL&&S.penL[p])||[];
+  ml.forEach((m,i)=>{h+='<div class="pk got minus'+(i?"":" first")+'">'+m+'</div>'});   /* プラスのカードの後ろにマイナスのカード（取り合い1回ごと） */
   h+='<span class="faces">＝<b>'+Math.max(0,sumOf(p)-pen)+'</b>面</span>';
-  box.classList.toggle("tight",slotsOf(p)+(pen?1:0)>=5);
+  const nc=slotsOf(p)+ml.length;box.classList.remove("n5","n6","n7");if(nc>=5)box.classList.add("n"+Math.min(7,nc));
   box.innerHTML=h;
 }
 function render(){
@@ -562,8 +564,8 @@ function paintStat(battle,k,ep){
 function numFx(cls){const el=$("num");el.classList.remove("pop","reset");void el.offsetWidth;if(cls)el.classList.add(cls)}
 
 /* ---------- engine (CPU mode or online host) ---------- */
-function snap(){return{n:S.n,win:S.win,round:S.round,rt:S.rt,acq:{1:S.acq[1].slice(),2:S.acq[2].slice()},p2:!!S.pressed[2],phase:S.phase,bonus:S.bonus?{p:S.bonus.p,pct:S.bonus.pct}:null,pen:{1:S.pen[1],2:S.pen[2]}}}
-function resetDraft(){S.endShow=false;S.pen={1:0,2:0};S.con=null;S.conKey="";S.bonus=null;S.bonusQ=[];S.round=1;S.n=null;S.win=0;S.rt=0;S.acq={1:[],2:[]};S.pressed={1:false,2:false};S.phase="draft";S.waiting=true;S.faces=null;S.rolls=null;S.battleDone=false;S.applied=false;S.winner=0;S.got=0;S.votes={};S.lastNew=null;
+function snap(){return{n:S.n,win:S.win,round:S.round,rt:S.rt,acq:{1:S.acq[1].slice(),2:S.acq[2].slice()},p2:!!S.pressed[2],phase:S.phase,bonus:S.bonus?{p:S.bonus.p,pct:S.bonus.pct}:null,pen:{1:S.pen[1],2:S.pen[2]},penL:{1:S.penL[1].slice(),2:S.penL[2].slice()}}}
+function resetDraft(){S.endShow=false;S.pen={1:0,2:0};S.penL={1:[],2:[]};S.con=null;S.conKey="";S.bonus=null;S.bonusQ=[];S.round=1;S.n=null;S.win=0;S.rt=0;S.acq={1:[],2:[]};S.pressed={1:false,2:false};S.phase="draft";S.waiting=true;S.faces=null;S.rolls=null;S.battleDone=false;S.applied=false;S.winner=0;S.got=0;S.votes={};S.lastNew=null;
   setDie($("dieOpp"),6,null);setDie($("dieMe"),6,null);$("dieOpp").className="die";$("dieMe").className="die";$("dfOpp").textContent="";$("dfMe").textContent="";$("dhMe").classList.remove("on");S.stopped={1:false,2:false};S.stopReq=false}
 function startMatch(){
   resetDraft();fxHide();
@@ -711,7 +713,7 @@ function conResolvePick(){
   if(!w){w=Math.random()<0.5?1:2;c.lot=true}   /* 3回続けて同じ目なら抽選 */
   c.stage="dice";c.F=F;c.rolls=R;c.w=w;c.dl=0;sendCon();render();
   const id=c.id;playConDice();
-  later(()=>{if(S.con&&S.con.id===id){S.pen[1]+=F[1];S.pen[2]+=F[2];conGive(w,true)}},conDiceDur(R));
+  later(()=>{if(S.con&&S.con.id===id){S.pen[1]+=F[1];S.pen[2]+=F[2];S.penL[1].push(F[1]);S.penL[2].push(F[2]);conGive(w,true)}},conDiceDur(R));
 }
 function conGive(w,fought){   /* 勝負で負けた人はそのラウンド未獲得（―）。譲った時は今まで通り後で獲得できる */
   const c=S.con;S.con=null;S.acq[w].push(c.v);const ev={t:"take",v:c.v,k:c.k,who:w,con:true};
@@ -890,7 +892,7 @@ $("grab").onclick=()=>{
 function send(a){if(S.conn&&S.conn.open)S.conn.send(a)}
 function applySnap(st){
   S.n=st.n;S.win=st.win;S.round=st.round;S.rt=st.rt;S.acq={1:st.acq[1].slice(),2:st.acq[2].slice()};S.phase=st.phase;S.bonus=st.bonus||null;
-  if(st.pen)S.pen={1:st.pen[1]|0,2:st.pen[2]|0};S.con=null;
+  if(st.pen)S.pen={1:st.pen[1]|0,2:st.pen[2]|0};if(st.penL)S.penL={1:st.penL[1].slice(),2:st.penL[2].slice()};S.con=null;
   if(st.p2)S.pressed[2]=true;
 }
 function onNet(m,conn){
