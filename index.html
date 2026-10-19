@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261019w">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261019w">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261019w">
+<meta name="draft-dice-rev" content="20261019x">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261019x">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261019x">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -871,8 +871,7 @@ function runBattle(F){
   S.phase="battle";S.faces=F;S.rolls=[{1:null,2:null}];S.stopped={1:false,2:false};S.stopReq=false;S.settled=0;S.shown={};S.battleDone=false;S.waiting=true;
   const me=S.me,op=oppOf(me);
   setDie($("dieMe"),F[me],null);setDie($("dieOpp"),F[op],null);
-  const lab=p=>S.pen&&S.pen[p]?sumOf(p)+"面−"+S.pen[p]+"＝"+F[p]+"面":F[p]+"面";
-  $("dfMe").textContent=lab(me);$("dfOpp").textContent=lab(op);
+  $("dfMe").textContent=F[me]+"面";$("dfOpp").textContent=F[op]+"面";   /* 取り合いで減った後の最終面だけ（式は出さない） */
   ["dieMe","dieOpp"].forEach(id=>{const el=$(id);el.className="die";el.querySelector("svg").style.transform="rotate(0deg)"});
   render();spinLoop(S.bid);
 }
