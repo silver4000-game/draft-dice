@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261019e">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261019e">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261019e">
+<meta name="draft-dice-rev" content="20261019f">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261019f">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261019f">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -176,7 +176,6 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .cDisp b{font-family:Cinzel,serif;font-size:36px;font-weight:900;color:#fff;line-height:1}.cDisp span{font-size:16px;font-weight:900;color:#e8c36a}
 .cKeys{display:grid;grid-template-columns:repeat(3,64px);gap:8px;justify-content:center}
 .cKeys button{min-width:0;min-height:0;width:64px;height:44px;padding:0;font-size:20px;border-radius:10px}
-.cKeys button.z{grid-column:span 2;width:auto}
 .cKeys button:disabled{opacity:.35}
 .cDice{display:flex;gap:22px;justify-content:center;align-items:flex-start}
 .cDice .die{width:100px;height:100px}.cDice .die b{font-size:38px}
@@ -744,7 +743,7 @@ function paintCon(){
       '<div class="cBtns"><button class="'+(mc==="yield"?"sel":"")+'" data-c="yield"'+(mc?" disabled":"")+'>ゆずる</button><button class="gold'+(mc==="fight"?" sel":"")+'" data-c="fight"'+(mc?" disabled":"")+'>取り合う</button></div>'+
       '<div class="cWait">'+(mc?"相手を待っています…":"")+'</div><div class="cT" id="conT"></div>';
   }else if(c.stage==="pick"){const mp=c.pick[me],ent=mp?String(mp):(c.ent||""),dis=mp?" disabled":"";let g="";
-    ["7","8","9","4","5","6","1","2","3","C","0"].forEach(k=>{g+='<button data-k="'+k+'"'+(k==="0"?' class="z"':'')+dis+'>'+k+'</button>'});   /* 電卓と同じ並び */
+    ["1","2","3","4","5","6","7","8","9","C","0"].forEach(k=>{g+='<button data-k="'+k+'"'+dis+'>'+k+'</button>'});   /* 上から 1 2 3 / 4 5 6 / 7 8 9 / C 0（9の下は空き） */
     h='<div class="cSub">'+c.v+' の取り合い　面を選ぶ（相手には見えない）</div><div class="cDisp"><b>'+(ent||"&nbsp;")+'</b><span>面</span></div><div class="cKeys">'+g+'</div>'+
       '<div class="cBtns"><button class="gold" data-go="1"'+(mp||!entVal()?" disabled":"")+'>決定</button></div>'+
       '<div class="cWait">'+(mp?"相手が選んでいます…":"")+'</div><div class="cT" id="conT"></div><div class="cHint">使った面の数だけ 最後のサイコロの面が減る</div>';
