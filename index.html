@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261019d">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261019d">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261019d">
+<meta name="draft-dice-rev" content="20261019e">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261019e">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261019e">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -57,7 +57,7 @@ html.no-bar #app{height:calc(100dvh - var(--safari-bar, 83px));max-height:calc(1
 html.no-bar:has(#result.on),
 html.no-bar:has(#result.on) body{background:#0a100c}
 html.no-bar #result.on{background:#0a100c}
-html.no-bar #chatBtn{bottom:calc(18px + var(--safari-bar, 83px))}
+html.no-bar #chatBtn,html.no-bar .acts .tot{bottom:calc(18px + var(--safari-bar, 83px))}
 html.no-bar #chatPanel{bottom:calc(68px + var(--safari-bar, 83px))}
 @media (display-mode: standalone) and (pointer: coarse),
        (display-mode: fullscreen) and (pointer: coarse),
@@ -66,7 +66,7 @@ html.no-bar #chatPanel{bottom:calc(68px + var(--safari-bar, 83px))}
   html:has(#result.on),
   html:has(#result.on) body{background:#0a100c}
   #result.on{background:#0a100c}
-  #chatBtn{bottom:calc(18px + var(--safari-bar, 83px))}
+  #chatBtn,.acts .tot{bottom:calc(18px + var(--safari-bar, 83px))}
   #chatPanel{bottom:calc(68px + var(--safari-bar, 83px))}
 }
 section{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;padding:18px 14px;padding-top:max(12px,env(safe-area-inset-top));padding-bottom:max(12px,env(safe-area-inset-bottom))}
@@ -111,7 +111,8 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .plus{font-size:16px;font-weight:900;color:#e8c36a}
 .faces{min-width:64px;text-align:left;font-size:16px;font-weight:900;color:#e8c36a;white-space:nowrap}
 .faces b{font-size:22px;color:#fff}
-.faces small.pen{display:block;font-size:13px;line-height:1;margin-top:1px}.pen.me{color:#6aa8ff}.pen.op{color:#ff5a6a}   /* 取り合い勝負で使った面（最後のサイコロから引く） */
+.pk.penS{font-size:21px;color:#c0303c;letter-spacing:-.02em;margin-left:4px}   /* 取り合い勝負で使った面（最後のサイコロから引く）の枠 */
+.picks.tight{gap:4px}.picks.tight .pk{width:40px;height:52px;font-size:23px}.picks.tight .pk.penS{font-size:18px}.picks.tight .plus{font-size:14px}.picks.tight .faces{min-width:56px}   /* 枠が5つの時だけ少し小さく */
 .center{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;min-height:0}
 .gauge{width:190px;height:190px;position:relative}
 .gauge svg{width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
@@ -161,7 +162,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .dhint.on{visibility:visible}
 @keyframes hintBlink{0%,100%{opacity:1}50%{opacity:.35}}
 /* 取り合い勝負 */
-.con{display:none;flex-direction:column;align-items:center;gap:8px;width:100%;text-align:center}
+.con{display:none;position:fixed;inset:0;background:#000c;z-index:100;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center}   /* やり直しの確認と同じ暗い全画面 */
 .con.on{display:flex}
 .cTitle{font-size:24px;font-weight:900;color:#ffb347;letter-spacing:.06em}
 .cSub{font-size:13px;font-weight:800;color:#e8c36a}
@@ -171,17 +172,18 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .cBtns button.sel{outline:3px solid #7dffb0;outline-offset:2px;opacity:1}
 .cWait,.cT{font-size:13px;font-weight:800;color:#f4ead0;min-height:18px}
 .cT{color:#e8c36a;opacity:.85}
-.cBig{font-size:16px;font-weight:900;color:#e8c36a}.cBig b{font-family:Cinzel,serif;font-size:40px;color:#fff;margin-right:2px}
-.cGrid{display:grid;grid-template-columns:repeat(5,52px);gap:6px;justify-content:center}
-.cGrid button{min-width:0;min-height:0;width:52px;height:40px;padding:0;font-size:17px;border-radius:10px}
-.cGrid button.on{background:linear-gradient(#f0d27a,#c9a03a);color:#1a1208}
-.cGrid button:disabled{opacity:.35}.cGrid button.on:disabled{opacity:.8}
+.cDisp{width:208px;height:52px;box-sizing:border-box;border:2px solid #e8c36a;border-radius:12px;background:#0a1810e6;display:flex;align-items:center;justify-content:flex-end;gap:4px;padding:0 14px}   /* 電卓の表示 */
+.cDisp b{font-family:Cinzel,serif;font-size:36px;font-weight:900;color:#fff;line-height:1}.cDisp span{font-size:16px;font-weight:900;color:#e8c36a}
+.cKeys{display:grid;grid-template-columns:repeat(3,64px);gap:8px;justify-content:center}
+.cKeys button{min-width:0;min-height:0;width:64px;height:44px;padding:0;font-size:20px;border-radius:10px}
+.cKeys button.z{grid-column:span 2;width:auto}
+.cKeys button:disabled{opacity:.35}
 .cDice{display:flex;gap:22px;justify-content:center;align-items:flex-start}
 .cDice .die{width:100px;height:100px}.cDice .die b{font-size:38px}
 .die.cMe polygon{stroke:#6aa8ff;stroke-width:5}.die.cOpp polygon{stroke:#ff5a6a;stroke-width:5}
 .die.cMe.win polygon{stroke:#6aa8ff;stroke-width:6;filter:drop-shadow(0 0 8px #f0d27a)}.die.cOpp.win polygon{stroke:#ff5a6a;stroke-width:6;filter:drop-shadow(0 0 8px #f0d27a)}
 .cCard{display:flex;flex-direction:column;align-items:center;justify-content:center;width:84px;height:92px;border:2px solid #c8b89a;border-radius:12px;background:#f7f1e6;box-shadow:0 2px 6px #0005;margin-bottom:4px}   /* 獲得した数字の枠と同じ白いカード */
-.cCard small{font-size:11px;font-weight:900;color:#6b5a3e;letter-spacing:.08em}.cCard b{font-family:Cinzel,serif;font-size:46px;font-weight:900;color:#1a1208;line-height:1.05}
+.cCard small{font-size:11px;font-weight:900;color:#6b5a3e;letter-spacing:.08em}.cCard b{font-family:Cinzel,serif;font-size:46px;font-weight:900;color:#1a1208;line-height:1}
 .cRes{font-size:22px;font-weight:900;min-height:30px;color:#e8c36a}.cRes.w{color:#ffb347}.cRes.l{color:#7a8cff}
 .cHint{font-size:11px;font-weight:800;color:#e8c36a;opacity:.75}
 .fx{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:20;text-align:center;pointer-events:none;display:none;white-space:nowrap}
@@ -190,7 +192,8 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .fx .s{margin-top:8px;font-size:15px;font-weight:900;color:#f4ead0;background:#0a1810cc;border-radius:10px;padding:4px 10px;display:inline-block}
 .fx.get{color:#7dffb0}.fx.taken{color:#ff5a6a}.fx.kaburi{color:#ffb347}.fx.auto{color:#e8c36a}
 @keyframes fxPop{0%{transform:translate(-50%,-50%) scale(.5);opacity:0}12%{transform:translate(-50%,-50%) scale(1.08);opacity:1}22%{transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{opacity:0}}
-.acts{display:flex;gap:8px;justify-content:center;margin-top:2px}
+.acts{display:flex;gap:8px;justify-content:center;margin-top:2px;position:relative;width:100%}
+.acts .tot{position:fixed;left:10px;bottom:18px;top:auto;transform:none;height:46px;z-index:80}   /* 通算はチャットボタンと左右対称の位置（左下） */
 #grab{width:170px;height:64px;font-size:24px;letter-spacing:.12em;border-radius:16px}
 #grab.pressed{background:linear-gradient(#7dffb0,#2fae6a);color:#062014;opacity:1}
 .banner{display:none;position:fixed;left:50%;top:22%;transform:translate(-50%,0);font-size:28px;font-weight:900;color:#e8c36a;z-index:70;padding:10px 18px;border:3px solid #e8c36a;border-radius:14px;background:#0a1810ee;white-space:nowrap;pointer-events:none}
@@ -302,7 +305,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 </div>
 <div class="ruleHead">ー　取り合い勝負　ー</div>
 <div class="ruleRow" style="flex-direction:column;gap:8px">
-<div class="ruleArt"><span class="rBtn">勝負する</span><span class="rBtn" style="background:linear-gradient(#4a3210,#2c1c08);color:#e8c36a;border:1.5px solid #e8c36a">譲る</span></div>
+<div class="ruleArt"><span class="rBtn" style="background:linear-gradient(#4a3210,#2c1c08);color:#e8c36a;border:1.5px solid #e8c36a">ゆずる</span><span class="rBtn">取り合う</span></div>
 <div class="ruleTxt">かぶったら <span class="ruleGold">勝負する</span>か <span class="ruleGold">譲る</span>か選ぶ<br>譲ったら 相手がその数字をもらう<br>どちらも勝負なら <span class="ruleGold">好きな面のサイコロ</span>で勝負<br>負けた人は そのラウンド<span class="ruleNo">未獲得</span><br>使った面の数だけ <span class="ruleNo">最後のサイコロの面が減る</span></div>
 </div>
 <div class="ruleHead">ー　未獲得　ー</div>
@@ -328,7 +331,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 <section id="room"><h1>部屋</h1><p class="hint">合言葉は3文字以上</p><input id="code" maxlength="8" placeholder="あいことば" /><div class="row" style="margin-top:10px"><button id="mk">部屋を作る</button><button id="jn">入る</button></div><p class="hint" id="roomSt"></p><button id="roomBack" style="margin-top:14px">戻る</button></section>
 
 <section id="game">
-<div class="topbar"><div><b id="oppName">1戦目</b></div><div class="tot"><span class="diff zero" id="sc">±0</span></div><div><button id="retry" type="button">やり直し</button></div></div>
+<div class="topbar"><div><b id="oppName">1戦目</b></div><div><button id="retry" type="button">やり直し</button></div></div>
 <div class="board">
   <div class="side"><div class="who">相手</div><div class="picks" id="pkOpp"></div></div>
   <div class="center">
@@ -337,16 +340,16 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
       <div class="dcol"><div class="dlab">相手</div><div class="die" id="dieOpp"><svg viewBox="0 0 100 100"><polygon/></svg><b>?</b></div><div class="dface" id="dfOpp"></div></div>
       <div class="dcol"><div class="dlab">自分</div><div class="die" id="dieMe"><svg viewBox="0 0 100 100"><polygon/></svg><b>?</b></div><div class="dface" id="dfMe"></div><div class="dhint" id="dhMe">タップで止める</div></div>
     </div>
-    <div class="con" id="con"></div>
     <div class="rinfo" id="rinfo">ラウンド 1/3</div>
     <div class="stat" id="stat"><div class="pill" id="pRange"><small>出る数字</small><b id="vRange">1〜3</b></div><div class="pill h0" id="pEnd"><small>終わる確率</small><b id="vEnd">0%</b></div></div>
   </div>
   <div class="side"><div class="picks" id="pkMe"></div><div class="who">自分</div></div>
   <div class="banner" id="banner"></div>
 </div>
-<div class="acts"><button class="gold" id="grab" disabled>獲得</button></div>
+<div class="acts"><div class="tot"><span class="diff zero" id="sc">±0</span></div><button class="gold" id="grab" disabled>獲得</button></div>
 </section>
 <section id="result"><div class="box"><div id="rTitle">Win</div><div id="rCalc" style="font-size:14px;line-height:1.7;margin:8px 0;color:#e8c36a"></div><div id="rPts" style="font-size:40px;font-weight:900;margin:6px 0 16px"></div><div class="row"><button id="again">もう1度</button><button id="home">やめる</button></div></div></section>
+<div class="con" id="con"></div>
 <div id="ask"><div style="color:#e8c36a;font-weight:800">モード選択に戻りますか？</div><div class="row"><button id="askYes" class="gold">はい</button><button id="askNo">いいえ</button></div></div>
 </div>
 <script>
@@ -516,7 +519,10 @@ function paintPicks(id,p){
     const isNew=S.lastNew&&S.lastNew.i===i&&has;
     h+='<div class="pk'+(has?(v==null?" miss":" got"):"")+(cur?" cur":"")+(isNew?" new":"")+'">'+(has?pickTxt(v):"")+'</div>';
   }
-  h+='<span class="faces">＝<b>'+sumOf(p)+'</b>面'+(S.pen&&S.pen[p]?'<small class="pen '+(p===S.me?"me":"op")+'">−'+S.pen[p]+'</small>':'')+'</span>';
+  const pen=S.pen&&S.pen[p]||0;
+  if(pen)h+='<div class="pk got penS">−'+pen+'</div>';   /* 使った面は自分の枠の後ろに −N の枠で出す（ある時だけ） */
+  h+='<span class="faces">＝<b>'+Math.max(0,sumOf(p)-pen)+'</b>面</span>';
+  box.classList.toggle("tight",slotsOf(p)+(pen?1:0)>=5);
   box.innerHTML=h;
 }
 function render(){
@@ -524,16 +530,15 @@ function render(){
   paintDiff();
   paintPicks("pkOpp",oppOf(S.me));paintPicks("pkMe",S.me);S.lastNew=null;
   const battle=(S.phase==="battle"&&!!S.faces)||S.phase==="result";  /* サイコロ勝負が始まるまではゲージと演出を出したまま */
-  const inCon=!!S.con&&!battle;
-  $("gauge").style.display=battle||inCon?"none":"";
+  $("gauge").style.display=battle?"none":"";
   paintCon();
   $("dice").classList.toggle("on",battle);
   $("num").textContent=S.endShow?"終了":S.n==null?"?":S.n;$("num").classList.toggle("end",!!S.endShow);
   $("gauge").classList.toggle("bonus",!!S.bonus&&S.phase==="draft");
   $("gauge").classList.toggle("pressed",!!S.pressed[S.me]&&need(S.me)&&S.phase==="draft");
   const k=winK(),ep=endPct(k);
-  const bon=!battle&&S.phase==="draft"&&S.bonus;$("rinfo").firstChild.textContent=battle?"サイコロ勝負":bon?"ボーナスラウンド（"+(S.bonus.p===S.me?"自分":"相手")+"）":"";$("rinfo").style.display=(battle||bon)&&!inCon?"":"none";
-  paintStat(battle,k,ep);if(inCon)$("stat").style.display="none";
+  const bon=!battle&&S.phase==="draft"&&S.bonus;$("rinfo").firstChild.textContent=battle?"サイコロ勝負":bon?"ボーナスラウンド（"+(S.bonus.p===S.me?"自分":"相手")+"）":"";$("rinfo").style.display=battle||bon?"":"none";
+  paintStat(battle,k,ep);
   const g=$("grab");g.classList.remove("pressed");
   if(S.phase==="draft"){
     if(!need(S.me)){g.textContent="獲得";g.disabled=true}
@@ -659,9 +664,9 @@ function cpuThink(){
   if(press){const w=S.win;later(()=>{if(S.phase==="draft"&&!S.waiting&&S.win===w&&need(2))S.pressed[2]=true},winDur(k)*(0.1+Math.random()*0.77))}
 }
 /* ---------- 取り合い勝負（被った時） ---------- */
-const CON={CHOICE:10000,PICK:15000,GRACE:1200,SPIN1:1500,SPIN2:1000,TIE:900,SHOW:1300,YIELD:1100,MAXN:20};
+const CON={CHOICE:10000,PICK:15000,GRACE:1200,SPIN1:1500,SPIN2:1000,TIE:900,SHOW:1300,YIELD:1100,MAXN:99};
 function startContest(v,k){
-  S.con={id:++S.conId,v:v,k:k,stage:"choice",dl:performance.now()+CON.CHOICE,choice:{1:null,2:null},pick:{1:null,2:null},sel:1};
+  S.con={id:++S.conId,v:v,k:k,stage:"choice",dl:performance.now()+CON.CHOICE,choice:{1:null,2:null},pick:{1:null,2:null},ent:""};
   S.waiting=true;S.n=v;sendCon();sfxKaburi();render();
   const id=S.con.id;
   later(()=>{if(S.con&&S.con.id===id&&S.con.stage==="choice")conResolveChoice()},CON.CHOICE);   /* 10秒選ばなければ譲る */
@@ -679,7 +684,7 @@ function conResolveChoice(){
   const c=S.con;if(!c||c.stage!=="choice")return;
   const f1=c.choice[1]==="fight",f2=c.choice[2]==="fight";
   if(f1&&f2){   /* 2人とも勝負 → 面を選ぶ */
-    c.stage="pick";c.dl=performance.now()+CON.PICK;c.sel=1;sendCon();render();conPickTimer();
+    c.stage="pick";c.dl=performance.now()+CON.PICK;c.ent="";sendCon();render();conPickTimer();
     const id=c.id;later(()=>{if(S.con&&S.con.id===id&&S.con.stage==="pick")conResolvePick()},CON.PICK+CON.GRACE);
     if(S.mode==="cpu"){const n=Math.max(1,Math.min(c.v,3+Math.floor(Math.random()*6)));later(()=>hostConPick(2,n,id),1500+Math.random()*2500)}
     return;
@@ -690,9 +695,10 @@ function conResolveChoice(){
   }
   S.con=null;settleWindow({t:"kaburi",v:c.v,k:c.k});   /* 2人とも譲った（または選ばなかった）→ 今までの被ったと同じ */
 }
-function conPickTimer(){   /* 15秒たったら今選んでいる面で決定 */
-  const c=S.con,id=c.id;later(()=>{if(S.con&&S.con.id===id&&S.con.stage==="pick"&&!S.con.pick[S.me])conPick(S.con.sel||1)},CON.PICK);
+function conPickTimer(){   /* 15秒たったら今の表示の数で決定（空や0なら1） */
+  const c=S.con,id=c.id;later(()=>{if(S.con&&S.con.id===id&&S.con.stage==="pick"&&!S.con.pick[S.me])conPick(entVal()||1)},CON.PICK);
 }
+function entVal(){const v=parseInt(S.con&&S.con.ent||"",10);return v>=1&&v<=CON.MAXN?v:0}
 function hostConPick(p,n,id){
   const c=S.con;if(!isAuth()||!c||c.id!==id||c.stage!=="pick"||c.pick[p])return;
   n=Math.round(+n);if(!(n>=1&&n<=CON.MAXN))n=1;
@@ -700,7 +706,7 @@ function hostConPick(p,n,id){
 }
 function conResolvePick(){
   const c=S.con;if(!c||c.stage!=="pick")return;
-  const F={1:c.pick[1]||(S.me===1?c.sel:1)||1,2:c.pick[2]||1};
+  const F={1:c.pick[1]||(S.me===1?entVal():1)||1,2:c.pick[2]||1};
   const R=[];let w=0;
   for(let i=0;i<3&&!w;i++){const r={1:1+Math.floor(Math.random()*F[1]),2:1+Math.floor(Math.random()*F[2])};R.push(r);if(r[1]!==r[2])w=r[1]>r[2]?1:2}
   if(!w){w=Math.random()<0.5?1:2;c.lot=true}   /* 3回続けて同じ目なら抽選 */
@@ -730,20 +736,20 @@ function paintCon(){
   const el=$("con"),c=S.con,battle=(S.phase==="battle"&&!!S.faces)||S.phase==="result";
   if(!c||battle){if(S.conKey){el.innerHTML="";S.conKey=""}el.classList.remove("on");return}
   const me=S.me,op=oppOf(me);
-  const key=[c.id,c.stage,c.choice[me],c.pick[me],c.sel,c.w].join("|");
+  const key=[c.id,c.stage,c.choice[me],c.pick[me],c.ent,c.w].join("|");
   el.classList.add("on");if(key===S.conKey)return;S.conKey=key;
   let h="";
   if(c.stage==="choice"){const mc=c.choice[me];
     h='<div class="cTitle">被った！</div><div class="cNum">'+c.v+'</div><div class="cSub">この数字をどうする？</div>'+
-      '<div class="cBtns"><button class="gold'+(mc==="fight"?" sel":"")+'" data-c="fight"'+(mc?" disabled":"")+'>勝負する</button><button class="'+(mc==="yield"?"sel":"")+'" data-c="yield"'+(mc?" disabled":"")+'>譲る</button></div>'+
+      '<div class="cBtns"><button class="'+(mc==="yield"?"sel":"")+'" data-c="yield"'+(mc?" disabled":"")+'>ゆずる</button><button class="gold'+(mc==="fight"?" sel":"")+'" data-c="fight"'+(mc?" disabled":"")+'>取り合う</button></div>'+
       '<div class="cWait">'+(mc?"相手を待っています…":"")+'</div><div class="cT" id="conT"></div>';
-  }else if(c.stage==="pick"){const mp=c.pick[me],sel=c.sel||1;let g="";
-    for(let n=1;n<=CON.MAXN;n++)g+='<button data-n="'+n+'" class="'+(n===sel?"on":"")+'"'+(mp?" disabled":"")+'>'+n+'</button>';
-    h='<div class="cSub">'+c.v+' の取り合い　面を選ぶ（相手には見えない）</div><div class="cBig"><b>'+sel+'</b>面</div><div class="cGrid">'+g+'</div>'+
-      '<div class="cBtns"><button class="gold" data-go="1"'+(mp?" disabled":"")+'>勝負</button></div>'+
+  }else if(c.stage==="pick"){const mp=c.pick[me],ent=mp?String(mp):(c.ent||""),dis=mp?" disabled":"";let g="";
+    ["7","8","9","4","5","6","1","2","3","C","0"].forEach(k=>{g+='<button data-k="'+k+'"'+(k==="0"?' class="z"':'')+dis+'>'+k+'</button>'});   /* 電卓と同じ並び */
+    h='<div class="cSub">'+c.v+' の取り合い　面を選ぶ（相手には見えない）</div><div class="cDisp"><b>'+(ent||"&nbsp;")+'</b><span>面</span></div><div class="cKeys">'+g+'</div>'+
+      '<div class="cBtns"><button class="gold" data-go="1"'+(mp||!entVal()?" disabled":"")+'>決定</button></div>'+
       '<div class="cWait">'+(mp?"相手が選んでいます…":"")+'</div><div class="cT" id="conT"></div><div class="cHint">使った面の数だけ 最後のサイコロの面が減る</div>';
   }else if(c.stage==="dice"){
-    h='<div class="cCard"><small>取り合い</small><b>'+c.v+'</b></div><div class="cDice">'+
+    h='<div class="cCard"><b>'+c.v+'</b></div><div class="cDice">'+
       '<div class="dcol"><div class="dlab">相手 '+c.F[op]+'面</div><div class="die cOpp" id="cdOpp"><svg viewBox="0 0 100 100"><polygon/></svg><b>?</b></div></div>'+
       '<div class="dcol"><div class="dlab">自分 '+c.F[me]+'面</div><div class="die cMe" id="cdMe"><svg viewBox="0 0 100 100"><polygon/></svg><b>?</b></div></div></div><div class="cRes" id="cRes"></div>';
   }else if(c.stage==="done"){
@@ -755,8 +761,9 @@ function paintCon(){
 $("con").onclick=e=>{
   const b=e.target.closest("button");if(!b||b.disabled||!S.con)return;
   if(b.dataset.c)conChoose(b.dataset.c);
-  else if(b.dataset.n){if(S.con.stage==="pick"&&!S.con.pick[S.me]){S.con.sel=+b.dataset.n;render()}}
-  else if(b.dataset.go)conPick(S.con.sel||1);
+  else if(b.dataset.k){const c=S.con,k=b.dataset.k;if(c.stage!=="pick"||c.pick[S.me])return;   /* 2けたまで。先頭の0は入らない */
+    if(k==="C")c.ent="";else if((c.ent||"").length<2&&!(k==="0"&&!c.ent))c.ent=(c.ent||"")+k;render()}
+  else if(b.dataset.go){if(entVal())conPick(entVal())}
 };
 /* 取り合いのサイコロ: 自動で回って約1.5秒で止まる。同じ目ならもう一度 */
 function playConDice(){
@@ -914,7 +921,7 @@ function guestCon(m){
   const prev=c.stage;c.stage=m.stage;c.w=m.w||0;c.lot=!!m.lot;c.dl=m.left?performance.now()+m.left:0;
   if(m.F)c.F=m.F;if(m.rolls)c.rolls=m.rolls;
   render();
-  if(prev!==c.stage){if(c.stage==="pick"){c.sel=1;render();conPickTimer()}else if(c.stage==="dice")playConDice()}
+  if(prev!==c.stage){if(c.stage==="pick"){c.ent="";render();conPickTimer()}else if(c.stage==="dice")playConDice()}
 }
 function watchConn(conn){
   const epoch=S.netEpoch||0;let opened=false;
