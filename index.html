@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261019b">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261019b">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261019b">
+<meta name="draft-dice-rev" content="20261019c">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261019c">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261019c">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -180,6 +180,8 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .cDice .die{width:100px;height:100px}.cDice .die b{font-size:38px}
 .die.cMe polygon{stroke:#6aa8ff;stroke-width:5}.die.cOpp polygon{stroke:#ff5a6a;stroke-width:5}
 .die.cMe.win polygon{stroke:#6aa8ff;stroke-width:6;filter:drop-shadow(0 0 8px #f0d27a)}.die.cOpp.win polygon{stroke:#ff5a6a;stroke-width:6;filter:drop-shadow(0 0 8px #f0d27a)}
+.cCard{display:flex;flex-direction:column;align-items:center;justify-content:center;width:84px;height:92px;border:2.5px solid #e8c36a;border-radius:14px;background:#0a1810e6;box-shadow:0 0 0 1px #0006,0 0 12px #e8c36a55;margin-bottom:4px}
+.cCard small{font-size:11px;font-weight:900;color:#e8c36a;letter-spacing:.08em}.cCard b{font-family:Cinzel,serif;font-size:46px;font-weight:900;color:#f4ead0;line-height:1.05}
 .cRes{font-size:22px;font-weight:900;min-height:30px;color:#e8c36a}.cRes.w{color:#ffb347}.cRes.l{color:#7a8cff}
 .cHint{font-size:11px;font-weight:800;color:#e8c36a;opacity:.75}
 .fx{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:20;text-align:center;pointer-events:none;display:none;white-space:nowrap}
@@ -301,7 +303,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 <div class="ruleHead">ー　取り合い勝負　ー</div>
 <div class="ruleRow" style="flex-direction:column;gap:8px">
 <div class="ruleArt"><span class="rBtn">勝負する</span><span class="rBtn" style="background:linear-gradient(#4a3210,#2c1c08);color:#e8c36a;border:1.5px solid #e8c36a">譲る</span></div>
-<div class="ruleTxt">かぶったら <span class="ruleGold">勝負する</span>か <span class="ruleGold">譲る</span>か選ぶ<br>譲ったら 相手がその数字をもらう<br>どちらも勝負なら <span class="ruleGold">好きな面のサイコロ</span>で勝負<br>使った面の数だけ <span class="ruleNo">最後のサイコロの面が減る</span></div>
+<div class="ruleTxt">かぶったら <span class="ruleGold">勝負する</span>か <span class="ruleGold">譲る</span>か選ぶ<br>譲ったら 相手がその数字をもらう<br>どちらも勝負なら <span class="ruleGold">好きな面のサイコロ</span>で勝負<br>負けた人は そのラウンド<span class="ruleNo">未獲得</span><br>使った面の数だけ <span class="ruleNo">最後のサイコロの面が減る</span></div>
 </div>
 <div class="ruleHead">ー　未獲得　ー</div>
 <div class="ruleRow" style="flex-direction:column;gap:8px">
@@ -704,9 +706,13 @@ function conResolvePick(){
   if(!w){w=Math.random()<0.5?1:2;c.lot=true}   /* 3回続けて同じ目なら抽選 */
   c.stage="dice";c.F=F;c.rolls=R;c.w=w;c.dl=0;sendCon();render();
   const id=c.id;playConDice();
-  later(()=>{if(S.con&&S.con.id===id){S.pen[1]+=F[1];S.pen[2]+=F[2];conGive(w)}},conDiceDur(R));
+  later(()=>{if(S.con&&S.con.id===id){S.pen[1]+=F[1];S.pen[2]+=F[2];conGive(w,true)}},conDiceDur(R));
 }
-function conGive(w){const c=S.con;S.con=null;S.acq[w].push(c.v);settleWindow({t:"take",v:c.v,k:c.k,who:w,con:true})}
+function conGive(w,fought){   /* 勝負で負けた人はそのラウンド未獲得（―）。譲った時は今まで通り後で獲得できる */
+  const c=S.con;S.con=null;S.acq[w].push(c.v);const ev={t:"take",v:c.v,k:c.k,who:w,con:true};
+  if(fought){const l=oppOf(w);if(need(l)){S.acq[l].push(null);ev.lost=l}}
+  settleWindow(ev);
+}
 function conDiceDur(R){return CON.SPIN1+(R.length-1)*(CON.TIE+CON.SPIN2)+CON.SHOW}
 /* 入力 */
 function conChoose(ch){
@@ -737,7 +743,7 @@ function paintCon(){
       '<div class="cBtns"><button class="gold" data-go="1"'+(mp?" disabled":"")+'>勝負</button></div>'+
       '<div class="cWait">'+(mp?"相手が選んでいます…":"")+'</div><div class="cT" id="conT"></div><div class="cHint">使った面の数だけ 最後のサイコロの面が減る</div>';
   }else if(c.stage==="dice"){
-    h='<div class="cSub">'+c.v+' の取り合い</div><div class="cDice">'+
+    h='<div class="cCard"><small>取り合い</small><b>'+c.v+'</b></div><div class="cDice">'+
       '<div class="dcol"><div class="dlab">相手 '+c.F[op]+'面</div><div class="die cOpp" id="cdOpp"><svg viewBox="0 0 100 100"><polygon/></svg><b>?</b></div></div>'+
       '<div class="dcol"><div class="dlab">自分 '+c.F[me]+'面</div><div class="die cMe" id="cdMe"><svg viewBox="0 0 100 100"><polygon/></svg><b>?</b></div></div></div><div class="cRes" id="cRes"></div>';
   }else if(c.stage==="done"){
