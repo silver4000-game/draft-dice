@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261020a">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261020a">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261020a">
+<meta name="draft-dice-rev" content="20261020b">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261020b">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261020b">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -298,6 +298,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 
 
 
+
 #ask{display:none;position:fixed;inset:0;background:#000c;z-index:100;align-items:center;justify-content:center;flex-direction:column;gap:12px}
 #ask.on{display:flex}
 #chatBtn{position:fixed;z-index:80;min-height:46px;min-width:88px;font-size:15px;font-weight:800;padding:0 14px;border:2px solid #e8c36a;background:linear-gradient(#4a3210,#2c1c08);color:#e8c36a;border-radius:12px;display:none}
@@ -333,7 +334,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 <div class="ruleRow" style="flex-direction:column;gap:8px"><div class="xCol"><div class="xRow"><span class="xk me ">5</span><span class="xp">＋</span><span class="xk me ">3</span><span class="xp">＋</span><span class="xk me ">8</span><span class="xp">－</span><span class="xk me minus">4</span><span class="xt">＝<span class="xv"><b>12</b><i>面</i></span></span></div><span class="ruleArr">↓</span><span class="xH"><span class="rD me"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 83.9,16.1 98.0,50.0 83.9,83.9 50.0,98.0 16.1,83.9 2.0,50.0 16.1,16.1"/></svg><b>9</b></span><span class="xDl">12面</span></span></div><div class="ruleTxt"><span class="ruleGold">3ラウンド</span>　数字を<span class="ruleGold">1つずつ</span>とる<br>合計 － マイナス ＝ <span class="ruleGold">サイコロの面</span></div></div>
 <div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt"><span class="xCol"><span class="rD me win"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 83.9,16.1 98.0,50.0 83.9,83.9 50.0,98.0 16.1,83.9 2.0,50.0 16.1,16.1"/></svg><b>12</b></span><span class="xCap">自分 12</span></span><span class="xVs">VS</span><span class="xCol"><span class="rD op lose"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 83.9,16.1 98.0,50.0 83.9,83.9 50.0,98.0 16.1,83.9 2.0,50.0 16.1,16.1"/></svg><b>6</b></span><span class="xCap">相手 6</span></span></div><div class="ruleArt"><span class="xPt plus">勝ち ＋1200</span><span class="xPt minus">負け －1200</span></div><div class="ruleTxt"><span class="ruleGold">目が大きい方</span>が勝ち<br>勝った人の目×100 を<span class="ruleYes">もらう</span><br>負けた人は 同じだけ<span class="ruleNo">へる</span></div></div>
 <div class="ruleHead">ー　数字　ー</div>
-<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="rStages"><div class="rStage"><span>1〜3回目</span><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#e8c36a" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>2</b></span><span class="rg">1〜3</span><span class="xSec">2.4秒</span><span class="xE" style="color:#7dffb0">0%</span></div><div class="rStage"><span>4〜6回目</span><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#e8c36a" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>5</b></span><span class="rg">1〜6</span><span class="xSec">2.4秒</span><span class="xE" style="color:#ffe066">5%</span></div><div class="rStage"><span>7〜9回目</span><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#e8c36a" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>8</b></span><span class="rg">1〜9</span><span class="xSec">2.4秒</span><span class="xE" style="color:#ffe066">10%</span></div><span class="xDots">…</span></div><div class="ruleTxt">円が1周するごとに 数字が1つ出る<br>3回ごとに 数字は<span class="ruleGold">＋3</span>　終わる確率は<span class="ruleNo">＋5%</span><br>上限なし（<span class="ruleNo">61回目</span>には必ず終わる）</div></div>
+<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="rStages"><div class="rStage"><span>1〜3回目</span><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#e8c36a" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>2</b></span><span class="rg">1〜3</span><span class="xSec">2.4秒</span><span class="xE" style="color:#7dffb0">0%</span></div><div class="rStage"><span>4〜6回目</span><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#e8c36a" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>5</b></span><span class="rg">1〜6</span><span class="xSec">2.4秒</span><span class="xE" style="color:#ffe066">0〜20%</span></div><div class="rStage"><span>7〜9回目</span><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#e8c36a" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>8</b></span><span class="rg">1〜9</span><span class="xSec">2.4秒</span><span class="xE" style="color:#ffe066">0〜20%</span></div><span class="xDots">…</span></div><div class="ruleTxt">円が1周するごとに 数字が1つ出る<br>3回ごとに 数字は<span class="ruleGold">＋3</span>（上限なし）<br>4回目から 終わる確率は 3回ごとに<br><span class="ruleNo">0〜20%</span>（5%きざみ）で ランダムにかわる</div></div>
 <div class="ruleHead">ー　獲得　ー</div>
 <div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt"><span class="xBtn gold">獲得</span><span class="ruleArr">→</span><span class="xBtn res">予約中</span><span class="ruleArr">→</span><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#7dffb0" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>5</b></span><span class="ruleArr">→</span><span class="xk me ">5</span></div><div class="ruleTxt">円が<span class="ruleGold">いっぱいになった時</span>の数字がもらえる<br>取り消しはできない　<span class="ruleGold">1ラウンドに1つ</span></div></div>
 <div class="ruleHead">ー　終了　ー</div>
@@ -598,7 +599,7 @@ function paintStat(battle,k,ep){
   $("stat").classList.toggle("off",!on);$("stat").style.display=battle?"none":"";
   if(!on){S.shownStage=0;return}
   const st=Math.ceil(k/3),pr=$("pRange"),pe=$("pEnd");
-  $("vRange").textContent=S.bonus?"＋"+bonusZ()+"ずつ":rangeLo()+"〜"+rangeHi(k);$("vEnd").textContent=ep+"%"+(S.bonus?" 固定":"");
+  $("vRange").textContent=S.bonus?"＋"+bonusZ():rangeLo()+"〜"+rangeHi(k);$("vEnd").textContent=ep+"%";   /* ボーナス中も「ずつ」「固定」は付けない */
   pe.className="pill h"+heat(ep);
   if(S.shownStage&&st!==S.shownStage){const c=st>S.shownStage?"up":"down";[pr,pe].forEach(e=>{e.classList.remove("up","down");void e.offsetWidth;e.classList.add(c)})}
   S.shownStage=st;
@@ -606,8 +607,8 @@ function paintStat(battle,k,ep){
 function numFx(cls){const el=$("num");el.classList.remove("pop","reset");void el.offsetWidth;if(cls)el.classList.add(cls)}
 
 /* ---------- engine (CPU mode or online host) ---------- */
-function snap(){return{n:S.n,win:S.win,round:S.round,rt:S.rt,acq:{1:S.acq[1].slice(),2:S.acq[2].slice()},p2:!!S.pressed[2],phase:S.phase,bonus:S.bonus?{p:S.bonus.p,pct:S.bonus.pct}:null,pen:{1:S.pen[1],2:S.pen[2]},penL:{1:S.penL[1].slice(),2:S.penL[2].slice()}}}
-function resetDraft(){S.endShow=false;S.pen={1:0,2:0};S.penL={1:[],2:[]};S.con=null;S.conKey="";S.bonus=null;S.bonusQ=[];S.round=1;S.n=null;S.win=0;S.rt=0;S.acq={1:[],2:[]};S.pressed={1:false,2:false};S.phase="draft";S.waiting=true;S.faces=null;S.rolls=null;S.battleDone=false;S.applied=false;S.winner=0;S.got=0;S.votes={};S.lastNew=null;
+function snap(){return{n:S.n,win:S.win,round:S.round,rt:S.rt,acq:{1:S.acq[1].slice(),2:S.acq[2].slice()},p2:!!S.pressed[2],phase:S.phase,bonus:S.bonus?{p:S.bonus.p,pct:S.bonus.pct}:null,ep:S.ep|0,epB:S.epB|0,pen:{1:S.pen[1],2:S.pen[2]},penL:{1:S.penL[1].slice(),2:S.penL[2].slice()}}}
+function resetDraft(){S.endShow=false;S.pen={1:0,2:0};S.penL={1:[],2:[]};S.con=null;S.conKey="";S.bonus=null;S.ep=0;S.epB=1;S.bonusQ=[];S.round=1;S.n=null;S.win=0;S.rt=0;S.acq={1:[],2:[]};S.pressed={1:false,2:false};S.phase="draft";S.waiting=true;S.faces=null;S.rolls=null;S.battleDone=false;S.applied=false;S.winner=0;S.got=0;S.votes={};S.lastNew=null;
   setDie($("dieOpp"),6,null);setDie($("dieMe"),6,null);$("dieOpp").className="die";$("dieMe").className="die";$("dfOpp").textContent="";$("dfMe").textContent="";$("dhMe").classList.remove("on");S.stopped={1:false,2:false};S.stopReq=false}
 function startMatch(){
   resetDraft();fxHide();
@@ -622,10 +623,12 @@ function rangeMax(k){return 3*Math.ceil(k/3)}    /* 1〜3回目:3, 4〜6回目:6
 function rangeLo(){return 1}                     /* ボーナスラウンドも最小1 */
 function rangeHi(k){return rangeMax(k)}
 function bonusZ(){return S.bonus?Math.max(1,Math.round(S.bonus.pct/3)):0}   /* ゾロ目の数（合計％＝3×ゾロ目の数） */
-function endPct(k){return S.bonus?S.bonus.pct:(Math.ceil(k/3)-1)*5}  /* 1〜3回目:0%, 4〜6回目:5%, 7〜9回目:10% ... */
+const EP_SET=[0,5,10,15,20];
+function endPct(k){if(S.bonus)return S.bonus.pct;const b=Math.ceil(k/3);return b<=1?0:(S.epB===b?S.ep:0)}  /* 1〜3回目:0%。4回目から 3回ごとに 0/5/10/15/20% をランダムに決める（部屋を作った側が決めて同期） */
+function ensureEp(){if(!isAuth()||S.bonus)return;const b=Math.ceil(winK()/3);if(b<=1){S.ep=0;S.epB=1}else if(S.epB!==b){S.epB=b;S.ep=EP_SET[Math.floor(Math.random()*EP_SET.length)]}}
 function beginWindow(){
   if(S.phase!=="draft")return;
-  S.win++;S.waiting=false;S.tickStart=performance.now();
+  S.win++;S.waiting=false;S.tickStart=performance.now();ensureEp();
   if(S.bonus)S.n=bonusZ()*winK();   /* ボーナス: ゾロ目の数ずつ増える（z, 2z, 3z…・上限なし） */
   else{const lo=rangeLo(),hi=rangeHi(winK());S.n=lo+Math.floor(Math.random()*(hi-lo+1))}
   if(S.mode==="pvp")send({type:"win",st:snap()});
@@ -664,7 +667,7 @@ function settleWindow(ev){
     else{S.round++;ev.next=S.round;pause+=D.PAUSE_RD;cpuRoundInit()}
   }
   if(ev.t==="take"&&!ev.next&&!ev.end&&!ev.ended&&!ev.bonus)pause=0;   /* 片方だけ先に獲得した時は止めずにそのまま次の回へ */
-  S.waiting=true;
+  S.waiting=true;ensureEp();
   if(S.mode==="pvp")send({type:"res",ev:ev,st:snap()});
   applyEv(ev);render();
   if(ev.end)later(startBattle,pause+D.PAUSE_RD);
@@ -691,7 +694,17 @@ function applyEv(ev){
   if(ev.bonus)later(()=>banner("ボーナスラウンド"),d?d-200:0);
   if(ev.end)later(()=>banner("サイコロ勝負"),d?d-200:700);
 }
-/* CPU AI: 数字の幅も終わる確率も3回ごとに大きくなる。待てば大きい数字が出やすいが、未獲得のリスクも上がる */
+/* CPU AI: 1人で遊ぶ時の一番よい取り方（DP）を目安にする。
+   数字は 1〜3·ceil(k/3)、終わる確率は 1〜3回目 0%、4回目から3回ごとに {0,5,10,15,20}% のどれか（決まるまでは分からない）。
+   CPU_THR[k][i] = その回・その確率で「この数字以上なら取る」（0 = 待つ） */
+const CPU_THR=(function(){const P=[0,.05,.1,.15,.2],K=600,T=[],nx=new Array(P.length).fill(0);let cur=null;
+  for(let k=K;k>=1;k--){const b=Math.ceil(k/3),m=3*b,ps=b<=1?[0]:P,last=k===K||Math.ceil((k+1)/3)!==b,row=[],Wk=[];
+    const avg=nx.reduce((a,v)=>a+v,0)/nx.length;
+    ps.forEach((p,i)=>{const c=(1-p)*(k===K?0:last?avg:cur[i]);let t=0,s=0;for(let n=1;n<=m;n++){if(!t&&n>=c-1e-9)t=n;s+=Math.max(n,c)}row.push(t);Wk.push(s/m)});
+    if(b<=1){T[k]=P.map(()=>row[0]);cur=P.map(()=>Wk[0])}else{T[k]=row;cur=Wk}
+    if(Math.ceil(k/3)!==Math.ceil((k-1)/3)||k===1){for(let i=0;i<P.length;i++)nx[i]=cur[i]}}
+  return T})();
+function cpuThr(k,E){const i=Math.max(0,EP_SET.indexOf(E));return CPU_THR[Math.min(k,CPU_THR.length-1)][i]}
 function cpuRoundInit(){const r=Math.random();S.cpuT=r<0.2?5:r<0.45?6:r<0.7?7:r<0.9?8:9}
 /* CPUのボーナスラウンド: 数字は z, 2z, 3z… と決まって増え、終わる確率は p で固定。
    期待値が一番高いのは n ≥ (1−p)/p になる最初の回。そこを狙って ±2回 ぶれる */
@@ -703,10 +716,11 @@ function cpuThink(){
   if(S.mode!=="cpu"||!need(2)||S.pressed[2]||S.n==null)return;
   if(S.bonus){if(winK()>=S.cpuBK){const w=S.win;later(()=>{if(S.phase==="draft"&&!S.waiting&&S.win===w&&need(2))S.pressed[2]=true},winDur(1)*(0.1+Math.random()*0.7))}return}
   const n=S.n,k=winK(),M=rangeMax(k),E=endPct(k);
-  let T=S.cpuT;
+  const base=cpuThr(k,E);
+  let T=base?base+(S.cpuT<=6?-1:S.cpuT>=9?1:0):Infinity;   /* 性格: 少し早取り／ふつう／少し欲ばり */
   const diff=sumOf(1)-sumOf(2);
-  if(S.round===ROUNDS&&!need(1)){if(diff>0)T+=Math.min(3,Math.floor(diff/3));else if(diff<-6)T=Math.max(3,T-2)}
-  let press=n>=T||(E>=10&&n>=Math.ceil(M*0.75))||(E>=15&&n>=Math.ceil(M*0.5))||E>=25;
+  if(S.round===ROUNDS&&!need(1)){if(diff>0&&T<Infinity)T+=Math.min(3,Math.floor(diff/3));else if(diff<-6)T=Math.max(3,(T<Infinity?T:M)-2)}
+  let press=n>=Math.max(1,T);
   if(press&&need(1)&&E<15&&n<M&&Math.random()<0.15)press=false;   // 被りを避けて1回待つ
   if(press){const w=S.win;later(()=>{if(S.phase==="draft"&&!S.waiting&&S.win===w&&need(2))S.pressed[2]=true},winDur(k)*(0.1+Math.random()*0.77))}
 }
@@ -968,7 +982,7 @@ $("grab").onclick=()=>{
 /* ---------- online ---------- */
 function send(a){if(S.conn&&S.conn.open)S.conn.send(a)}
 function applySnap(st){
-  S.n=st.n;S.win=st.win;S.round=st.round;S.rt=st.rt;S.acq={1:st.acq[1].slice(),2:st.acq[2].slice()};S.phase=st.phase;S.bonus=st.bonus||null;
+  S.n=st.n;S.win=st.win;S.round=st.round;S.rt=st.rt;S.acq={1:st.acq[1].slice(),2:st.acq[2].slice()};S.phase=st.phase;S.bonus=st.bonus||null;if(st.epB!=null){S.ep=st.ep|0;S.epB=st.epB|0}
   if(st.pen)S.pen={1:st.pen[1]|0,2:st.pen[2]|0};if(st.penL)S.penL={1:st.penL[1].slice(),2:st.penL[2].slice()};S.con=null;
   if(st.p2)S.pressed[2]=true;
 }
