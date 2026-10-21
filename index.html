@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261021j">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261021j">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261021j">
+<meta name="draft-dice-rev" content="20261022a">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261022a">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261022a">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -548,13 +548,20 @@ function setDie(el,faces,val){el.querySelector("polygon").setAttribute("points",
 const GC=2*Math.PI*86;
 $("gfg").setAttribute("stroke-dasharray",GC.toFixed(2));
 $("rbM").setAttribute("stroke-dasharray",GC.toFixed(2));
-(function(){  /* 虹色リング: 色付きの短い弧を一周並べ、進み具合の円でマスクする（Safariでも動くSVGのみ） */
-  const N=72,R=86,ns="http://www.w3.org/2000/svg",g=$("rbRing");
-  for(let i=0;i<N;i++){const a0=(i/N)*2*Math.PI,a1=((i+1.6)/N)*2*Math.PI;
-    const p=document.createElementNS(ns,"path");
-    p.setAttribute("d","M"+(100+R*Math.cos(a0)).toFixed(2)+" "+(100+R*Math.sin(a0)).toFixed(2)+"A"+R+" "+R+" 0 0 1 "+(100+R*Math.cos(a1)).toFixed(2)+" "+(100+R*Math.sin(a1)).toFixed(2));
-    p.setAttribute("fill","none");p.setAttribute("stroke","hsl("+Math.round(i*360/N)+",95%,62%)");p.setAttribute("stroke-width","22");
-    g.appendChild(p)}
+(function(){  /* 虹色リング: なめらかな虹の輪を画像で1回だけ作り、進み具合の円でマスクする（色の境目が見えない・Safariでも動く） */
+  const R=86,W=22,SC=4,SZ=200*SC,ns="http://www.w3.org/2000/svg",g=$("rbRing");
+  const cv=document.createElement("canvas");cv.width=cv.height=SZ;const cx=cv.getContext("2d"),im=cx.createImageData(SZ,SZ),d=im.data;
+  const r0=(R-W/2)*SC,r1=(R+W/2)*SC,S2=0.95,L=0.62,A=S2*Math.min(L,1-L) /* hsl(h,95%,62%) と同じ色 */;
+  const f=(n,h)=>{const k=(n+h/30)%12;return L-A*Math.max(-1,Math.min(k-3,9-k,1))};
+  for(let y=0;y<SZ;y++)for(let x=0;x<SZ;x++){const dx=x+.5-SZ/2,dy=y+.5-SZ/2,r=Math.hypot(dx,dy);
+    const a=Math.min(1,r-r0+.5,r1-r+.5);if(a<=0)continue;
+    let h=Math.atan2(dy,dx)*180/Math.PI;if(h<0)h+=360;   /* 右(3時)から時計回りに 赤→黄→緑→青→紫→赤 */
+    const i=(y*SZ+x)*4;d[i]=Math.round(f(0,h)*255);d[i+1]=Math.round(f(8,h)*255);d[i+2]=Math.round(f(4,h)*255);d[i+3]=Math.round(a*255)}
+  cx.putImageData(im,0,0);
+  const img=document.createElementNS(ns,"image");
+  img.setAttribute("x","0");img.setAttribute("y","0");img.setAttribute("width","200");img.setAttribute("height","200");
+  const u=cv.toDataURL("image/png");img.setAttribute("href",u);img.setAttributeNS("http://www.w3.org/1999/xlink","xlink:href",u);
+  g.appendChild(img)
 })();
 function gaugeLoop(){
   requestAnimationFrame(gaugeLoop);
