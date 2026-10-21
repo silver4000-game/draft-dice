@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261021f">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261021f">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261021f">
+<meta name="draft-dice-rev" content="20261021g">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261021g">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261021g">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -185,6 +185,26 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .cBtns{display:flex;gap:10px;justify-content:center;margin-top:4px}
 .cBtns button{min-width:120px;height:54px;font-size:18px}
 .cBtns button.sel{outline:3px solid #7dffb0;outline-offset:2px;opacity:1}
+.cHelpBtn{min-height:0;height:34px;min-width:96px;padding:0 14px;margin-top:6px;font-size:13px;border-width:1.5px;border-radius:10px;opacity:.9}   /* 被った画面の「説明」ボタン（小さめ） */
+/* 被った時の説明ページ（被った画面の上にかさねる） */
+.cHelp{display:none;position:fixed;inset:0;background:#06120ef5;z-index:110;flex-direction:column;align-items:center;justify-content:flex-start;overflow:auto;-webkit-overflow-scrolling:touch;padding:max(14px,env(safe-area-inset-top)) 0 max(14px,env(safe-area-inset-bottom));box-sizing:border-box;text-align:center}
+.cHelp.on{display:flex}
+.cHelp .cTitle{flex:none;margin-bottom:4px}
+.hList{width:min(92vw,360px);display:flex;flex-direction:column;gap:10px;flex:none}
+.hItem{padding:8px 8px 9px;background:#0a181066;border-radius:12px;border:1px solid #e8c36a33;display:flex;flex-direction:column;align-items:center;gap:6px}
+.hHead{font-size:15px;font-weight:900;color:#e8c36a}
+.hTxt{font-size:13px;font-weight:700;line-height:1.45;color:#f4ead0}
+.hArt{display:flex;align-items:center;justify-content:center;gap:8px}
+.hRows{display:flex;flex-direction:column;gap:5px;align-items:flex-start}
+.hR{display:flex;align-items:center;gap:5px;height:32px}
+.hW{width:24px;text-align:right}
+.hArt .xBtn{min-width:64px;height:26px;font-size:12px;padding:0 6px;border-radius:8px}
+.hArt .xk{width:26px;height:32px;font-size:16px}
+.hArt .xCard{flex:none}
+.hCont{font-size:11px;font-weight:900;color:#7dffb0;white-space:nowrap}
+.hArt .rD{width:30px;height:30px}.hArt .rD b{font-size:14px}
+.hBat{font-size:12px;font-weight:900;color:#ffb347;white-space:nowrap}
+.cHelp>button{flex:none;margin-top:12px;min-width:140px}
 .cWait,.cT{font-size:13px;font-weight:800;color:#f4ead0;min-height:18px}
 .cT{color:#e8c36a;opacity:.85}
 .cDisp{width:208px;height:52px;box-sizing:border-box;border:2px solid #e8c36a;border-radius:12px;background:#0a1810e6;display:flex;align-items:center;justify-content:flex-end;gap:4px;padding:0 14px}   /* 電卓の表示 */
@@ -390,6 +410,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 </section>
 <section id="result"><div class="box"><div id="rTitle">Win</div><div id="rCalc" style="font-size:14px;line-height:1.7;margin:8px 0;color:#e8c36a"></div><div id="rPts" style="font-size:40px;font-weight:900;margin:6px 0 16px"></div><div class="row"><button id="again">もう1度</button><button id="home">やめる</button></div></div></section>
 <div class="con" id="con"></div>
+<div class="cHelp" id="cHelp"><div class="cTitle">被ったとき</div><div class="hList"><div class="hItem"><div class="hHead">お互いゆずる</div><div class="hArt"><span class="xCard">7</span><span class="hRows"><span class="hR"><span class="xWho hW">相手</span><span class="xBtn">ゆずる</span></span><span class="hR"><span class="xWho hW">自分</span><span class="xBtn">ゆずる</span></span></span><span class="ruleArr">→</span><span class="hRows"><span class="hR"><span class="xk miss op">―</span></span><span class="hR"><span class="xk miss me">―</span></span></span></div><div class="hTxt">お互い未獲得のまま<br>ラウンド終了</div></div><div class="hItem"><div class="hHead">自分だけゆずる</div><div class="hArt"><span class="xCard">7</span><span class="hRows"><span class="hR"><span class="xWho hW">相手</span><span class="xBtn gold">取り合う</span></span><span class="hR"><span class="xWho hW">自分</span><span class="xBtn">ゆずる</span></span></span><span class="ruleArr">→</span><span class="hRows"><span class="hR"><span class="xk op">7</span></span><span class="hR"><span class="hCont">続きから</span></span></span></div><div class="hTxt">数字は相手が獲得して、<br>自分は続きから数字を選び直す</div></div><div class="hItem"><div class="hHead">自分だけ取り合う</div><div class="hArt"><span class="xCard">7</span><span class="hRows"><span class="hR"><span class="xWho hW">相手</span><span class="xBtn">ゆずる</span></span><span class="hR"><span class="xWho hW">自分</span><span class="xBtn gold">取り合う</span></span></span><span class="ruleArr">→</span><span class="hRows"><span class="hR"><span class="hCont">続きから</span></span><span class="hR"><span class="xk me">7</span></span></span></div><div class="hTxt">相手がゆずってくれたので<br>数字を獲得</div></div><div class="hItem"><div class="hHead">お互い取り合う</div><div class="hArt"><span class="xCard">7</span><span class="hRows"><span class="hR"><span class="xWho hW">相手</span><span class="xBtn gold">取り合う</span></span><span class="hR"><span class="xWho hW">自分</span><span class="xBtn gold">取り合う</span></span></span><span class="ruleArr">→</span><span class="hRows"><span class="hR"><span class="rD op"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,26.0 91.6,74.0 50.0,98.0 8.4,74.0 8.4,26.0"/></svg><b>?</b></span></span><span class="hR"><span class="rD me"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,26.0 91.6,74.0 50.0,98.0 8.4,74.0 8.4,26.0"/></svg><b>?</b></span></span></span><span class="hBat">バトル！</span></div><div class="hTxt">数字を取り合う<br>バトルがはじまるよ</div></div></div><button id="cHelpBack">もどる</button></div>
 
 <div id="ask"><div style="color:#e8c36a;font-weight:800">モード選択に戻りますか？</div><div class="row"><button id="askYes" class="gold">はい</button><button id="askNo">いいえ</button></div></div>
 </div>
@@ -414,7 +435,7 @@ function stopAudio(){
 }
 function hardStopSounds(){
   bumpGameGen();clearGameTimers();stopAudio();
-  try{banner("");fxHide();lotHide()}catch(e){}
+  try{banner("");fxHide();lotHide();$("cHelp").classList.remove("on")}catch(e){}
 }
 function ac(){if(!audioCtx||audioCtx.state==="closed")audioCtx=new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==="suspended")audioCtx.resume();return audioCtx}
 function tone(freq,dur,type,gain,slide,delay){try{const ctx=ac();const t0=ctx.currentTime+(delay||0);const o=ctx.createOscillator();const g=ctx.createGain();o.type=type||"square";o.frequency.setValueAtTime(freq,t0);if(slide)o.frequency.exponentialRampToValueAtTime(slide,t0+dur);g.gain.setValueAtTime(0.0001,t0);g.gain.exponentialRampToValueAtTime(gain||0.08,t0+0.008);g.gain.exponentialRampToValueAtTime(0.001,t0+dur);o.connect(g);g.connect(ctx.destination);o.start(t0);o.stop(t0+dur+0.02)}catch(e){}}
@@ -851,14 +872,16 @@ function conPick(n){
 /* 画面 */
 function paintCon(){
   const el=$("con"),c=S.con,battle=(S.phase==="battle"&&!!S.faces)||S.phase==="result";
+  const hp=$("cHelp");if(hp&&hp.classList.contains("on")&&(!c||battle||c.id!==S.helpId||c.stage!=="choice"))hp.classList.remove("on");   /* 説明を見ている間に 取り合いの結果が決まったら 説明を閉じて ふつうに結果を見せる */
   if(!c||battle){if(S.conKey){el.innerHTML="";S.conKey=""}el.classList.remove("on");return}
   const me=S.me,op=oppOf(me);
   const key=[c.id,c.stage,c.choice[me],c.pick[me],c.ent,c.stage==="dice"?0:c.w].join("|");
   el.classList.add("on");if(key===S.conKey)return;S.conKey=key;
   let h="";
   if(c.stage==="choice"){const mc=c.choice[me];
-    h='<div class="cTitle">被った！</div><div class="cNum">'+c.v+'</div><div class="cSub">この数字をどうする？</div>'+
+    h='<div class="cTitle">被った！</div><div class="cNum">'+c.v+'</div>'+
       '<div class="cBtns"><button class="'+(mc==="yield"?"sel":"")+'" data-c="yield"'+(mc?" disabled":"")+'>ゆずる</button><button class="gold'+(mc==="fight"?" sel":"")+'" data-c="fight"'+(mc?" disabled":"")+'>取り合う</button></div>'+
+      '<button class="cHelpBtn" data-help="1">説明</button>'+   /* 被った時の4つのパターンの説明ページを開く（選んだことにはならない） */
       '<div class="cWait">'+(mc?"相手を待っています…":"")+'</div>';
   }else if(c.stage==="pick"){const mp=c.pick[me],ent=mp?String(mp):(c.ent||""),dis=mp?" disabled":"";let g="";
     ["1","2","3","4","5","6","7","8","9","C","0"].forEach(k=>{g+='<button data-k="'+k+'"'+dis+'>'+k+'</button>'});   /* 上から 1 2 3 / 4 5 6 / 7 8 9 / C 0（9の下は空き） */
@@ -877,9 +900,11 @@ function paintCon(){
   el.innerHTML=h;
   if(c.stage==="dice"){setDie($("cdOpp"),c.F[op],null);setDie($("cdMe"),c.F[me],null);conDicePaint()}
 }
+$("cHelpBack").onclick=()=>$("cHelp").classList.remove("on");   /* もどる: 被った画面にもどる（選んだ内容・待ち状態はそのまま） */
 $("con").onclick=e=>{
   if(e.target.closest("#cdMe")){conTap();return}
   const b=e.target.closest("button");if(!b||b.disabled||!S.con)return;
+  if(b.dataset.help){S.helpId=S.con.id;$("cHelp").classList.add("on");$("cHelp").scrollTop=0;return}
   if(b.dataset.c)conChoose(b.dataset.c);
   else if(b.dataset.k){const c=S.con,k=b.dataset.k;if(c.stage!=="pick"||c.pick[S.me])return;   /* 2けたまで。先頭の0は入らない */
     if(k==="C")c.ent="";else if((c.ent||"").length<2&&!(k==="0"&&!c.ent))c.ent=(c.ent||"")+k;render()}
