@@ -20,6 +20,11 @@ h2{font-size:15px;color:#f0c75e;margin:14px 0 6px}.note{font-size:12px;opacity:.
 <div class="bar"><i id="bar"></i></div><div id="st">まだ始めていません</div>
 <h2>性格ごとの結果</h2><div id="tbl"></div>
 <h2>組み合わせごとの勝率（行の性格から見た勝率）</h2><div id="mx"></div>
+<h2 style="margin-top:26px">B譲 対 B取（取り合いの選び方だけ ちがう B どうし）</h2>
+<p class="s">2人とも 性格B。被った時だけ、B譲 は いつも「ゆずる」、B取 は いつも「取り合う」を選びます。先手と後手は 1試合ごとに交代します。</p>
+<div class="ctl"><label>対戦数 <input id="numBY" type="number" min="10" step="10" value="200000"></label><button id="goBY">B譲 対 B取 スタート</button><button id="stopBY" disabled style="background:#c0504d;color:#fff">ストップ</button></div>
+<div class="bar"><i id="barBY"></i></div><div id="stBY">まだ始めていません</div>
+<div id="tblBY"></div><div id="bdBY"></div>
 <div class="note">
 ・最終の数字＝最後のサイコロの面（合計 − マイナス、0より下にならない）<br>
 ・平均の何回目＝ラウンド1〜3で カードをとった回（ボーナスは入れない）<br>
@@ -31,7 +36,7 @@ h2{font-size:15px;color:#f0c75e;margin:14px 0 6px}.note{font-size:12px;opacity:.
 ・ボーナス：B はゲームのCPUと同じ（一番よい回 ±2）。A は遅め、C は早め、D はほぼ同じ
 </div>
 <script id="eng" type="text/plain">
-/* ドラフトダイス CPU 総当たりシミュレーション エンジン（rev 20261021a のルール） */
+/* ドラフトダイス CPU 総当たりシミュレーション エンジン（rev 20261021b のルール） */
 'use strict';
 const ROUNDS=3,EP_SET=[0,5,10,15,20];
 let rnd=Math.random;
@@ -116,6 +121,9 @@ const P={
   fight(c){return rnd()<(P.E.isTgt(c)?0.9:0.15)},
   faces(c){return P.E.isTgt(c)?1+ri(3):ri(3)}}
 };
+/* B譲 / B取: 取り合いの選び方だけ ちがう B（ほかは B とまったく同じ） */
+P.BY=Object.assign({},P.B,{name:'B譲（いつも譲る）',fight(){return false}});
+P.BT=Object.assign({},P.B,{name:'B取（いつも取り合う）',fight(){return true}});
 function playGame(t1,t2){
   const T={1:P[t1],2:P[t2]},acq={1:[],2:[]},pen={1:0,2:0},kSum={1:0,2:0},kCnt={1:0,2:0};
   let round=1,rt=0,bonus=null,bonusQ=null,ep=0,epB=1;const st={1:null,2:null};
@@ -125,6 +133,7 @@ function playGame(t1,t2){
   const roundInit=()=>{st[1]=T[1].roundInit();st[2]=T[2].roundInit()};
   const gs={1:T[1].gameInit?T[1].gameInit():{},2:T[2].gameInit?T[2].gameInit():{}};
   const took=(p,k)=>{kSum[p]+=k;kCnt[p]++};
+  const cs={ff:0,fy:0,yy:0},yl=[];   /* 取り合いの内訳: ff=2人とも取り合う fy=片方が譲る yy=2人とも譲る / yl=譲った記録 */
   roundInit();let guard=0;
   while(true){
     if(++guard>200000)throw new Error('loop');
@@ -141,6 +150,7 @@ function playGame(t1,t2){
     if(a&&b&&!bonus){
       const ctx=p=>{const o=3-p;return{v:n,k,M,E,round,gs:gs[p],ownAcq:acq[p],ownSum:sumOf(p),oppSum:sumOf(o),ownPen:pen[p],oppPen:pen[o]}};
       const f1=T[1].fight(ctx(1)),f2=T[2].fight(ctx(2));
+      if(f1&&f2)cs.ff++;else if(f1||f2){cs.fy++;yl.push({p:f1?2:1,v:n,r:round,k})}else cs.yy++;   /* 記録だけ（乱数は使わない） */
       if(f1&&f2){const F={};for(const p of [1,2]){let x=Math.round(+T[p].faces(ctx(p)));if(!(x>=1&&x<=99))x=x>99?99:1;F[p]=x}
         let w=0;for(let i=0;i<3&&!w;i++){const r1=ri(F[1]),r2=ri(F[2]);if(r1!==r2)w=r1>r2?1:2}
         if(!w)w=rnd()<0.5?1:2;
@@ -164,13 +174,27 @@ function playGame(t1,t2){
   const F={1:Math.max(0,sumOf(1)-pen[1]),2:Math.max(0,sumOf(2)-pen[2])};
   const r={1:F[1]>0?ri(F[1]):0,2:F[2]>0?ri(F[2]):0};
   const w=r[1]===r[2]?0:r[1]>r[2]?1:2;
-  return{F,w,pts:w?r[w]*100:0,kSum,kCnt,bonus:{1:acq[1].length===4,2:acq[2].length===4}};
+  return{F,w,pts:w?r[w]*100:0,kSum,kCnt,bonus:{1:acq[1].length===4,2:acq[2].length===4},cs,yl,acq,pen};
 }
-
 
 const C=['A','B','C','D','E'],PAIRS=[];for(let a=0;a<5;a++)for(let b=a+1;b<5;b++)PAIRS.push([C[a],C[b]]);
 function blank(){const s={};C.forEach(c=>s[c]={g:0,w:0,l:0,d:0,F:0,k:0,kn:0,pts:0,bon:0});const m={};C.forEach(a=>{m[a]={};C.forEach(b=>{if(a!==b)m[a][b]={g:0,w:0}})});return{s,m}}
-onmessage=function(e){const N=e.data.n,R=blank(),t0=Date.now(),STEP=2000;let i=0;
+function blankBY(){const s={};for(const c of ['BY','BT'])s[c]={g:0,w:0,l:0,d:0,F:0,k:0,kn:0,pts:0,bon:0,dash:0,pen:0,g1:0,w1:0};
+  return{s,ff:0,fy:0,yy:0,byR:[0,0,0,0],yn:0,yv:0,lt:0,lv:0,ld:0,lup:0,byTook:0}}
+function runBY(N){const R=blankBY(),t0=Date.now(),STEP=2000;let i=0;   /* B譲 対 B取（1試合ごとに先手を交代） */
+  function chunk(){const end=Math.min(N,i+STEP);
+    for(;i<end;i++){const sw=i%2,t1=sw?'BT':'BY',t2=sw?'BY':'BT',g=playGame(t1,t2);
+      for(const [p,c] of [[1,t1],[2,t2]]){const x=R.s[c];x.g++;x.F+=g.F[p];x.k+=g.kSum[p];x.kn+=g.kCnt[p];if(g.bonus[p])x.bon++;
+        x.pen+=g.pen[p];for(let j=0;j<3;j++)if(g.acq[p][j]==null)x.dash++;
+        if(p===1){x.g1++;if(g.w===1)x.w1++}
+        if(g.w===p){x.w++;x.pts+=g.pts}else if(!g.w)x.d++;else{x.l++;x.pts-=g.pts}}
+      R.ff+=g.cs.ff;R.fy+=g.cs.fy;R.yy+=g.cs.yy;
+      for(const y of g.yl){const yc=y.p===1?t1:t2;if(yc!=='BY')continue;R.yn++;R.yv+=y.v;R.byR[y.r]++;R.byTook++;
+        const later=g.acq[y.p][y.r-1];if(later==null)R.ld++;else{R.lt++;R.lv+=later;if(later>y.v)R.lup++}}}
+    postMessage({mode:'by',done:i>=N,i,N,ms:Date.now()-t0,R});
+    if(i<N)setTimeout(chunk,0)}
+  chunk()}
+onmessage=function(e){if(e.data.mode==='by')return runBY(e.data.n);const N=e.data.n,R=blank(),t0=Date.now(),STEP=2000;let i=0;
   function chunk(){const end=Math.min(N,i+STEP);
     for(;i<end;i++){const pr=PAIRS[i%10],sw=Math.floor(i/10)%2,t1=sw?pr[1]:pr[0],t2=sw?pr[0]:pr[1],g=playGame(t1,t2);
       for(const [p,c,o] of [[1,t1,t2],[2,t2,t1]]){const x=R.s[c];x.g++;x.F+=g.F[p];x.k+=g.kSum[p];x.kn+=g.kCnt[p];if(g.bonus[p])x.bon++;
@@ -200,6 +224,35 @@ $('go').onclick=()=>{let n=Math.round(+$('num').value);if(!(n>=10))n=10;n=Math.m
     if(d.done){$('go').disabled=false;$('stop').disabled=true;W.terminate();W=null}};
   W.onerror=e=>{$('st').textContent='エラー：'+e.message;$('go').disabled=false;$('stop').disabled=true};
   W.postMessage({n})};
+let WB=null,lastB=null;
+function paintBY(d){const R=d.R,NM={BY:'B譲（いつも譲る）',BT:'B取（いつも取り合う）'},G=R.s.BY.g;
+  let h='<table id="byMain"><tr><th>CPU</th><th>試合</th><th>勝ち</th><th>負け</th><th>引き分け</th><th>勝率</th><th>引き分け率</th><th>最終の数字<br>（平均）</th><th>点<br>（1試合平均）</th><th>「―」<br>（1試合平均）</th><th>マイナス面<br>（1試合平均）</th><th>とった回<br>（平均 何回目）</th><th>ボーナス<br>（率）</th><th>先手の時の<br>勝率</th></tr>';
+  for(const c of ['BY','BT']){const x=R.s[c],o=R.s[c==='BY'?'BT':'BY'],wr=x.g?x.w/x.g:0,ow=o.g?o.w/o.g:0;
+    h+=`<tr><td>${NM[c]}</td><td>${fmt(x.g)}</td><td>${fmt(x.w)}</td><td>${fmt(x.l)}</td><td>${fmt(x.d)}</td><td class="${x.g?(wr>ow?'hi':'lo'):''}">${pc(x.w,x.g)}</td><td>${pc(x.d,x.g)}</td><td>${f2(x.F,x.g)}</td><td>${x.g?(x.pts/x.g>=0?'+':'')+(x.pts/x.g).toFixed(1):'-'}</td><td>${f2(x.dash,x.g)}</td><td>${f2(x.pen,x.g)}</td><td>${f2(x.k,x.kn)}</td><td>${pc(x.bon,x.g)}</td><td>${pc(x.w1,x.g1)}</td></tr>`}
+  $('tblBY').innerHTML=h+'</table>';
+  const tot=R.ff+R.fy+R.yy,rows=[
+   ['被った（取り合い）の回数',fmt(tot)+' 回（1試合 '+f2(tot,G)+' 回）'],
+   ['　ラウンド1 / 2 / 3',fmt(R.byR[1])+' / '+fmt(R.byR[2])+' / '+fmt(R.byR[3])+' 回'],
+   ['B譲が 譲った回数',fmt(R.yn)+' 回'],
+   ['B取が 譲られて取った回数',fmt(R.byTook)+' 回'],
+   ['2人とも取り合う（サイコロ勝負）',fmt(R.ff)+' 回'],
+   ['2人とも譲る',fmt(R.yy)+' 回'],
+   ['譲った数字の平均',f2(R.yv,R.yn)],
+   ['譲ったあと 同じラウンドで 数字を取れた',fmt(R.lt)+' 回（'+pc(R.lt,R.yn)+'）'],
+   ['　取れた数字の平均',f2(R.lv,R.lt)],
+   ['　譲った数字より 大きい数字を取れた',fmt(R.lup)+' 回（'+pc(R.lup,R.yn)+'）'],
+   ['譲ったあと そのラウンドが「―」になった',fmt(R.ld)+' 回（'+pc(R.ld,R.yn)+'）'],
+   ['譲ったあと そのラウンドで得た数字の平均（「―」は0）',f2(R.lv,R.yn)]];
+  $('bdBY').innerHTML='<h2>取り合いの内訳</h2><table id="byBreak">'+rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')+'</table>';}
+$('goBY').onclick=()=>{let n=Math.round(+$('numBY').value);if(!(n>=10))n=10;n=Math.min(n,50000000);$('numBY').value=n;
+  if(WB)WB.terminate();WB=new Worker(url);$('goBY').disabled=true;$('stopBY').disabled=false;$('stBY').textContent='計算中…';$('barBY').style.width='0';
+  WB.onmessage=e=>{const d=e.data;lastB=d;$('barBY').style.width=(100*d.i/d.N)+'%';paintBY(d);
+    $('stBY').textContent=(d.done?'おわり：':'計算中：')+fmt(d.i)+' / '+fmt(d.N)+' 試合　'+(d.ms/1000).toFixed(1)+'秒';
+    if(d.done){$('goBY').disabled=false;$('stopBY').disabled=true;WB.terminate();WB=null}};
+  WB.onerror=e=>{$('stBY').textContent='エラー：'+e.message;$('goBY').disabled=false;$('stopBY').disabled=true};
+  WB.postMessage({n,mode:'by'})};
+$('stopBY').onclick=()=>{if(WB){WB.terminate();WB=null}$('goBY').disabled=false;$('stopBY').disabled=true;
+  if(lastB)$('stBY').textContent='ストップ：'+fmt(lastB.i)+' / '+fmt(lastB.N)+' 試合まで（ここまでの結果）　'+(lastB.ms/1000).toFixed(1)+'秒'};
 $('stop').onclick=()=>{if(W){W.terminate();W=null}$('go').disabled=false;$('stop').disabled=true;
   if(last)$('st').textContent='ストップ：'+fmt(last.i)+' / '+fmt(last.N)+' 試合まで（ここまでの結果）　'+(last.ms/1000).toFixed(1)+'秒'};
 </script>
