@@ -15,7 +15,7 @@ h2{font-size:15px;color:#f0c75e;margin:14px 0 6px}.note{font-size:12px;opacity:.
 .hi{color:#7dffb0;font-weight:700}.lo{color:#ff8a80}
 </style></head><body>
 <h1>ドラフトダイス CPU総当たり</h1>
-<p class="s">性格 A〜E の CPU どうしを 総当たり（10組・先手と後手を交代）で 自動対戦させます。ルールは 今のゲーム（rev 20261021b）と同じです。</p>
+<p class="s">性格 A〜E の CPU どうしを 総当たり（10組・先手と後手を交代）で 自動対戦させます。ルールは 今のゲーム（rev 20261021c）と同じです。</p>
 <div class="ctl"><label>対戦数 <input id="num" type="number" min="10" step="10" value="200000"></label><button id="go">スタート</button><button id="stop" disabled>ストップ</button></div>
 <div class="bar"><i id="bar"></i></div><div id="st">まだ始めていません</div>
 <h2>性格ごとの結果</h2><div id="tbl"></div>
@@ -36,17 +36,17 @@ h2{font-size:15px;color:#f0c75e;margin:14px 0 6px}.note{font-size:12px;opacity:.
 ・ボーナス：B はゲームのCPUと同じ（一番よい回 ±2）。A は遅め、C は早め、D はほぼ同じ
 </div>
 <script id="eng" type="text/plain">
-/* ドラフトダイス CPU 総当たりシミュレーション エンジン（rev 20261021b のルール） */
+/* ドラフトダイス CPU 総当たりシミュレーション エンジン（rev 20261021c のルール） */
 'use strict';
-const ROUNDS=3,EP_SET=[0,5,10,15,20];
+const ROUNDS=3,EP_SET=[5,10,15,20];
 let rnd=Math.random;
 const U=(a,b)=>a+(b-a)*rnd();
 const ri=n=>1+Math.floor(rnd()*n);
 const rangeMax=k=>3*Math.ceil(k/3);
 /* ゲームの CPU_THR と同じ DP。CONT[k][i] = 窓 k・確率 EP_SET[i] で「待った時の期待値」 */
-const CONT=(function(){const P=[0,.05,.1,.15,.2],K=600,C=[],nx=new Array(P.length).fill(0);let cur=null;
+const CONT=(function(){const P=[.05,.1,.15,.2],K=600,C=[],nx=new Array(P.length).fill(0);let cur=null;
   for(let k=K;k>=1;k--){const b=Math.ceil(k/3),m=3*b,ps=b<=1?[0]:P,last=k===K||Math.ceil((k+1)/3)!==b,row=[],Wk=[];
-    const sum=nx.reduce((a,v)=>a+v,0),avgEx=i=>(sum-nx[i])/(nx.length-1);
+    const sum=nx.reduce((a,v)=>a+v,0),avgEx=i=>b<=1?sum/nx.length:(sum-nx[i])/(nx.length-1);
     ps.forEach((p,i)=>{const c=(1-p)*(k===K?0:last?avgEx(i):cur[i]);let s=0;for(let n=1;n<=m;n++)s+=Math.max(n,c);row.push(c);Wk.push(s/m)});
     if(b<=1){C[k]=P.map(()=>row[0]);cur=P.map(()=>Wk[0])}else{C[k]=row;cur=Wk}
     if(Math.ceil(k/3)!==Math.ceil((k-1)/3)||k===1){for(let i=0;i<P.length;i++)nx[i]=cur[i]}}
