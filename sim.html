@@ -15,7 +15,7 @@ h2{font-size:15px;color:#f0c75e;margin:14px 0 6px}.note{font-size:12px;opacity:.
 .hi{color:#7dffb0;font-weight:700}.lo{color:#ff8a80}
 </style></head><body>
 <h1>ドラフトダイス CPU総当たり</h1>
-<p class="s">性格 A〜E の CPU どうしを 総当たり（10組・先手と後手を交代）で 自動対戦させます。ルールは 今のゲーム（rev 20261021h）と同じです。</p>
+<p class="s">性格 A〜E の CPU どうしを 総当たり（10組・先手と後手を交代）で 自動対戦させます。ルールは 今のゲーム（rev 20261021j）と同じです。</p>
 <div class="ctl"><label>対戦数 <input id="num" type="number" min="10" step="10" value="200000"></label><button id="go">スタート</button><button id="stop" disabled>ストップ</button></div>
 <div class="bar"><i id="bar"></i></div><div id="st">まだ始めていません</div>
 <h2>性格ごとの結果</h2><div id="tbl"></div>
@@ -36,7 +36,7 @@ h2{font-size:15px;color:#f0c75e;margin:14px 0 6px}.note{font-size:12px;opacity:.
 ・ボーナス：2ずつ増える・終わる確率 5% 固定。B はゲームのCPUと同じ（一番よい回 ±2）。A は遅め、C は早め、D はほぼ同じ
 </div>
 <script id="eng" type="text/plain">
-/* ドラフトダイス CPU 総当たりシミュレーション エンジン（rev 20261021h のルール） */
+/* ドラフトダイス CPU 総当たりシミュレーション エンジン（rev 20261021j のルール） */
 'use strict';
 const ROUNDS=3,EP_SET=[5,10,15,20,25];
 let rnd=Math.random;
@@ -151,7 +151,7 @@ function playGame(t1,t2){
       const ctx=p=>{const o=3-p;return{v:n,k,M,E,round,gs:gs[p],ownAcq:acq[p],ownSum:sumOf(p),oppSum:sumOf(o),ownPen:pen[p],oppPen:pen[o]}};
       const f1=T[1].fight(ctx(1)),f2=T[2].fight(ctx(2));
       if(f1&&f2)cs.ff++;else if(f1||f2){cs.fy++;yl.push({p:f1?2:1,v:n,r:round,k})}else cs.yy++;   /* 記録だけ（乱数は使わない） */
-      if(f1&&f2){const F={};for(const p of [1,2]){let x=Math.round(+T[p].faces(ctx(p)));if(!(x>=1&&x<=99))x=x>99?99:1;F[p]=x}
+      if(f1&&f2){const F={};for(const p of [1,2]){let x=Math.round(+T[p].faces(ctx(p)));if(!(x>=2))x=2;F[p]=x   /* 面は2から（上限なし）rev 20261021j */}
         let w=0;for(let i=0;i<3&&!w;i++){const r1=ri(F[1]),r2=ri(F[2]);if(r1!==r2)w=r1>r2?1:2}
         if(!w)w=rnd()<0.5?1:2;
         pen[1]+=F[1];pen[2]+=F[2];acq[w].push(n);took(w,k);const l=3-w;if(need(l))acq[l].push(null);ev='take'}
