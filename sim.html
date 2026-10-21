@@ -15,7 +15,7 @@ h2{font-size:15px;color:#f0c75e;margin:14px 0 6px}.note{font-size:12px;opacity:.
 .hi{color:#7dffb0;font-weight:700}.lo{color:#ff8a80}
 </style></head><body>
 <h1>ドラフトダイス CPU総当たり</h1>
-<p class="s">性格 A〜E の CPU どうしを 総当たり（10組・先手と後手を交代）で 自動対戦させます。ルールは 今のゲーム（rev 20261021a）と同じです。</p>
+<p class="s">性格 A〜E の CPU どうしを 総当たり（10組・先手と後手を交代）で 自動対戦させます。ルールは 今のゲーム（rev 20261021b）と同じです。</p>
 <div class="ctl"><label>対戦数 <input id="num" type="number" min="10" step="10" value="200000"></label><button id="go">スタート</button><button id="stop" disabled>ストップ</button></div>
 <div class="bar"><i id="bar"></i></div><div id="st">まだ始めていません</div>
 <h2>性格ごとの結果</h2><div id="tbl"></div>
@@ -149,7 +149,7 @@ function playGame(t1,t2){
       else ev='kaburi'}
     else if(a||b){const w=a?1:2;acq[w].push(n);if(!bonus)took(w,k);ev='take'}
     rt++;
-    if(ev==='kaburi')rt=0;
+    if(ev==='kaburi'){for(const p of [1,2])if(need(p))acq[p].push(null)}   /* 2人とも譲った → 2人とも「―」で次のラウンドへ（rev 20261021b） */
     else if((need(1)||need(2))&&rnd()*100<E){for(const p of [1,2])if(need(p))acq[p].push(null)}
     if(!need(1)&&!need(2)){
       rt=0;
