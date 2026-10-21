@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261022d">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261022d">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261022d">
+<meta name="draft-dice-rev" content="20261022e">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261022e">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261022e">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -455,7 +455,7 @@ function sfxWinJ(){[523,659,784,1046].forEach((f,i)=>later(()=>tone(f,0.28,"squa
 function sfxLose(){[392,330,262].forEach((f,i)=>later(()=>tone(f,0.25,"triangle",0.06),i*150))}
 
 const S={mode:null,me:1,host:true,round:1,n:1,win:0,rt:0,acq:{1:[],2:[]},pressed:{1:false,2:false},phase:"idle",waiting:true,tickStart:0,
-  totals:{1:0,2:0},matchNo:1,votes:{},faces:null,rolls:null,battleDone:false,applied:false,winner:0,got:0,cpuT:5,peer:null,conn:null,lastNew:null,pen:{1:0,2:0},penL:{1:[],2:[]},con:null,conId:0};
+  totals:{1:0,2:0},matchNo:1,votes:{},faces:null,rolls:null,battleDone:false,applied:false,winner:0,got:0,peer:null,conn:null,lastNew:null,pen:{1:0,2:0},penL:{1:[],2:[]},con:null,conId:0};
 const oppOf=p=>p===1?2:1;
 function need(p){return S.bonus?(p===S.bonus.p&&S.acq[p].length<4):S.acq[p].length<S.round}
 /* ゾロ目: 3ラウンドの数字が3つとも同じ（―は数えない） */
@@ -652,6 +652,7 @@ function snap(){return{n:S.n,win:S.win,round:S.round,rt:S.rt,acq:{1:S.acq[1].sli
 function resetDraft(){S.endShow=false;S.hold=null;S.pen={1:0,2:0};S.penL={1:[],2:[]};S.con=null;S.conKey="";S.bonus=null;S.ep=0;S.epB=1;S.bonusQ=[];S.round=1;S.n=null;S.win=0;S.rt=0;S.acq={1:[],2:[]};S.pressed={1:false,2:false};S.phase="draft";S.waiting=true;S.faces=null;S.rolls=null;S.battleDone=false;S.applied=false;S.winner=0;S.got=0;S.votes={};S.lastNew=null;
   setDie($("dieOpp"),6,null);setDie($("dieMe"),6,null);$("dieOpp").className="die";$("dieMe").className="die";$("dfOpp").textContent="";$("dfMe").textContent="";$("dhMe").classList.remove("on");S.stopped={1:false,2:false};S.stopReq=false}
 function startMatch(){
+  S.cpuGS=null;   /* CPU の「通算で負けているか」は 試合ごとに 見直す */
   resetDraft();fxHide();
   $("again").textContent="もう1度";$("again").style.display="";
   show("game");render();
@@ -738,36 +739,71 @@ function applyEv(ev){
   if(ev.bonus)later(()=>banner("ボーナスラウンド"),d?d-200:0);
   if(ev.end)later(()=>banner("サイコロ勝負"),d?d-200:700);
 }
-/* CPU AI: 1人で遊ぶ時の一番よい取り方（DP）を目安にする。
+/* CPU AI の目安: 1人で遊ぶ時の一番よい取り方（DP）。
    数字は 1〜3·ceil(k/3)、終わる確率は 1〜3回目 0%、4回目から3回ごとに {0,5,10,15,20,25}% のどれか（前の3回と同じ%もあり・決まるまでは分からない）。
-   CPU_THR[k][i] = その回・その確率で「この数字以上なら取る」（0 = 待つ） */
-const CPU_THR=(function(){const P=[0,.05,.1,.15,.2,.25],K=600,T=[],nx=new Array(P.length).fill(0);let cur=null;
+   CPU_CONT[k][i] = その回・その確率で「待った時の期待値」（この数字以上なら取るのが目安）。シミュレーションの CONT と同じ */
+const CPU_CONT=(function(){const P=[0,.05,.1,.15,.2,.25],K=600,C=[],nx=new Array(P.length).fill(0);let cur=null;
   for(let k=K;k>=1;k--){const b=Math.ceil(k/3),m=3*b,ps=b<=1?[0]:P,last=k===K||Math.ceil((k+1)/3)!==b,row=[],Wk=[];
-    const sum=nx.reduce((a,v)=>a+v,0),avgEx=i=>sum/nx.length;   /* 次の3回は 0〜25%の6つから同じ確率で（前と同じ%もあり） */
-    ps.forEach((p,i)=>{const c=(1-p)*(k===K?0:last?avgEx(i):cur[i]);let t=0,s=0;for(let n=1;n<=m;n++){if(!t&&n>=c-1e-9)t=n;s+=Math.max(n,c)}row.push(t);Wk.push(s/m)});
-    if(b<=1){T[k]=P.map(()=>row[0]);cur=P.map(()=>Wk[0])}else{T[k]=row;cur=Wk}
+    const sum=nx.reduce((a,v)=>a+v,0),avgEx=()=>sum/nx.length;   /* 次の3回は 0〜25%の6つから同じ確率で（前と同じ%もあり） */
+    ps.forEach((p,i)=>{const c=(1-p)*(k===K?0:last?avgEx(i):cur[i]);let s=0;for(let n=1;n<=m;n++)s+=Math.max(n,c);row.push(c);Wk.push(s/m)});
+    if(b<=1){C[k]=P.map(()=>row[0]);cur=P.map(()=>Wk[0])}else{C[k]=row;cur=Wk}
     if(Math.ceil(k/3)!==Math.ceil((k-1)/3)||k===1){for(let i=0;i<P.length;i++)nx[i]=cur[i]}}
-  return T})();
-function cpuThr(k,E){const i=Math.max(0,EP_SET.indexOf(E));return CPU_THR[Math.min(k,CPU_THR.length-1)][i]}
-function cpuRoundInit(){const r=Math.random();S.cpuT=r<0.2?5:r<0.45?6:r<0.7?7:r<0.9?8:9}
-/* CPUのボーナスラウンド: 数字は d, 2d, 3d… と決まって増え（d=2）、終わる確率は p=5% で固定。
-   k回目で取った時の期待値は d·k·(1−p)^(k−1)。一番高いのは k ≥ (1−p)/p になる最初の回（d によらない）
-   → 5% なので 19回目（20回目もほぼ同じ）。そこを狙って ±2回 ぶれる */
+  return C})();
+function cpuCont(k,E){const i=Math.max(0,EP_SET.indexOf(E));return CPU_CONT[Math.min(k,CPU_CONT.length-1)][i]}
+/* ===== CPU「H ゲームCPU」: B（バランス）を土台に、F（逆転狙い）と G（ゾロ目止め）をまぜ、A/C/D/E を ほんのちょっぴり =====
+   ・ふだん: B と同じ（一番よい取り方の目安 cont × 0.85〜1.05）
+   ・F: 通算（今までの点の合計）で負けている点 def から 逆転モードの強さ L（0/0.25/0.5/0.75/1）を決める
+        L = min(1, floor(def ÷ (400×√10) × 4) ÷ 4)  … ゲームには「あと何試合」がないので いつも「あと10試合」として考える
+        → 約320点負けで 0.25、630点で 0.5、950点で 0.75、1270点で 1。勝っている・同点なら L=0（B のまま）
+        L>0: 大きい数字まで待つ（目安×(1+0.3L)）・ラウンドごとに 確率L で ゾロ目ねらい・ボーナスで ねばる（×(1+0.4L)）・取り合いで勝負（+0.2L）・面を多め
+   ・G: ラウンド3で 相手が 同じ数字を2つ持っていて まだ3つ目をとっていない → その数字が出たら（自分がまだ取っていなければ）押す。取り合いは必ず勝負、面は 4〜7
+        ただし 勝っても 自分の最後の面が 0 より下にならない数まで（マイナスに 自分から つっこまない）
+   ・ちょっぴり（ラウンドごと）: 6% A風（少し欲ばり ×1.15）・6% C風（少し早取り ×0.8）・6% D風（最大の数字を 半分の確率で見送る）
+                     （試合ごと）: 8% E風（自然に 2つそろったら 3つ目を待つ） */
+const H_AI={
+  L(def){const x=(def>0?def:0)/(400*Math.sqrt(10));return Math.min(1,Math.floor(x*4)/4)},
+  gameInit(def){return{L:H_AI.L(def),e:Math.random()<0.08}},
+  roundInit(){const r=Math.random();return{m:0.85+0.2*Math.random(),fl:r<0.06?"A":r<0.12?"C":r<0.18?"D":"",chase:null}},
+  blockT(c){const a=c.oppAcq;if(!a||c.bonus||c.oppDone)return null;
+    return c.round===3&&a.length===2&&a[0]!=null&&a[0]===a[1]?a[0]:null},
+  isBlock(c,v){const t=H_AI.blockT(c);return t!=null&&v===t},
+  evOK(c,L){const st=c.st;let fac=st.m*(1+0.3*L);if(st.fl==="A")fac*=1.15;else if(st.fl==="C")fac*=0.8;
+    const F=c.ownSum-c.ownPen,r=c.round-1;
+    if(r>0&&F<5*r)fac*=0.8;else if(r>0&&F>=8*r)fac*=1.1;
+    if(c.n<Math.max(2,fac*c.cont))return false;
+    if(st.fl==="D"&&c.n===c.M&&c.E<=15&&!c.oppDone&&Math.random()<0.5)return false;
+    if(c.n<c.M&&c.E<=10&&Math.random()<0.2+0.2*L)return false;
+    return true},
+  press(c){const g=c.gs,st=c.st,L=g.L||0;
+    if(c.bonus)return c.k>=st.bk;
+    if(H_AI.isBlock(c,c.n))return true;
+    const a=c.ownAcq;
+    if(st.chase==null)st.chase=L>0&&Math.random()<L;
+    if(st.chase||g.e){
+      if(c.round===3&&a[0]!=null&&a[0]===a[1]){if(c.n===a[0])return true;if(c.E>=15+10*L)return H_AI.evOK(c,L);return false}
+      if(st.chase&&c.round===2&&a[0]!=null&&a[0]<=4&&c.n===a[0]&&c.n>=0.5*c.cont)return true}
+    return H_AI.evOK(c,L)},
+  bonusInit(i){const L=(i.gs&&i.gs.L)||0,p=Math.min(1,i.pct/100),best=p>=1?1:Math.max(1,Math.ceil((1-p)/p-1e-9));
+    return{bk:Math.max(1,Math.round((best+Math.floor(Math.random()*5)-2)*(1+0.4*L)))}},
+  fight(c){if(H_AI.isBlock(c,c.v))return true;const L=c.gs.L||0;
+    const hi=c.v>=Math.ceil(0.6*c.M),behind=(c.oppSum-c.oppPen)>(c.ownSum-c.ownPen);return Math.random()<(hi?0.75:0.2)+(behind?0.1:0)+0.2*L},
+  faces(c){const own=c.ownSum-c.ownPen;
+    if(H_AI.isBlock(c,c.v)){const f=4+Math.floor(Math.random()*4);return Math.max(2,Math.min(f,own+c.v))}
+    const L=c.gs.L||0;let f=Math.round(c.v*(0.3+0.3*L+Math.random()*(0.4+0.2*L)));const d=(c.oppSum-c.oppPen)-own;if(d>0)f+=Math.round(d*Math.random()*(0.3+0.5*L));return Math.max(2,f)}
+};
+/* ゲームでの使い方（CPU は いつも プレイヤー2） */
+function cpuGameInit(){S.cpuGS=H_AI.gameInit((S.totals[1]||0)-(S.totals[2]||0))}   /* 通算で 負けている点 → 逆転モードの強さ */
+function cpuRoundInit(){if(!S.cpuGS)cpuGameInit();S.cpuST=H_AI.roundInit()}
+function cpuCtx(n,k){const E=endPct(k);return{n:n,v:n,k:k,M:S.bonus?n:rangeMax(k),E:E,round:S.round,gs:S.cpuGS||{L:0,e:false},st:S.cpuST||H_AI.roundInit(),ownAcq:S.acq[2],oppAcq:S.acq[1],oppDone:!S.bonus&&!need(1),bonus:S.bonus?S.bonus.pct:0,ownSum:sumOf(2),oppSum:sumOf(1),ownPen:S.pen[2]|0,oppPen:S.pen[1]|0,cont:cpuCont(k,E)}}
+/* ボーナス: 数字は 2, 4, 6… と増え、終わる確率は 5% 固定。一番よいのは 19回目 → ±2回 ぶれる（逆転モードなら 長く ねばる） */
 function cpuBonusInit(){
-  if(!S.bonus)return;const p=Math.min(1,S.bonus.pct/100),best=p>=1?1:Math.max(1,Math.ceil((1-p)/p-1e-9));
-  S.cpuBK=Math.max(1,best+Math.floor(Math.random()*5)-2);
+  if(!S.bonus)return;S.cpuBK=H_AI.bonusInit({gs:S.cpuGS,pct:S.bonus.pct}).bk;
 }
 function cpuThink(){
   if(S.mode!=="cpu"||!need(2)||S.pressed[2]||S.n==null)return;
   if(S.bonus){if(winK()>=S.cpuBK){const w=S.win;later(()=>{if(S.phase==="draft"&&!S.waiting&&S.win===w&&need(2))S.pressed[2]=true},winDur(1)*(0.1+Math.random()*0.7))}return}
-  const n=S.n,k=winK(),M=rangeMax(k),E=endPct(k);
-  const base=cpuThr(k,E);
-  let T=base?base+(S.cpuT<=6?-1:S.cpuT>=9?1:0):Infinity;   /* 性格: 少し早取り／ふつう／少し欲ばり */
-  const diff=sumOf(1)-sumOf(2);
-  if(S.round===ROUNDS&&!need(1)){if(diff>0&&T<Infinity)T+=Math.min(3,Math.floor(diff/3));else if(diff<-6)T=Math.max(3,(T<Infinity?T:M)-2)}
-  let press=n>=Math.max(1,T);
-  if(press&&need(1)&&E<15&&n<M&&Math.random()<0.15)press=false;   // 被りを避けて1回待つ
-  if(press){const w=S.win;later(()=>{if(S.phase==="draft"&&!S.waiting&&S.win===w&&need(2))S.pressed[2]=true},winDur(k)*(0.1+Math.random()*0.77))}
+  const k=winK();
+  if(H_AI.press(cpuCtx(S.n,k))){const w=S.win;later(()=>{if(S.phase==="draft"&&!S.waiting&&S.win===w&&need(2))S.pressed[2]=true},winDur(k)*(0.1+Math.random()*0.77))}
 }
 /* ---------- 取り合い勝負（被った時） ---------- */
 const CON={CHOICE:10000,PICK:15000,GRACE:1200,SPIN1:1500,SPIN2:1000,TIE:900,SHOW:1300,YIELD:1100,MIN:2,DIG:4};
@@ -775,8 +811,7 @@ function startContest(v,k){
   S.con={id:++S.conId,v:v,k:k,stage:"choice",dl:0,choice:{1:null,2:null},pick:{1:null,2:null},ent:""};
   S.waiting=true;S.n=v;sendCon();sfxKaburi();render();
   const id=S.con.id;   /* 取り合いに制限時間なし（人が選ぶまで待つ。CPUは従来どおり自動で選ぶ） */
-  if(S.mode==="cpu"){const t=cpuThr(k,endPct(k)),c=t&&v>=t?"fight":"yield";later(()=>hostConChoice(2,c,id),1200+Math.random()*1300)}
-  /* CPU: 2人とも譲ると2人とも「―」。相手がどちらを選んでも「取り合う」が得になるのは 数字 ≥ 1人で続けた時の期待値（＝取る目安）の時 */
+  if(S.mode==="cpu"){const c=H_AI.fight(cpuCtx(v,k))?"fight":"yield";later(()=>hostConChoice(2,c,id),1200+Math.random()*1300)}   /* CPU: B のように数字の大きさで決める（ゾロ目止めの時は必ず取り合う） */
 }
 function sendCon(){   /* 相手の選んだ面は送らない（サイコロが出る時に初めて送る） */
   if(S.mode!=="pvp"||!S.host||!S.con)return;const c=S.con;
@@ -792,7 +827,7 @@ function conResolveChoice(){
   if(f1&&f2){   /* 2人とも勝負 → 面を選ぶ（制限時間なし） */
     c.stage="pick";c.dl=0;c.ent="";sendCon();render();
     const id=c.id;
-    if(S.mode==="cpu"){const n=Math.max(CON.MIN,Math.min(c.v,3+Math.floor(Math.random()*6)));later(()=>hostConPick(2,n,id),1500+Math.random()*2500)}
+    if(S.mode==="cpu"){const n=Math.max(CON.MIN,Math.min(9999,H_AI.faces(cpuCtx(c.v,c.k))));later(()=>hostConPick(2,n,id),1500+Math.random()*2500)}
     return;
   }
   if(f1||f2){   /* 片方が譲った → 勝負を選んだ方がもらう */
