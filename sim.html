@@ -15,7 +15,7 @@ h2{font-size:15px;color:#f0c75e;margin:14px 0 6px}.note{font-size:12px;opacity:.
 .hi{color:#7dffb0;font-weight:700}.lo{color:#ff8a80}
 </style></head><body>
 <h1>ドラフトダイス CPU総当たり</h1>
-<p class="s">性格 A〜F の CPU どうしを 総当たり（15組・先手と後手を交代）で 自動対戦させます。同じ相手と 続けて何試合か（シリーズ）戦い、点の合計で シリーズの勝ち負けも出します。ルールは 今のゲーム（rev 20261022c）と同じです。</p>
+<p class="s">性格 A〜G の CPU どうしを 総当たり（21組・先手と後手を交代）で 自動対戦させます。同じ相手と 続けて何試合か（シリーズ）戦い、点の合計で シリーズの勝ち負けも出します。ルールは 今のゲーム（rev 20261022c）と同じです。</p>
 <div class="ctl"><label>シリーズ（何試合）<input id="ser" type="number" min="1" step="1" value="10"></label></div>
 <div class="ctl"><label>対戦数 <input id="num" type="number" min="10" step="10" value="200000"></label><button id="go">スタート</button><button id="stop" disabled>ストップ</button></div>
 <div class="bar"><i id="bar"></i></div><div id="st">まだ始めていません</div>
@@ -31,6 +31,11 @@ h2{font-size:15px;color:#f0c75e;margin:14px 0 6px}.note{font-size:12px;opacity:.
 <div class="ctl"><label>対戦数 <input id="numBF" type="number" min="10" step="10" value="200000"></label><button id="goBF">B 対 F スタート</button><button id="stopBF" disabled style="background:#c0504d;color:#fff">ストップ</button></div>
 <div class="bar"><i id="barBF"></i></div><div id="stBF">まだ始めていません</div>
 <div id="tblBF"></div>
+<h2 style="margin-top:26px">E 対 G（くらべる用に E 対 B も）</h2>
+<p class="s">性格E（ゾロ目狙い）と 性格G（ゾロ目止め）が戦います。くらべるために 同じ数だけ E 対 B も やります。シリーズは 上の試合数。先手と後手は 1試合ごとに交代します。</p>
+<div class="ctl"><label>対戦数（それぞれ） <input id="numEX" type="number" min="10" step="10" value="200000"></label><button id="goEX">E 対 G スタート</button><button id="stopEX" disabled style="background:#c0504d;color:#fff">ストップ</button></div>
+<div class="bar"><i id="barEX"></i></div><div id="stEX">まだ始めていません</div>
+<div id="tblEX"></div>
 <div class="note">
 ・最終の数字＝最後のサイコロの面（合計 − マイナス、0より下にならない）<br>
 ・平均の何回目＝ラウンド1〜3で カードをとった回（ボーナスは入れない）<br>
@@ -40,6 +45,7 @@ h2{font-size:15px;color:#f0c75e;margin:14px 0 6px}.note{font-size:12px;opacity:.
 ・D ソロ狙い：Bより少し早め。相手と被りそうな数字（範囲の最大など）を よく見送る<br>
 ・E ゾロ目狙い：7割の試合で 1-1-1〜3-3-3 のゾロ目をねらう。ボーナスは 相手をこえる回を見て止める<br>
 ・F 逆転狙い：ふだんは B とまったく同じ。シリーズで負けている点が 大きいほど 少しずつ（4だん階）逆転モードに：大きい数字まで待つ・ゾロ目をねらう・ボーナスで長くねばる・取り合いで勝負して面を多め。勝っている時は B のまま<br>
+・G ゾロ目止め：ふだんは B とまったく同じ。ラウンド3で 相手が 同じ数字を2つ持っていたら、その数字が出た時に（自分がまだ取っていなければ）必ず押して じゃまする。取り合いは いつも勝負、面は 4〜7。数字が小さくても じゃまする<br>
 ・シリーズ：同じ相手と 続けて戦う試合のまとまり。点（勝った人の目×100）の合計が多い方が勝ち<br>
 ・ボーナス：2ずつ増える・終わる確率 5% 固定。B はゲームのCPUと同じ（一番よい回 ±2）。A は遅め、C は早め、D はほぼ同じ
 </div>
@@ -157,6 +163,20 @@ P.F=Object.assign({},P.B,{name:'F 逆転狙い',
     const hi=c.v>=Math.ceil(0.6*c.M),behind=(c.oppSum-c.oppPen)>(c.ownSum-c.ownPen);return rnd()<(hi?0.75:0.2)+(behind?0.1:0)+0.2*L},
   faces(c){const L=c.gs.L||0;if(!L)return P.B.faces(c);
     let f=Math.round(c.v*U(0.3+0.3*L,0.7+0.5*L));const d=(c.oppSum-c.oppPen)-(c.ownSum-c.ownPen);if(d>0)f+=Math.round(d*U(0,0.3+0.5*L));return Math.max(1,f)}});
+/* G ゾロ目止め: ふだんは B とまったく同じ。相手のとった数字（見えている）から、相手が ゾロ目に必要な数字が出たら 押して じゃまする。
+   ・ラウンド3: 相手が 同じ数字を2つ持っていて まだ3つ目をとっていない → その数字が出たら（自分がまだこのラウンドの数字をとっていなければ）必ず押す
+   ・ラウンド2 の じゃま（G_OPT.r2=true の時だけ）: 相手の1つ目の数字（r2max 以下）が また出たら 押す。ふだんは しない
+   ・じゃまの取り合いは いつも「取り合う」。面は 4〜7（相手は ボーナスで 平均 +15 くらい得するので、面を少し多めに使っても 止める方が得） */
+const G_OPT={r2:false,r2max:3,f1:4,f2:7};   /* ラウンド2の じゃまは しない（試したら 損だった）・面は 4〜7 */
+P.G=Object.assign({},P.B,{name:'G ゾロ目止め',
+  blockT(c){const a=c.oppAcq;if(!a||c.bonus||c.oppDone)return null;
+    if(c.round===3&&a.length===2&&a[0]!=null&&a[0]===a[1])return a[0];
+    if(G_OPT.r2&&c.round===2&&a.length===1&&a[0]!=null&&a[0]<=G_OPT.r2max)return a[0];
+    return null},
+  isBlock(c){const t=P.G.blockT(c);return t!=null&&(c.n!=null?c.n:c.v)===t},
+  press(c){if(P.G.isBlock(c))return true;return P.B.press(c)},
+  fight(c){if(P.G.isBlock(c))return true;return P.B.fight(c)},
+  faces(c){if(P.G.isBlock(c))return G_OPT.f1+Math.floor(rnd()*(G_OPT.f2-G_OPT.f1+1));return P.B.faces(c)}});
 /* B譲 / B取: 取り合いの選び方だけ ちがう B（ほかは B とまったく同じ） */
 P.BY=Object.assign({},P.B,{name:'B譲（いつも譲る）',fight(){return false}});
 P.BT=Object.assign({},P.B,{name:'B取（いつも取り合う）',fight(){return true}});
@@ -169,7 +189,7 @@ function playGame(t1,t2,sc){   /* sc = シリーズの状況 {1:{def,rem},2:{def
   const roundInit=()=>{st[1]=T[1].roundInit();st[2]=T[2].roundInit()};
   const gs={1:T[1].gameInit?T[1].gameInit(sc&&sc[1]):{},2:T[2].gameInit?T[2].gameInit(sc&&sc[2]):{}};
   const took=(p,k)=>{kSum[p]+=k;kCnt[p]++};
-  const cs={ff:0,fy:0,yy:0},yl=[];   /* 取り合いの内訳: ff=2人とも取り合う fy=片方が譲る yy=2人とも譲る / yl=譲った記録 */
+  const cs={ff:0,fy:0,yy:0},yl=[],blocks=[];   /* 取り合いの内訳: ff=2人とも取り合う fy=片方が譲る yy=2人とも譲る / yl=譲った記録 */
   roundInit();let guard=0;
   while(true){
     if(++guard>200000)throw new Error('loop');
@@ -181,10 +201,11 @@ function playGame(t1,t2,sc){   /* sc = シリーズの状況 {1:{def,rem},2:{def
     const M=bonus?n:rangeMax(k);
     const pr={1:false,2:false};
     for(const p of [1,2]){if(!need(p))continue;const o=3-p;
-      pr[p]=T[p].press({n,k,M,E,round,gs:gs[p],ownAcq:acq[p],oppDone:!bonus&&!need(o),bonus:bonus?bonus.pct:0,ownSum:sumOf(p),oppSum:sumOf(o),ownPen:pen[p],oppPen:pen[o],st:st[p]})}
+      pr[p]=T[p].press({n,k,M,E,round,gs:gs[p],ownAcq:acq[p],oppAcq:acq[o],oppDone:!bonus&&!need(o),bonus:bonus?bonus.pct:0,ownSum:sumOf(p),oppSum:sumOf(o),ownPen:pen[p],oppPen:pen[o],st:st[p]})}
     const a=pr[1]&&need(1),b=pr[2]&&need(2);let ev='none';
+    const blk={};for(const p of [1,2]){const o=3-p;if(pr[p]&&need(p)&&T[p].isBlock&&T[p].isBlock({n,round,bonus:bonus?1:0,oppAcq:acq[o],oppDone:!need(o)}))blk[p]={r:round,v:n,oppPressed:!!pr[o]&&need(o),la:acq[p].length,lo:acq[o].length,pen0:pen[p]}}   /* ゾロ目止め の記録 */
     if(a&&b&&!bonus){
-      const ctx=p=>{const o=3-p;return{v:n,k,M,E,round,gs:gs[p],ownAcq:acq[p],ownSum:sumOf(p),oppSum:sumOf(o),ownPen:pen[p],oppPen:pen[o]}};
+      const ctx=p=>{const o=3-p;return{v:n,k,M,E,round,gs:gs[p],ownAcq:acq[p],oppAcq:acq[o],oppDone:!need(o),ownSum:sumOf(p),oppSum:sumOf(o),ownPen:pen[p],oppPen:pen[o]}};
       const f1=T[1].fight(ctx(1)),f2=T[2].fight(ctx(2));
       if(f1&&f2)cs.ff++;else if(f1||f2){cs.fy++;yl.push({p:f1?2:1,v:n,r:round,k})}else cs.yy++;   /* 記録だけ（乱数は使わない） */
       if(f1&&f2){const F={};for(const p of [1,2]){let x=Math.round(+T[p].faces(ctx(p)));if(!(x>=2))x=2;F[p]=x   /* 面は2から（上限なし）rev 20261022b */}
@@ -194,6 +215,7 @@ function playGame(t1,t2,sc){   /* sc = シリーズの状況 {1:{def,rem},2:{def
       else if(f1||f2){const w=f1?1:2;acq[w].push(n);took(w,k);ev='take'}
       else ev='kaburi'}
     else if(a||b){const w=a?1:2;acq[w].push(n);if(!bonus)took(w,k);ev='take'}
+    for(const p in blk){const o=3-p,x=blk[p];x.got=acq[p].length>x.la&&acq[p][x.la]===n;x.oppGot=acq[o].length>x.lo&&acq[o][x.lo]===n;x.ff=pen[p]>x.pen0;blocks.push(Object.assign({p:+p},x))}
     rt++;
     if(ev==='kaburi'){for(const p of [1,2])if(need(p))acq[p].push(null)}   /* 2人とも譲った → 2人とも「―」で次のラウンドへ（rev 20261021b） */
     else if((need(1)||need(2))&&rnd()*100<E){for(const p of [1,2])if(need(p))acq[p].push(null)}
@@ -210,10 +232,10 @@ function playGame(t1,t2,sc){   /* sc = シリーズの状況 {1:{def,rem},2:{def
   const F={1:Math.max(0,sumOf(1)-pen[1]),2:Math.max(0,sumOf(2)-pen[2])};
   const r={1:F[1]>0?ri(F[1]):0,2:F[2]>0?ri(F[2]):0};
   const w=r[1]===r[2]?0:r[1]>r[2]?1:2;
-  return{F,w,pts:w?r[w]*100:0,kSum,kCnt,bonus:{1:acq[1].length===4,2:acq[2].length===4},cs,yl,acq,pen,gs};
+  return{F,w,pts:w?r[w]*100:0,kSum,kCnt,bonus:{1:acq[1].length===4,2:acq[2].length===4},cs,yl,acq,pen,gs,blocks};
 }
 
-const C=['A','B','C','D','E','F'],PAIRS=[];for(let a=0;a<C.length;a++)for(let b=a+1;b<C.length;b++)PAIRS.push([C[a],C[b]]);
+const C=['A','B','C','D','E','F','G'],PAIRS=[];for(let a=0;a<C.length;a++)for(let b=a+1;b<C.length;b++)PAIRS.push([C[a],C[b]]);
 function blank(){const s={};C.forEach(c=>s[c]={g:0,w:0,l:0,d:0,F:0,k:0,kn:0,pts:0,bon:0,sg:0,sw:0,sl:0,sd:0,act:0});const m={};C.forEach(a=>{m[a]={};C.forEach(b=>{if(a!==b)m[a][b]={g:0,w:0,sg:0,sw:0}})});return{s,m}}
 function blankBY(){const s={};for(const c of ['BY','BT'])s[c]={g:0,w:0,l:0,d:0,F:0,k:0,kn:0,pts:0,bon:0,dash:0,pen:0,g1:0,w1:0};
   return{s,ff:0,fy:0,yy:0,byR:[0,0,0,0],yn:0,yv:0,lt:0,lv:0,ld:0,lup:0,byTook:0}}
@@ -247,7 +269,27 @@ function runBF(N,S){const R=blankBF(),t0=Date.now(),STEP=2000;let i=0,A=0,B=0,ev
     postMessage({mode:'bf',done:i>=N,i,N,ms:Date.now()-t0,R,S});
     if(i<N)setTimeout(chunk,0)}
   chunk()}
-onmessage=function(e){if(e.data.mode==='by')return runBY(e.data.n);if(e.data.mode==='bf')return runBF(e.data.n,e.data.s);
+/* E 対 G と E 対 B（くらべる用）。シリーズは 上の試合数。先手は 1試合ごとに交代 */
+function runEX(N,S){const t0=Date.now(),STEP=2000,X=['G','B'],R={};let q=0,i=0,A=0,B=0;
+  for(const x of X)R[x]={s:{E:{g:0,w:0,l:0,d:0,F:0,pts:0,bon:0,sg:0,sw:0,sl:0,sd:0},[x]:{g:0,w:0,l:0,d:0,F:0,pts:0,bon:0,sg:0,sw:0,sl:0,sd:0}},
+    pair:0,pairZ:0,pairBlk:0,pairBlkZ:0,bk:0,bk3:0,bkC:0,bkWon:0,bkYield:0,bkSolo:0,bkOpp:0,bkOk:0,bkG:0};
+  function chunk(){let left=STEP;
+    while(left>0&&q<X.length){const x=X[q],r=R[x];
+      for(;left>0&&i<N;i++,left--){const j=i%S;if(!j){A=0;B=0}
+        const sw=(Math.floor(i/S)+j)%2,t1=sw?x:'E',t2=sw?'E':x,pe=sw?2:1,px=3-pe,g=playGame(t1,t2,{});
+        for(const [p,c] of [[pe,'E'],[px,x]]){const y=r.s[c];y.g++;y.F+=g.F[p];if(g.bonus[p])y.bon++;if(g.w===p){y.w++;y.pts+=g.pts}else if(!g.w)y.d++;else{y.l++;y.pts-=g.pts}}
+        if(g.w===pe)A+=g.pts;else if(g.w===px)B+=g.pts;
+        const a=g.acq[pe],hasPair=a[0]!=null&&a[0]===a[1],z=a.length>=3&&hasPair&&a[1]===a[2];let blk=false;
+        for(const b of g.blocks){if(b.p!==px)continue;r.bk++;if(b.r!==3)continue;r.bk3++;blk=true;
+          if(b.oppPressed){if(b.got&&b.ff)r.bkWon++;else if(b.got)r.bkYield++;else if(b.oppGot)r.bkOpp++}else if(b.got)r.bkSolo++;
+          if(b.oppPressed&&b.ff)r.bkC++;if(b.got)r.bkG++;if(!b.oppGot)r.bkOk++}
+        if(hasPair){r.pair++;if(z)r.pairZ++;if(blk){r.pairBlk++;if(z)r.pairBlkZ++}}
+        if(j===S-1){const w=A>B?'E':B>A?x:0;for(const c of ['E',x]){const y=r.s[c];y.sg++;if(!w)y.sd++;else if(w===c)y.sw++;else y.sl++}}}
+      if(i>=N){q++;i=0}}
+    const done=q>=X.length;postMessage({mode:'ex',done,i:q*N+i,N:N*X.length,ms:Date.now()-t0,R,S});
+    if(!done)setTimeout(chunk,0)}
+  chunk()}
+onmessage=function(e){if(e.data.mode==='by')return runBY(e.data.n);if(e.data.mode==='ex')return runEX(e.data.n,e.data.s);if(e.data.mode==='bf')return runBF(e.data.n,e.data.s);
   const N=e.data.n,S=e.data.s||10,R=blank(),t0=Date.now(),STEP=2000;let i=0,A=0,B=0;   /* 同じ組み合わせで S試合続けて（シリーズ）。A,B = そのシリーズの合計点 */
   function chunk(){const end=Math.min(N,i+STEP);
     for(;i<end;i++){const s=Math.floor(i/S),j=i%S;if(j===0){A=0;B=0}
@@ -264,7 +306,7 @@ onmessage=function(e){if(e.data.mode==='by')return runBY(e.data.n);if(e.data.mod
   chunk()};
 </script>
 <script>
-const $=id=>document.getElementById(id),C=['A','B','C','D','E','F'],NAME={A:'A 欲張り',B:'B バランス',C:'C 堅実',D:'D ソロ狙い',E:'E ゾロ目狙い',F:'F 逆転狙い'};
+const $=id=>document.getElementById(id),C=['A','B','C','D','E','F','G'],NAME={A:'A 欲張り',B:'B バランス',C:'C 堅実',D:'D ソロ狙い',E:'E ゾロ目狙い',F:'F 逆転狙い',G:'G ゾロ目止め'};
 let W=null,last=null;
 const url=URL.createObjectURL(new Blob([$('eng').textContent],{type:'text/javascript'}));
 const pc=(a,b)=>b?(100*a/b).toFixed(1)+'%':'-',f2=(a,b)=>b?(a/b).toFixed(2):'-',fmt=n=>n.toLocaleString('ja-JP');
@@ -336,6 +378,28 @@ $('goBF').onclick=()=>{let n=Math.round(+$('numBF').value);if(!(n>=10))n=10;n=Ma
   WF.postMessage({n,s,mode:'bf'})};
 $('stopBF').onclick=()=>{if(WF){WF.terminate();WF=null}$('goBF').disabled=false;$('stopBF').disabled=true;
   if(lastF)$('stBF').textContent='ストップ：'+fmt(lastF.i)+' / '+fmt(lastF.N)+' 試合まで（ここまでの結果）　'+(lastF.ms/1000).toFixed(1)+'秒'};
+let WX=null,lastX=null;
+function paintEX(d){const NM={E:'E ゾロ目狙い',G:'G ゾロ目止め',B:'B バランス'};let h='';
+  for(const x of ['G','B']){const r=d.R[x];h+=`<h2>E 対 ${x}</h2><table><tr><th>CPU</th><th>試合</th><th>勝ち</th><th>負け</th><th>引き分け</th><th>勝率</th><th>最終の数字<br>（平均）</th><th>点<br>（1試合平均）</th><th>ボーナス<br>（率）</th><th>シリーズ</th><th>シリーズ<br>勝率</th></tr>`;
+    for(const c of ['E',x]){const y=r.s[c],o=r.s[c==='E'?x:'E'],wr=y.g?y.w/y.g:0,ow=o.g?o.w/o.g:0,sr=y.sg?y.sw/y.sg:0,os=o.sg?o.sw/o.sg:0;
+      h+=`<tr><td>${NM[c]}</td><td>${fmt(y.g)}</td><td>${fmt(y.w)}</td><td>${fmt(y.l)}</td><td>${fmt(y.d)}</td><td class="${y.g?(wr>ow?'hi':'lo'):''}">${pc(y.w,y.g)}</td><td>${f2(y.F,y.g)}</td><td>${y.g?(y.pts/y.g>=0?'+':'')+(y.pts/y.g).toFixed(1):'-'}</td><td>${pc(y.bon,y.g)}</td><td>${fmt(y.sg)}</td><td class="${y.sg?(sr>os?'hi':'lo'):''}">${pc(y.sw,y.sg)}</td></tr>`}
+    h+='</table>';
+    const G=r.s.E.g,rows=[['E が ラウンド3で 2つそろっていた',fmt(r.pair)+' 試合（'+pc(r.pair,G)+'）'],['　→ ゾロ目になった',fmt(r.pairZ)+'（'+pc(r.pairZ,r.pair)+'）']];
+    if(x==='G')rows.push(['G が じゃました回数（ラウンド3）',fmt(r.bk3)+' 回（1試合 '+f2(r.bk3,G)+' 回）'],
+      ['　取り合いになって G が勝った',fmt(r.bkWon)+' 回'],['　E が ゆずって G が取った',fmt(r.bkYield)+' 回'],['　E が押さず G が そのまま取った',fmt(r.bkSolo)+' 回'],['　それでも E が取った（取り合いで E の勝ち）',fmt(r.bkOpp)+' 回'],
+      ['　じゃま成功（その数字を E に取らせなかった）',fmt(r.bkOk)+' 回（'+pc(r.bkOk,r.bk3)+'）'],
+      ['じゃまされた試合で E が それでも ゾロ目',fmt(r.pairBlkZ)+' / '+fmt(r.pairBlk)+'（'+pc(r.pairBlkZ,r.pairBlk)+'）']);
+    h+='<table>'+rows.map(z=>`<tr><td>${z[0]}</td><td>${z[1]}</td></tr>`).join('')+'</table>'}
+  $('tblEX').innerHTML=h}
+$('goEX').onclick=()=>{let n=Math.round(+$('numEX').value);if(!(n>=10))n=10;n=Math.min(n,50000000);$('numEX').value=n;const s=serLen();
+  if(WX)WX.terminate();WX=new Worker(url);$('goEX').disabled=true;$('stopEX').disabled=false;$('stEX').textContent='計算中…';$('barEX').style.width='0';
+  WX.onmessage=e=>{const d=e.data;lastX=d;$('barEX').style.width=(100*d.i/d.N)+'%';paintEX(d);
+    $('stEX').textContent=(d.done?'おわり：':'計算中：')+fmt(d.i)+' / '+fmt(d.N)+' 試合　'+(d.ms/1000).toFixed(1)+'秒';
+    if(d.done){$('goEX').disabled=false;$('stopEX').disabled=true;WX.terminate();WX=null}};
+  WX.onerror=e=>{$('stEX').textContent='エラー：'+e.message;$('goEX').disabled=false;$('stopEX').disabled=true};
+  WX.postMessage({n,s,mode:'ex'})};
+$('stopEX').onclick=()=>{if(WX){WX.terminate();WX=null}$('goEX').disabled=false;$('stopEX').disabled=true;
+  if(lastX)$('stEX').textContent='ストップ：'+fmt(lastX.i)+' / '+fmt(lastX.N)+' 試合まで（ここまでの結果）　'+(lastX.ms/1000).toFixed(1)+'秒'};
 $('stop').onclick=()=>{if(W){W.terminate();W=null}$('go').disabled=false;$('stop').disabled=true;
   if(last)$('st').textContent='ストップ：'+fmt(last.i)+' / '+fmt(last.N)+' 試合まで（ここまでの結果）　'+(last.ms/1000).toFixed(1)+'秒'};
 </script>
