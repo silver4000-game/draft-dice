@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261022c">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261022c">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261022c">
+<meta name="draft-dice-rev" content="20261022d">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261022d">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261022d">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -164,6 +164,11 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 @keyframes dspin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 .die.win polygon{stroke:#f0d27a;stroke-width:6;filter:drop-shadow(0 0 8px #f0d27a)}
 .die.lose{filter:brightness(.42)}
+.die.neg polygon{fill:#3b1a20}.die.neg b{color:#ff8a95}   /* マイナスの目は 暗い赤のサイコロに 明るい赤の字 */
+.rsEq{display:flex;align-items:flex-start;justify-content:center;gap:8px;margin:8px 0 2px}.rsEq .rsOp{font-size:30px;font-weight:900;color:#e8c36a;line-height:64px}.rsEq .rsPt{font-size:34px;font-weight:900;color:#f0d27a;line-height:64px;font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif}
+.rsCol{display:flex;flex-direction:column;align-items:center}.rsCol small{font-size:12px;font-weight:900;color:#e8c36a;margin-top:2px}
+.rsDie{width:64px;height:64px;position:relative}.rsDie svg{width:100%;height:100%;display:block}.rsDie polygon{fill:#f7f1e6;stroke:#c8b89a;stroke-width:6;stroke-linejoin:round}.rsDie.me polygon{stroke:#6aa8ff}.rsDie.op polygon{stroke:#ff5a6a}
+.rsDie b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:Cinzel,serif;font-size:25px;font-weight:900;color:#1a1208}.rsDie.neg polygon{fill:#3b1a20}.rsDie.neg b{color:#ff8a95}
 #dieMe polygon{stroke:#6aa8ff;stroke-width:5}#dieOpp polygon{stroke:#ff5a6a;stroke-width:5}   /* 自分=青・相手=赤の枠 */
 #dieMe.win polygon{stroke:#6aa8ff;stroke-width:6;filter:drop-shadow(0 0 8px #f0d27a)}#dieOpp.win polygon{stroke:#ff5a6a;stroke-width:6;filter:drop-shadow(0 0 8px #f0d27a)}
 .dface{font-size:16px;font-weight:900;color:#e8c36a;opacity:1;letter-spacing:.04em}   /* 取り合いの .cFace に合わせる */
@@ -282,7 +287,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .xCap{font-size:11px;font-weight:900;color:#e8c36a;white-space:nowrap}
 .xVs{font-weight:900;color:#e8c36a;font-size:14px}
 .xPt{font-size:13px;font-weight:900;padding:2px 8px;border-radius:8px;border:2px solid currentColor;background:#0a1810;white-space:nowrap}.xPt.plus{color:#6aa8ff}.xPt.minus{color:#ff5a6a}.xPt.zero{color:#e8c36a}
-.rD.me polygon{stroke:#6aa8ff}.rD.op polygon{stroke:#ff5a6a}.rD.win polygon{filter:drop-shadow(0 0 4px #f0d27a)}.rD.zero b{color:#1a1208}
+.rD.neg polygon{fill:#3b1a20}.rD.neg b{color:#ff8a95}.rD.me polygon{stroke:#6aa8ff}.rD.op polygon{stroke:#ff5a6a}.rD.win polygon{filter:drop-shadow(0 0 4px #f0d27a)}.rD.zero b{color:#1a1208}
 .xSec{font-size:11px;color:#f4ead0}.xE{font-size:12px}.xDots{align-self:center;color:#e8c36a;font-weight:900}
 .rStages{align-items:flex-start}
 .xBtn{display:inline-flex;align-items:center;justify-content:center;height:30px;padding:0 10px;border-radius:9px;border:1.5px solid #e8c36a;background:linear-gradient(#4a3210,#2c1c08);color:#e8c36a;font-weight:900;font-size:13px;white-space:nowrap;box-sizing:border-box}
@@ -309,6 +314,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .xPill{--c:#f0d27a;padding:3px 8px;border:2px solid var(--c);border-radius:10px;background:#0a1810e6;text-align:center;line-height:1.1}.xPill small{display:block;font-size:9px;font-weight:900;color:#e8c36a}.xPill b{display:block;font-size:14px;font-weight:900;color:var(--c)}.xPill b .bv{font-size:16px;color:#ffffff}.xPill b .bu{font-size:10px;color:var(--c)}
 .xRes{background:#1a140c;border:2px solid #e8c36a;border-radius:12px;padding:8px 10px;text-align:center;min-width:120px;display:flex;flex-direction:column;align-items:center;gap:2px}
 .xrT{font-size:20px;font-weight:900;color:#ffb347;letter-spacing:.08em}.xrK{font-size:11px;font-weight:800;color:#e8c36a}.xrV{font-size:18px;font-weight:900;color:#6aa8ff;line-height:1.1}.xrS{font-size:10px;color:#e8c36a;margin:6px 0}
+.xrE{display:flex;align-items:center;gap:3px;font-size:12px;font-weight:900;color:#f0d27a;margin:2px 0}.xrE .rD{width:26px;height:26px}.xrE .rD b{font-size:11px}   /* 結果の式（大きい目 − 小さい目 ＝ 点） */
 .xRes .xBtns{margin-top:4px;gap:5px}
 /* /RX-RULES */
 
@@ -355,7 +361,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 <section id="rules"><h1>ルール</h1><div class="rules-body">
 <div class="ruleHead" style="margin-top:6px">ー　流れ　ー</div>
 <div class="ruleRow" style="flex-direction:column;gap:8px"><div class="xCol"><div class="xRow"><span class="xk me ">5</span><span class="xp">＋</span><span class="xk me ">3</span><span class="xp">＋</span><span class="xk me ">8</span><span class="xp">－</span><span class="xk me minus">4</span><span class="xt">＝<span class="xv"><b>12</b><i>面</i></span></span></div><span class="ruleArr">↓</span><span class="xH"><span class="rD me"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 83.9,16.1 98.0,50.0 83.9,83.9 50.0,98.0 16.1,83.9 2.0,50.0 16.1,16.1"/></svg><b>9</b></span><span class="xDl">12面</span></span></div><div class="ruleTxt"><span class="ruleGold">3ラウンド</span>　数字を<span class="ruleGold">1つずつ</span>とる<br>合計 － マイナス ＝ <span class="ruleGold">サイコロの面</span></div></div>
-<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt"><span class="xCol"><span class="rD me win"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 83.9,16.1 98.0,50.0 83.9,83.9 50.0,98.0 16.1,83.9 2.0,50.0 16.1,16.1"/></svg><b>12</b></span><span class="xCap">自分 12</span></span><span class="xVs">VS</span><span class="xCol"><span class="rD op lose"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 83.9,16.1 98.0,50.0 83.9,83.9 50.0,98.0 16.1,83.9 2.0,50.0 16.1,16.1"/></svg><b>6</b></span><span class="xCap">相手 6</span></span></div><div class="ruleArt"><span class="xPt plus">勝ち ＋1200</span><span class="xPt minus">負け －1200</span></div><div class="ruleTxt"><span class="ruleGold">目が大きい方</span>が勝ち<br>勝った人の目×100 を<span class="ruleYes">もらう</span><br>負けた人は 同じだけ<span class="ruleNo">へる</span></div></div>
+<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt"><span class="xCol"><span class="rD me win"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 83.9,16.1 98.0,50.0 83.9,83.9 50.0,98.0 16.1,83.9 2.0,50.0 16.1,16.1"/></svg><b>12</b></span><span class="xCap">自分 12</span></span><span class="xVs">VS</span><span class="xCol"><span class="rD op lose"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 83.9,16.1 98.0,50.0 83.9,83.9 50.0,98.0 16.1,83.9 2.0,50.0 16.1,16.1"/></svg><b>6</b></span><span class="xCap">相手 6</span></span></div><div class="ruleArt"><span class="xPt plus">勝ち ＋600</span><span class="xPt minus">負け －600</span></div><div class="ruleTxt"><span class="ruleGold">目が大きい方</span>が勝ち<br>点は <span class="ruleGold">目の差×100</span>（12−6＝6 → 600）<br>勝った人が<span class="ruleYes">もらう</span>　負けた人は 同じだけ<span class="ruleNo">へる</span></div></div>
 <div class="ruleHead">ー　数字　ー</div>
 <div class="ruleRow" style="flex-direction:column;gap:8px"><div class="rStages"><div class="rStage"><span>1〜3回目</span><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#e8c36a" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>2</b></span><span class="rg">1〜3</span><span class="xSec">2.4秒</span><span class="xE" style="color:#7dffb0">0%</span></div><div class="rStage"><span>4〜6回目</span><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#e8c36a" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>5</b></span><span class="rg">1〜6</span><span class="xSec">2.4秒</span><span class="xE" style="color:#ffe066">0〜25%</span></div><div class="rStage"><span>7〜9回目</span><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#e8c36a" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>8</b></span><span class="rg">1〜9</span><span class="xSec">2.4秒</span><span class="xE" style="color:#ffe066">0〜25%</span></div><span class="xDots">…</span></div><div class="ruleTxt">円が1周するごとに 数字が1つ出る<br>3回ごとに 数字は<span class="ruleGold">＋3</span>（上限なし）<br>終わる確率は 3回ごとに ランダムで決まる（5%きざみ）<br>4回目からは <span class="ruleNo">0〜25%</span><br>前の3回と 同じ%に なることもある</div></div>
 <div class="ruleHead">ー　獲得　ー</div>
@@ -371,13 +377,13 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 <div class="ruleHead">ー　ゾロ目ボーナス　ー</div>
 <div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt"><span class="xk me ">2</span><span class="xp">＋</span><span class="xk me ">2</span><span class="xp">＋</span><span class="xk me ">2</span><span class="ruleArr">→</span><span class="rG"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><path d="M90.00 50.00A40 40 0 0 1 88.45 61.03" fill="none" stroke="hsl(0,95%,62%)" stroke-width="10"/><path d="M89.39 56.95A40 40 0 0 1 85.95 67.53" fill="none" stroke="hsl(10,95%,62%)" stroke-width="10"/><path d="M87.59 63.68A40 40 0 0 1 82.36 73.51" fill="none" stroke="hsl(20,95%,62%)" stroke-width="10"/><path d="M84.64 70.00A40 40 0 0 1 77.79 78.77" fill="none" stroke="hsl(30,95%,62%)" stroke-width="10"/><path d="M80.64 75.71A40 40 0 0 1 72.37 83.16" fill="none" stroke="hsl(40,95%,62%)" stroke-width="10"/><path d="M75.71 80.64A40 40 0 0 1 66.27 86.54" fill="none" stroke="hsl(50,95%,62%)" stroke-width="10"/><path d="M70.00 84.64A40 40 0 0 1 59.68 88.81" fill="none" stroke="hsl(60,95%,62%)" stroke-width="10"/><path d="M63.68 87.59A40 40 0 0 1 52.79 89.90" fill="none" stroke="hsl(70,95%,62%)" stroke-width="10"/><path d="M56.95 89.39A40 40 0 0 1 45.82 89.78" fill="none" stroke="hsl(80,95%,62%)" stroke-width="10"/><path d="M50.00 90.00A40 40 0 0 1 38.97 88.45" fill="none" stroke="hsl(90,95%,62%)" stroke-width="10"/><path d="M43.05 89.39A40 40 0 0 1 32.47 85.95" fill="none" stroke="hsl(100,95%,62%)" stroke-width="10"/><path d="M36.32 87.59A40 40 0 0 1 26.49 82.36" fill="none" stroke="hsl(110,95%,62%)" stroke-width="10"/><path d="M30.00 84.64A40 40 0 0 1 21.23 77.79" fill="none" stroke="hsl(120,95%,62%)" stroke-width="10"/><path d="M24.29 80.64A40 40 0 0 1 16.84 72.37" fill="none" stroke="hsl(130,95%,62%)" stroke-width="10"/><path d="M19.36 75.71A40 40 0 0 1 13.46 66.27" fill="none" stroke="hsl(140,95%,62%)" stroke-width="10"/><path d="M15.36 70.00A40 40 0 0 1 11.19 59.68" fill="none" stroke="hsl(150,95%,62%)" stroke-width="10"/><path d="M12.41 63.68A40 40 0 0 1 10.10 52.79" fill="none" stroke="hsl(160,95%,62%)" stroke-width="10"/><path d="M10.61 56.95A40 40 0 0 1 10.22 45.82" fill="none" stroke="hsl(170,95%,62%)" stroke-width="10"/><path d="M10.00 50.00A40 40 0 0 1 11.55 38.97" fill="none" stroke="hsl(180,95%,62%)" stroke-width="10"/><path d="M10.61 43.05A40 40 0 0 1 14.05 32.47" fill="none" stroke="hsl(190,95%,62%)" stroke-width="10"/><path d="M12.41 36.32A40 40 0 0 1 17.64 26.49" fill="none" stroke="hsl(200,95%,62%)" stroke-width="10"/><path d="M15.36 30.00A40 40 0 0 1 22.21 21.23" fill="none" stroke="hsl(210,95%,62%)" stroke-width="10"/><path d="M19.36 24.29A40 40 0 0 1 27.63 16.84" fill="none" stroke="hsl(220,95%,62%)" stroke-width="10"/><path d="M24.29 19.36A40 40 0 0 1 33.73 13.46" fill="none" stroke="hsl(230,95%,62%)" stroke-width="10"/><path d="M30.00 15.36A40 40 0 0 1 37.64 11.96" fill="none" stroke="hsl(240,95%,62%)" stroke-width="10"/></svg><b>2</b></span><span style="display:flex;flex-direction:column;gap:4px"><span class="xPill" style="--c:#f0d27a"><small>増える数</small><b><span class="bv">2</span><span class="bu">ずつ増える</span></b></span><span class="xPill" style="--c:#ffe066"><small>終わる確率</small><b><span class="bv">5%</span><span class="bu"> 固定</span></b></span></span></div><div class="ruleTxt">3つとも同じ数字（―はダメ）なら<br><span class="ruleGold">自分だけ ラウンド4</span>（1.75秒ごと）<br>数字は <span class="ruleGold">2ずつ増える</span>（2→4→6…）<br>終わる確率は <span class="ruleNo">5% 固定</span><br><span class="xSm">2人ともなら 合計が小さい方から<br>（同じなら 部屋を作った人から）</span></div></div>
 <div class="ruleHead">ー　カードの見方　ー</div>
-<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="xCol"><div class="xRow"><span class="xk me ">9</span><span class="xp">＋</span><span class="xk me ">8</span><span class="xp">＋</span><span class="xk miss me">―</span><span class="xp">－</span><span class="xk me minus">5</span><span class="xt">＝<span class="xv"><b>12</b><i>面</i></span></span></div><div class="xLegend"><span><span class="xk me ">9</span>＝とった数字</span><span><span class="xk miss me">―</span>＝0</span><span><span class="xk me minus">5</span>＝マイナス</span></div></div><div class="ruleTxt">マイナスは<span class="ruleGold">1枚だけ</span>（取り合いで使った面の合計）<br>0ならマイナスは出ない<br>＝の右が<span class="ruleGold">サイコロの面</span>（0より下にならない）</div></div>
+<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="xCol"><div class="xRow"><span class="xk me ">9</span><span class="xp">＋</span><span class="xk me ">8</span><span class="xp">＋</span><span class="xk miss me">―</span><span class="xp">－</span><span class="xk me minus">5</span><span class="xt">＝<span class="xv"><b>12</b><i>面</i></span></span></div><div class="xLegend"><span><span class="xk me ">9</span>＝とった数字</span><span><span class="xk miss me">―</span>＝0</span><span><span class="xk me minus">5</span>＝マイナス</span></div></div><div class="ruleTxt">マイナスは<span class="ruleGold">1枚だけ</span>（取り合いで使った面の合計）<br>0ならマイナスは出ない<br>＝の右が<span class="ruleGold">サイコロの面</span>（<span class="ruleNo">マイナス</span>にもなる）</div></div>
 <div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt"><span class="xBlue">自分</span><span class="xRed">相手</span></div><div class="ruleTxt">自分のカードは<span style="color:#6aa8ff;font-weight:900">青</span>　相手は<span style="color:#ff5a6a;font-weight:900">赤</span></div></div>
 <div class="ruleHead">ー　サイコロ勝負　ー</div>
 <div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt" style="gap:22px"><span class="xCol"><span class="xCap">相手</span><span class="rD op lose"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 83.9,16.1 98.0,50.0 83.9,83.9 50.0,98.0 16.1,83.9 2.0,50.0 16.1,16.1"/></svg><b>6</b></span><span class="xDl">15面</span></span><span class="xCol"><span class="xCap">自分</span><span class="rD me win"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 83.9,16.1 98.0,50.0 83.9,83.9 50.0,98.0 16.1,83.9 2.0,50.0 16.1,16.1"/></svg><b>12</b></span><span class="xDl">24面−5＝19面</span></span></div><div class="ruleTxt">数字は<span class="ruleGold">0.05秒ごと</span>に ランダムに変わる<br><span class="ruleGold">タップで止める</span></div></div>
-<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt"><span class="xCol"><span class="rD op"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,74.0 8.4,74.0"/></svg><b>4</b></span><span class="xCap">相手</span></span><span class="xEq">＝</span><span class="xCol"><span class="rD me"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,26.0 91.6,74.0 50.0,98.0 8.4,74.0 8.4,26.0"/></svg><b>4</b></span><span class="xCap">自分</span></span><span class="ruleArr">→</span><span class="xPt zero">引き分け ±0</span></div><div class="ruleArt"><span class="xCol"><span class="rD op zero"><svg viewBox="0 0 100 100"><polygon points="85.4,85.4 14.6,85.4 14.6,14.6 85.4,14.6"/></svg><b>0</b></span><span class="xCap">0面</span></span><span class="ruleArr">→</span><span class="xTd">回らない　いつも 0</span></div><div class="ruleTxt">同じ目は<span class="ruleGold">引き分け</span>（ふりなおしなし・0点）</div></div>
+<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt"><span class="xCol"><span class="rD op"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,74.0 8.4,74.0"/></svg><b>4</b></span><span class="xCap">相手</span></span><span class="xEq">＝</span><span class="xCol"><span class="rD me"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,26.0 91.6,74.0 50.0,98.0 8.4,74.0 8.4,26.0"/></svg><b>4</b></span><span class="xCap">自分</span></span><span class="ruleArr">→</span><span class="xPt zero">引き分け ±0</span></div><div class="ruleArt"><span class="xCol"><span class="rD op neg"><svg viewBox="0 0 100 100"><polygon points="85.4,85.4 14.6,85.4 14.6,14.6 85.4,14.6"/></svg><b>−8</b></span><span class="xCap">−8面</span></span><span class="ruleArr">→</span><span class="xTd">回らない　いつも −8</span></div><div class="ruleTxt"><span class="ruleGold">1以下</span>（1・0・マイナス）は ふらない（その数字のまま）<br>例：−8 と 3 → 差は11 → <span class="ruleGold">1100点</span><br>同じ目は<span class="ruleGold">引き分け</span>（ふりなおしなし・0点）</div></div>
 <div class="ruleHead">ー　結果　ー</div>
-<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt"><div class="xRes"><div class="xrT">Win</div><div class="xrK">今回</div><div class="xrV">+1200</div><div class="xrK">今までの通算</div><div class="xrV">+1500</div><div class="xBtns"><span class="xBtn sm">もう1度</span><span class="xBtn sm">やめる</span></div></div><div class="xRes cut"><div class="xrT" style="color:#ff5a6a">切断</div><div class="xrS">相手との接続が切れました</div><div class="xBtns"><span class="xBtn sm">やめる</span></div></div></div><div class="ruleTxt">Win / Lose / Draw と 点数<br><span class="ruleGold">通算</span>は ページを読みこみ直すと<span class="ruleNo">0</span><br>対人戦で切れたら「切断」（もう1度なし）</div></div>
+<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt"><div class="xRes"><div class="xrT">Win</div><div class="xrK">今回</div><div class="xrE"><span class="rD me"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,26.0 91.6,74.0 50.0,98.0 8.4,74.0 8.4,26.0"/></svg><b>12</b></span>－<span class="rD op"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,26.0 91.6,74.0 50.0,98.0 8.4,74.0 8.4,26.0"/></svg><b>6</b></span>＝600</div><div class="xrV">+600</div><div class="xrK">今までの通算</div><div class="xrV">+900</div><div class="xBtns"><span class="xBtn sm">もう1度</span><span class="xBtn sm">やめる</span></div></div><div class="xRes cut"><div class="xrT" style="color:#ff5a6a">切断</div><div class="xrS">相手との接続が切れました</div><div class="xBtns"><span class="xBtn sm">やめる</span></div></div></div><div class="ruleTxt">Win / Lose / Draw と 点数<br>大きい目 － 小さい目 ＝ 点（×100）<br><span class="ruleGold">通算</span>は ページを読みこみ直すと<span class="ruleNo">0</span><br>対人戦で切れたら「切断」（もう1度なし）</div></div>
 </div><button id="rulesBack">戻る</button></section>
 
 <section id="room"><h1>部屋</h1><p class="hint">合言葉は3文字以上</p><input id="code" maxlength="8" placeholder="あいことば" /><div class="row" style="margin-top:10px"><button id="mk">部屋を作る</button><button id="jn">入る</button></div><p class="hint" id="roomSt"></p><button id="roomBack" style="margin-top:14px">戻る</button></section>
@@ -543,7 +549,8 @@ function fxHide(){const el=$("fx");if(el)el.className="fx"}
 /* polygon die shape: more faces -> more sides */
 function polySides(n){return 6}   /* サイコロはすべて六角形（前は面の数で三角〜十角） */
 function polyPts(n){const k=polySides(n),pts=[];const rot=k===4?Math.PI/4:-Math.PI/2;const r=k===4?50:48;for(let i=0;i<k;i++){const a=rot+i*2*Math.PI/k;pts.push((50+r*Math.cos(a)).toFixed(1)+","+(50+r*Math.sin(a)).toFixed(1))}return pts.join(" ")}
-function setDie(el,faces,val){el.querySelector("polygon").setAttribute("points",polyPts(faces||6));el.querySelector("b").textContent=val==null?"?":val}
+function fmtV(v){return v<0?"−"+(-v):String(v)}   /* マイナスは「−8」のように出す */
+function setDie(el,faces,val){el.querySelector("polygon").setAttribute("points",polyPts(faces||6));el.querySelector("b").textContent=val==null?"?":fmtV(val);el.classList.toggle("neg",typeof val==="number"&&val<0)}
 
 const GC=2*Math.PI*86;
 $("gfg").setAttribute("stroke-dasharray",GC.toFixed(2));
@@ -585,7 +592,7 @@ function paintPicks(id,p){
   }
   const pen=S.pen&&S.pen[p]||0,ml=(S.penL&&S.penL[p])||[];
   if(pen>0)h+='<span class="plus mns">－</span><div class="pk got minus">'+pen+'</div>';   /* マイナスのカードは1枚だけ（取り合いで使った面の合計） */
-  h+='<span class="faces"><span class="eq">＝</span><span class="fv"><b>'+Math.max(0,sumOf(p)-pen)+'</b><i>面</i></span></span>';
+  h+='<span class="faces"><span class="eq">＝</span><span class="fv"><b>'+fmtV(sumOf(p)-pen)+'</b><i>面</i></span></span>';   /* マイナスにもなる */
   const nc=slotsOf(p)+(pen>0?1:0);box.classList.remove("n5","n6","n7");if(nc>=5)box.classList.add("n"+Math.min(7,nc));
   box.innerHTML=h;
 }
@@ -919,7 +926,7 @@ function conDicePaint(){
 /* dice battle */
 function startBattle(){
   if(!isAuth())return;
-  const F={1:Math.max(0,sumOf(1)-S.pen[1]),2:Math.max(0,sumOf(2)-S.pen[2])};   /* 取り合い勝負で使った面を引く（0より下にはならない） */
+  const F={1:sumOf(1)-S.pen[1],2:sumOf(2)-S.pen[2]};   /* 取り合い勝負で使った面を引く（マイナスにもなる） */
   if(S.mode==="pvp")send({type:"battle",faces:F});
   runBattle(F);
   const f=firstStop(F);if(f)armBattleStop(F[f]>1?f:oppOf(f));else{armBattleStop(1);armBattleStop(2)}   /* 0面・1面の人は最初から止まっている → 相手の番から */
@@ -938,10 +945,10 @@ function runBattle(F){
   S.phase="battle";S.faces=F;S.rolls=[{1:null,2:null}];S.stopped={1:false,2:false};S.stopReq=false;S.settled=0;S.shown={};S.battleDone=false;S.waiting=true;
   const me=S.me,op=oppOf(me);
   setDie($("dieMe"),F[me],null);setDie($("dieOpp"),F[op],null);
-  $("dfMe").textContent=F[me]+"面";$("dfOpp").textContent=F[op]+"面";   /* 取り合いで減った後の最終面だけ（式は出さない） */
+  $("dfMe").textContent=fmtV(F[me])+"面";$("dfOpp").textContent=fmtV(F[op])+"面";   /* 取り合いで減った後の最終面だけ（式は出さない） */
   ["dieMe","dieOpp"].forEach(id=>{const el=$(id);el.className="die";el.querySelector("svg").style.transform="rotate(0deg)"});
-  [1,2].forEach(p=>{if(!(F[p]>1)){const v=F[p]>0?1:0;S.stopped[p]=true;S.rolls[0][p]=v;S.shown[p]=v;S.settled++;setDie(dieOf(p),F[p],v)}});   /* 0面の人は 0、1面の人は 1 で最初から止まっている（回らない・ボタンは押せない・相手を待つだけ） */
-  if(S.settled===2){const bid=S.bid;later(()=>{if(S.bid===bid)settleBattle()},500)}   /* 2人とも0面・1面 → すぐ勝ち負け（0と1なら1の勝ち、同じなら引き分け） */
+  [1,2].forEach(p=>{if(!(F[p]>1)){const v=F[p];S.stopped[p]=true;S.rolls[0][p]=v;S.shown[p]=v;S.settled++;setDie(dieOf(p),F[p],v)}});   /* 1以下（1・0・マイナス）の人は その数字で最初から止まっている（回らない・ボタンは押せない・相手を待つだけ） */
+  if(S.settled===2){const bid=S.bid;later(()=>{if(S.bid===bid)settleBattle()},500)}   /* 2人とも1以下 → すぐ勝ち負け（大きい方の勝ち、同じなら引き分け） */
   render();spinLoop(S.bid);
 }
 function dieOf(p){return p===S.me?$("dieMe"):$("dieOpp")}
@@ -967,7 +974,7 @@ function tapStop(){
 }
 function hostStop(p,bid,v){
   if(!isAuth()||S.bid!==bid||S.phase!=="battle"||!S.faces||!canStop(p))return;
-  const f=S.faces[p];let r=f>0?(Number.isInteger(v)&&v>=1&&v<=f?v:shownOf(p)):0;   /* 0面は必ず0 */
+  const f=S.faces[p];let r=f>1?(Number.isInteger(v)&&v>=1&&v<=f?v:shownOf(p)):f;   /* 1以下は その数字のまま */
   if(S.mode==="pvp")send({type:"dstop",p:p,r:r});
   applyStop(p,r);
   if(firstStop(S.faces)===p&&!S.stopped[oppOf(p)])armBattleStop(oppOf(p));   /* 先の人が止まったら次の人の番 */
@@ -993,11 +1000,11 @@ function settleBattle(){
   if(r[1]===r[2]){finishBattle(0,0);return}   /* 同じ目は引き分け */
   const w=r[1]>r[2]?1:2;
   dieOf(w).classList.add("win");dieOf(oppOf(w)).classList.add("lose");
-  finishBattle(w,r[w]);
+  finishBattle(w,r[w]-r[oppOf(w)]);   /* 点は 目の差×100 */
 }
 function finishBattle(w,roll){
   if(S.applied)return;S.applied=true;
-  S.winner=w;S.got=roll*100;
+  S.winner=w;S.got=roll*100;   /* roll = 目の差 */
   if(w){S.totals[w]+=S.got;S.totals[oppOf(w)]-=S.got}saveHub();
   banner(!w?"引き分け":w===S.me?"勝ち":"負け");
   if(!w)tone(440,0.2,"triangle",0.06);else if(w===S.me)sfxWinJ();else sfxLose();
@@ -1011,7 +1018,10 @@ function showResult(){
   $("rTitle").style.color=!w?"#e8c36a":w===me?"#ffb347":"#7a8cff";
   const mineGot=!w?0:w===me?S.got:-S.got,life=S.totals[me]||0;
   const col=n=>n>0?"#6aa8ff":n<0?"#ff5a6a":"#e8c36a";
-  $("rCalc").innerHTML='<div style="font-size:18px;font-weight:800;color:#e8c36a;margin-top:10px">今回</div>';  /* 式と説明は出さない */
+  const dieH=(p,v)=>'<span class="rsCol"><span class="rsDie '+(p===me?"me":"op")+(v<0?" neg":"")+'"><svg viewBox="0 0 100 100"><polygon points="'+polyPts(6)+'"/></svg><b>'+fmtV(v)+'</b></span><small>'+(p===me?"自分":"相手")+'</small></span>';
+  const hi=w||me,lo=oppOf(hi);   /* 大きい目 − 小さい目 ＝ 点（引き分けは 自分 − 相手 ＝ 0） */
+  const eq=r&&r[1]!=null&&r[2]!=null?'<div class="rsEq">'+dieH(hi,r[hi])+'<span class="rsOp">－</span>'+dieH(lo,r[lo])+'<span class="rsOp">＝</span><span class="rsPt">'+(Math.abs(r[hi]-r[lo])*100)+'</span></div>':'';
+  $("rCalc").innerHTML='<div style="font-size:18px;font-weight:800;color:#e8c36a;margin-top:10px">今回</div>'+eq;   /* 大きい目のサイコロ − 小さい目のサイコロ ＝ 点 */
   $("rPts").innerHTML='<div style="color:'+col(mineGot)+'">'+(mineGot>0?"+":mineGot===0?"±":"")+mineGot+'</div><div style="font-size:18px;font-weight:800;color:#e8c36a;margin-top:10px">今までの通算</div><div style="color:'+col(life)+'">'+(life===0?"±0":(life>0?"+":"")+life)+'</div>';
   show("result");
 }
