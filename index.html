@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261021c">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261021c">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261021c">
+<meta name="draft-dice-rev" content="20261021d">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261021d">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261021d">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -579,7 +579,7 @@ function render(){
   $("dice").classList.toggle("on",battle);
   {const live=S.phase==="battle"&&!!S.faces&&!S.battleDone&&!S.stopped[S.me],can=live&&canStop(S.me),h=$("dhMe");   /* 止められる時は「タップで止める」、相手が先の時は「相手が先に止める」 */
    h.textContent=can?"タップで止める":"相手が先に止める";h.classList.toggle("on",live);h.classList.toggle("wait",live&&!can);$("dieMe").classList.toggle("tap",can)}
-  $("num").textContent=S.endShow?"終了":S.n==null?"?":S.n;$("num").classList.toggle("end",!!S.endShow);
+  $("num").textContent=S.endShow?"終了":S.n==null?(S.hold!=null?S.hold:"?"):S.n;$("num").classList.toggle("end",!!S.endShow);
   $("gauge").classList.toggle("bonus",!!S.bonus&&S.phase==="draft");
   $("gauge").classList.toggle("pressed",!!S.pressed[S.me]&&need(S.me)&&S.phase==="draft");
   const k=winK(),ep=endPct(k);
@@ -610,7 +610,7 @@ function numFx(cls){const el=$("num");el.classList.remove("pop","reset");void el
 
 /* ---------- engine (CPU mode or online host) ---------- */
 function snap(){return{n:S.n,win:S.win,round:S.round,rt:S.rt,acq:{1:S.acq[1].slice(),2:S.acq[2].slice()},p2:!!S.pressed[2],phase:S.phase,bonus:S.bonus?{p:S.bonus.p,pct:S.bonus.pct}:null,ep:S.ep|0,epB:S.epB|0,pen:{1:S.pen[1],2:S.pen[2]},penL:{1:S.penL[1].slice(),2:S.penL[2].slice()}}}
-function resetDraft(){S.endShow=false;S.pen={1:0,2:0};S.penL={1:[],2:[]};S.con=null;S.conKey="";S.bonus=null;S.ep=0;S.epB=1;S.bonusQ=[];S.round=1;S.n=null;S.win=0;S.rt=0;S.acq={1:[],2:[]};S.pressed={1:false,2:false};S.phase="draft";S.waiting=true;S.faces=null;S.rolls=null;S.battleDone=false;S.applied=false;S.winner=0;S.got=0;S.votes={};S.lastNew=null;
+function resetDraft(){S.endShow=false;S.hold=null;S.pen={1:0,2:0};S.penL={1:[],2:[]};S.con=null;S.conKey="";S.bonus=null;S.ep=0;S.epB=1;S.bonusQ=[];S.round=1;S.n=null;S.win=0;S.rt=0;S.acq={1:[],2:[]};S.pressed={1:false,2:false};S.phase="draft";S.waiting=true;S.faces=null;S.rolls=null;S.battleDone=false;S.applied=false;S.winner=0;S.got=0;S.votes={};S.lastNew=null;
   setDie($("dieOpp"),6,null);setDie($("dieMe"),6,null);$("dieOpp").className="die";$("dieMe").className="die";$("dfOpp").textContent="";$("dfMe").textContent="";$("dhMe").classList.remove("on");S.stopped={1:false,2:false};S.stopReq=false}
 function startMatch(){
   resetDraft();fxHide();
@@ -638,7 +638,7 @@ function beginWindow(){
   cpuThink();winFx();render();
   later(resolveWindow,winDur(winK())+(S.mode==="pvp"?NET_GRACE:0));   /* 対人戦: 入室側の「獲得」が届くまで少し待ってから決める */
 }
-function winFx(){S.endShow=false;sfxUp(S.n);numFx("pop")}
+function winFx(){S.endShow=false;S.hold=null;sfxUp(S.n);numFx("pop")}
 function resolveWindow(){
   if(S.phase!=="draft")return;
   const k=winK();
@@ -689,8 +689,8 @@ function applyEv(ev){
   if(ev.ended){
     if(ev.ended.indexOf(me)>=0)S.pressed[me]=false;
     const mm=ev.ended.indexOf(me)>=0,om=ev.ended.indexOf(op)>=0;
-    const show=()=>{S.lastNew={i:ev.k?S.acq[me].length-1:0};S.endShow=true;if(mm)sfxTaken();render();numFx("pop")};  /* 円の中の数字の所に「終了」。取れなかった人の枠は―になる */
-    if(d)later(show,d);else show();
+    const show=()=>{S.hold=null;S.lastNew={i:ev.k?S.acq[me].length-1:0};S.endShow=true;if(mm)sfxTaken();render();numFx("pop")};  /* 円の中の数字の所に「終了」。取れなかった人の枠は―になる */
+    if(d){S.hold=ev.v;later(show,d)}else show();   /* 獲得のあと「終了」を出すまでは 取られた数字をそのまま見せる（一瞬「?」にしない） */
     d+=900;
   }
   if(ev.next)later(()=>banner("ラウンド "+ev.next),d?d-200:0);
