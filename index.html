@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261022e">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261022e">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261022e">
+<meta name="draft-dice-rev" content="20261022f">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261022f">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261022f">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -120,6 +120,8 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .picks.n5{gap:4px}.picks.n5 .pk{width:40px;height:52px;font-size:23px}.picks.n5 .plus{font-size:14px}.picks.n5 .faces{min-width:56px}
 .picks.n6{gap:2px}.picks.n6 .pk{width:33px;height:41px;font-size:19px;border-radius:8px}.picks.n6 .plus{font-size:13px}.picks.n6 .faces{min-width:54px}.picks.n6 .faces b{font-size:20px}
 .picks.n7{gap:2px}.picks.n7 .pk{width:28px;height:35px;font-size:17px;border-radius:7px}.picks.n7 .plus{font-size:12px}.picks.n7 .faces{min-width:50px;font-size:14px}.picks.n7 .faces b{font-size:19px}   /* カードが多い時だけ小さく */
+.picks.n8{gap:1px}.picks.n8 .pk{width:25px;height:32px;font-size:15px;border-radius:6px}.picks.n8 .plus{font-size:11px}.picks.n8 .faces{min-width:44px;font-size:13px}.picks.n8 .faces b{font-size:17px}.picks.n8 .eq{top:-1px}   /* 入りきらない時だけ さらに小さく（fitPicks） */
+.pk.w4{font-size:14px}.picks.n5 .pk.w3{font-size:16px}.picks.n5 .pk.w4{font-size:12px}.picks.n6 .pk.w4{font-size:11px}.picks.n7 .pk.w4{font-size:10px}.picks.n8 .pk.w3{font-size:11px}.picks.n8 .pk.w4{font-size:9px}   /* マイナスカードが3〜4けたの時 */
 .center{flex:1;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;min-height:0}
 .gauge{width:190px;height:190px;position:relative}
 .gauge svg{width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
@@ -591,18 +593,39 @@ function paintPicks(id,p){
     h+='<div class="pk'+(has?(v==null?" miss":" got"):"")+(has&&v>=100?" w3":"")+(cur?" cur":"")+(isNew?" new":"")+'">'+(has?pickTxt(v):"")+'</div>';
   }
   const pen=S.pen&&S.pen[p]||0,ml=(S.penL&&S.penL[p])||[];
-  if(pen>0)h+='<span class="plus mns">－</span><div class="pk got minus">'+pen+'</div>';   /* マイナスのカードは1枚だけ（取り合いで使った面の合計） */
+  if(pen>0)h+='<span class="plus mns">－</span><div class="pk got minus'+(pen>=1000?" w4":pen>=100?" w3":"")+'">'+pen+'</div>';   /* マイナスのカードは1枚だけ（取り合いで使った面の合計） */
   h+='<span class="faces"><span class="eq">＝</span><span class="fv"><b>'+fmtV(sumOf(p)-pen)+'</b><i>面</i></span></span>';   /* マイナスにもなる */
-  const nc=slotsOf(p)+(pen>0?1:0);box.classList.remove("n5","n6","n7");if(nc>=5)box.classList.add("n"+Math.min(7,nc));
+  const nc=slotsOf(p)+(pen>0?1:0);box.classList.remove("n5","n6","n7","n8");if(nc>=5)box.classList.add("n"+Math.min(7,nc));box.dataset.n=nc>=5?Math.min(7,nc):0;
   box.innerHTML=h;
 }
-/* 合計（N／面）は ＝の右端と盤の右端のまん中に置く（＝とカードは動かさない） */
+/* 盤の幅に入りきるか（カード・＋・＝・合計の数字）。入りきらない時だけ 1だん階ずつ 小さくする（ふだんの見た目は そのまま） */
+function picksFit(box,L,R){
+  const fv=box.querySelector(".fv"),eq=box.querySelector(".faces .eq");if(!fv||!eq)return true;
+  let lo=1e9,hi=-1e9;box.querySelectorAll(".pk,.plus,.eq").forEach(e=>{const q=e.getBoundingClientRect();if(q.width){lo=Math.min(lo,q.left);hi=Math.max(hi,q.right)}});
+  for(const e of box.querySelectorAll(".pk"))if(e.scrollWidth>e.clientWidth+1)return false;   /* カードの中の数字が はみ出す */
+  const fw=fv.querySelector("b").getBoundingClientRect().width;
+  return lo>=L-0.5&&hi<=R+0.5&&(R-eq.getBoundingClientRect().right)>=fw-0.5;
+}
+function fitPicks(box,L,R){
+  const base=+box.dataset.n||0,b=box.querySelector(".fv b");if(!b)return;b.style.fontSize="";
+  const lv=[base,5,6,7,8].filter(v=>!v||v>=base);let i=0;
+  const set=v=>{box.classList.remove("n5","n6","n7","n8");if(v)box.classList.add("n"+v)};
+  set(lv[0]);if(picksFit(box,L,R))return;
+  for(i=0;i<lv.length;i++){set(lv[i]);if(picksFit(box,L,R))return;
+    const fs=parseFloat(getComputedStyle(b).fontSize);b.style.fontSize=Math.round(fs*0.8)+"px";if(picksFit(box,L,R))return;b.style.fontSize=""}
+  let fs=parseFloat(getComputedStyle(b).fontSize);   /* いちばん小さくしても だめなら 合計の数字を もっと小さく */
+  while(fs>11&&!picksFit(box,L,R)){fs-=1;b.style.fontSize=fs+"px"}
+}
+/* 合計（N／面）は ＝の右端と盤の右端のまん中に置く（＝とカードは動かさない）。長い数字は 盤の右からはみ出さないように寄せる */
 function layoutTotals(){
   const bd=document.querySelector("#game .board");if(!bd||!$("game").classList.contains("on"))return;
-  const b=bd.getBoundingClientRect();if(!b.width)return;const right=b.left+bd.clientLeft+bd.clientWidth;
+  const b=bd.getBoundingClientRect();if(!b.width)return;const left=b.left+bd.clientLeft,right=b.left+bd.clientLeft+bd.clientWidth;   /* 盤の内側（ふちの内） */
   ["pkOpp","pkMe"].forEach(id=>{const f=$(id).querySelector(".faces"),fv=f&&f.querySelector(".fv");if(!fv||!f.firstChild)return;
-    fv.style.left="0px";const rg=document.createRange();rg.selectNodeContents(f.firstChild);const eq=rg.getBoundingClientRect().right;
-    const r=fv.getBoundingClientRect();fv.style.left=Math.round(((eq+right)/2-(r.left+r.width/2))*10)/10+"px"});
+    fv.style.left="0px";fitPicks($(id),left,right);
+    const rg=document.createRange();rg.selectNodeContents(f.firstChild);const eq=rg.getBoundingClientRect().right;
+    const r=fv.getBoundingClientRect(),bw=fv.querySelector("b").getBoundingClientRect().width;
+    let c=(eq+right)/2;c=Math.min(c,right-3-bw/2);c=Math.max(c,eq+1+bw/2);
+    fv.style.left=Math.round((c-(r.left+r.width/2))*10)/10+"px"});
 }
 addEventListener("resize",()=>{try{layoutTotals()}catch(e){}});
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{try{layoutTotals();fitDiff()}catch(e){}});
