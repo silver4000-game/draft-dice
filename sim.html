@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow"><title>ドラフトダイス CPU総当たり</title><link rel="icon" href="icon-192.png">
+<style>
+body{margin:0;background:#0f2a20;color:#f3ead2;font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;padding:16px;max-width:760px;margin:auto}
+h1{font-size:20px;color:#f0c75e;margin:4px 0 6px}p.s{font-size:13px;opacity:.8;margin:0 0 12px}
+.ctl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+input{width:120px;font-size:16px;padding:6px 8px;border-radius:8px;border:1px solid #c9a54a;background:#08190f;color:#fff}
+button{font-size:15px;padding:8px 16px;border-radius:10px;border:0;background:#f0c75e;color:#2a1d00;font-weight:700}button:disabled{opacity:.4}
+#stop{background:#c0504d;color:#fff}
+.bar{height:14px;background:#08190f;border:1px solid #c9a54a;border-radius:8px;overflow:hidden}.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#7dffb0,#f0c75e)}
+#st{font-size:13px;margin:6px 0 14px;min-height:18px}
+table{border-collapse:collapse;width:100%;font-size:13px;margin-bottom:16px}th,td{border:1px solid #2f5a45;padding:5px 6px;text-align:right}th{background:#163a2b;color:#f0c75e;font-weight:600}td:first-child,th:first-child{text-align:left}
+h2{font-size:15px;color:#f0c75e;margin:14px 0 6px}.note{font-size:12px;opacity:.75;line-height:1.6}
+.hi{color:#7dffb0;font-weight:700}.lo{color:#ff8a80}
+</style></head><body>
+<h1>ドラフトダイス CPU総当たり</h1>
+<p class="s">性格 A〜E の CPU どうしを 総当たり（10組・先手と後手を交代）で 自動対戦させます。ルールは 今のゲーム（rev 20261021a）と同じです。</p>
+<div class="ctl"><label>対戦数 <input id="num" type="number" min="10" step="10" value="200000"></label><button id="go">スタート</button><button id="stop" disabled>ストップ</button></div>
+<div class="bar"><i id="bar"></i></div><div id="st">まだ始めていません</div>
+<h2>性格ごとの結果</h2><div id="tbl"></div>
+<h2>組み合わせごとの勝率（行の性格から見た勝率）</h2><div id="mx"></div>
+<div class="note">
+・最終の数字＝最後のサイコロの面（合計 − マイナス、0より下にならない）<br>
+・平均の何回目＝ラウンド1〜3で カードをとった回（ボーナスは入れない）<br>
+・A 欲張り：大きい数字（範囲の8〜10割・6〜9以上）まで待つ。取り合いは ほぼ勝負、面も多め<br>
+・B バランス：ゲームのCPUと同じ「一番よい取り方」の目安 ×0.85〜1.05。面が少ない時は早め、多い時は遅め<br>
+・C 堅実：1〜3回目で すぐとる。取り合いは ほぼゆずる<br>
+・D ソロ狙い：Bより少し早め。相手と被りそうな数字（範囲の最大など）を よく見送る<br>
+・E ゾロ目狙い：7割の試合で 1-1-1〜3-3-3 のゾロ目をねらう。ボーナスは 相手をこえる回を見て止める<br>
+・ボーナス：B はゲームのCPUと同じ（一番よい回 ±2）。A は遅め、C は早め、D はほぼ同じ
+</div>
+<script id="eng" type="text/plain">
+/* ドラフトダイス CPU 総当たりシミュレーション エンジン（rev 20261021a のルール） */
+'use strict';
+const ROUNDS=3,EP_SET=[0,5,10,15,20];
+let rnd=Math.random;
+const U=(a,b)=>a+(b-a)*rnd();
+const ri=n=>1+Math.floor(rnd()*n);
+const rangeMax=k=>3*Math.ceil(k/3);
+/* ゲームの CPU_THR と同じ DP。CONT[k][i] = 窓 k・確率 EP_SET[i] で「待った時の期待値」 */
+const CONT=(function(){const P=[0,.05,.1,.15,.2],K=600,C=[],nx=new Array(P.length).fill(0);let cur=null;
+  for(let k=K;k>=1;k--){const b=Math.ceil(k/3),m=3*b,ps=b<=1?[0]:P,last=k===K||Math.ceil((k+1)/3)!==b,row=[],Wk=[];
+    const sum=nx.reduce((a,v)=>a+v,0),avgEx=i=>(sum-nx[i])/(nx.length-1);
+    ps.forEach((p,i)=>{const c=(1-p)*(k===K?0:last?avgEx(i):cur[i]);let s=0;for(let n=1;n<=m;n++)s+=Math.max(n,c);row.push(c);Wk.push(s/m)});
+    if(b<=1){C[k]=P.map(()=>row[0]);cur=P.map(()=>Wk[0])}else{C[k]=row;cur=Wk}
+    if(Math.ceil(k/3)!==Math.ceil((k-1)/3)||k===1){for(let i=0;i<P.length;i++)nx[i]=cur[i]}}
+  return C})();
+const cont=(k,E)=>CONT[Math.min(k,CONT.length-1)][Math.max(0,EP_SET.indexOf(E))];
+const bonusBest=pct=>{const p=Math.min(1,pct/100);return p>=1?1:Math.max(1,Math.ceil((1-p)/p-1e-9))};   /* ゲームの cpuBonusInit と同じ */
+const P={
+ A:{name:'A 欲張り',
+  roundInit(){return{f:U(0.8,1.0),minAbs:6+Math.floor(rnd()*4)}},
+  press(c){if(c.bonus)return c.k>=c.st.bk;
+    if(c.E>=20&&rnd()<0.03)return true;
+    return c.n>=Math.max(Math.ceil(c.st.f*c.M),c.st.minAbs)},
+  bonusInit(i){return{bk:Math.max(1,Math.round(bonusBest(i.pct)*U(1.0,1.2)))}},
+  fight(){return rnd()<0.95},
+  faces(c){let f=Math.ceil(c.v*U(0.8,1.5));const d=(c.oppSum-c.oppPen)-(c.ownSum-c.ownPen);if(d>0)f+=Math.round(d*U(0.5,1.0));return f}},
+ B:{name:'B バランス',
+  roundInit(){return{m:U(0.85,1.05)}},
+  press(c){if(c.bonus)return c.k>=c.st.bk;
+    let fac=c.st.m;const F=c.ownSum-c.ownPen,r=c.round-1;
+    if(r>0&&F<5*r)fac*=0.8;else if(r>0&&F>=8*r)fac*=1.1;
+    if(c.n<Math.max(2,fac*cont(c.k,c.E)))return false;
+    if(c.n<c.M&&c.E<=10&&rnd()<0.2)return false;
+    return true},
+  bonusInit(i){return{bk:Math.max(1,bonusBest(i.pct)+Math.floor(rnd()*5)-2)}},
+  fight(c){const hi=c.v>=Math.ceil(0.6*c.M),behind=(c.oppSum-c.oppPen)>(c.ownSum-c.ownPen);return rnd()<(hi?0.75:0.2)+(behind?0.1:0)},
+  faces(c){let f=Math.round(c.v*U(0.3,0.7));const d=(c.oppSum-c.oppPen)-(c.ownSum-c.ownPen);if(d>0)f+=Math.round(d*U(0,0.3));return Math.max(1,f)}},
+ C:{name:'C 堅実',
+  roundInit(){return{t:rnd()<0.6?3:2}},
+  press(c){if(c.bonus)return c.k>=c.st.bk;
+    if(c.k<=2)return c.n>=c.st.t;
+    if(c.k===3)return c.n>=2||rnd()<0.5;
+    if(c.k<=6)return c.n>=Math.ceil(0.4*c.M);
+    return true},
+  bonusInit(i){return{bk:Math.max(1,Math.round(bonusBest(i.pct)*U(0.6,0.85)))}},
+  fight(c){return rnd()<((c.v===c.M&&c.M>=6)?0.15:0.03)},
+  faces(){return ri(2)}},
+ D:{name:'D ソロ狙い',
+  roundInit(){return{m:U(0.8,1.0),avoid:U(0.4,0.6)}},
+  press(c){if(c.bonus)return c.k>=c.st.bk;
+    if(c.n<Math.max(2,c.st.m*cont(c.k,c.E)))return false;
+    if(c.oppDone)return true;
+    if(c.n===c.M&&c.E<=15&&rnd()<c.st.avoid)return false;
+    if(c.k%3===1&&c.n>=Math.ceil(0.8*c.M)&&c.E<=15&&rnd()<0.3)return false;
+    return true},
+  bonusInit(i){return{bk:Math.max(1,Math.round(bonusBest(i.pct)*U(0.9,1.05)))}},
+  fight(){return rnd()<0.15},
+  faces(){return ri(3)}},
+ E:{name:'E ゾロ目狙い',
+  gameInit(){const r=rnd();return{zmode:rnd()<0.7,plan:r<0.2?1:r<0.5?2:3}},
+  roundInit(){return{giveE:[10,15,20][Math.floor(rnd()*3)],m:U(0.85,1.05)}},
+  target(c){const a=c.ownAcq;if(!c.gs.zmode)return null;if(a.length===0)return 0;const v=a[0];if(v==null||v>3)return null;return a.every(x=>x===v)?v:null},
+  evOK(c){return c.n>=Math.max(2,c.st.m*cont(c.k,c.E))},
+  press(c){const g=c.gs;
+    if(c.bonus)return c.k>=c.st.bk;
+    if(!g.zmode)return P.E.evOK(c);
+    const t=P.E.target(c);
+    if(t===0){if(c.n>3)return false;
+      if(c.n===g.plan)return true;
+      if(c.k>=3)return true;
+      if(c.n>g.plan)return rnd()<0.35;
+      return c.k>=2&&rnd()<0.25}
+    if(t!=null){if(c.n===t)return true;if(c.E>=c.st.giveE)return P.E.evOK(c);return false}
+    return P.E.evOK(c)},
+  bonusInit(i){const z=Math.max(1,Math.round(i.pct/3)),best=bonusBest(i.pct),baseK=Math.max(1,Math.round(best*U(0.85,1.15)));
+    const need=i.opp-i.own+1,kneed=need<=0?0:Math.ceil(need/z);let bk;
+    if(need<=0)bk=rnd()<0.6?Math.max(1,Math.round(0.6*baseK)):baseK;
+    else if(kneed<=baseK)bk=rnd()<0.4?Math.max(kneed,Math.round(0.8*baseK)):baseK;
+    else if(kneed<=Math.ceil(1.3*baseK))bk=rnd()<0.5?kneed:baseK;
+    else bk=baseK;
+    return{bk}},
+  isTgt(c){const t=P.E.target(c);return(t===0&&c.v<=3)||(t!=null&&t!==0&&c.v===t)},
+  fight(c){return rnd()<(P.E.isTgt(c)?0.9:0.15)},
+  faces(c){return P.E.isTgt(c)?1+ri(3):ri(3)}}
+};
+function playGame(t1,t2){
+  const T={1:P[t1],2:P[t2]},acq={1:[],2:[]},pen={1:0,2:0},kSum={1:0,2:0},kCnt={1:0,2:0};
+  let round=1,rt=0,bonus=null,bonusQ=null,ep=0,epB=1;const st={1:null,2:null};
+  const sumOf=p=>acq[p].reduce((a,b)=>a+(b||0),0);
+  const zorome=p=>{const a=acq[p];return a.length>=3&&a[0]!=null&&a[0]===a[1]&&a[1]===a[2]};
+  const need=p=>bonus?(p===bonus.p&&acq[p].length<4):acq[p].length<round;
+  const roundInit=()=>{st[1]=T[1].roundInit();st[2]=T[2].roundInit()};
+  const gs={1:T[1].gameInit?T[1].gameInit():{},2:T[2].gameInit?T[2].gameInit():{}};
+  const took=(p,k)=>{kSum[p]+=k;kCnt[p]++};
+  roundInit();let guard=0;
+  while(true){
+    if(++guard>200000)throw new Error('loop');
+    const k=rt+1;
+    if(!bonus){const b=Math.ceil(k/3);if(b<=1){ep=0;epB=1}else if(epB!==b){const prev=b===2?0:ep,c=EP_SET.filter(v=>v!==prev);epB=b;ep=c[Math.floor(rnd()*c.length)]}}   /* ゲームの ensureEp と同じ */
+    const z=bonus?Math.max(1,Math.round(bonus.pct/3)):0;
+    const E=bonus?bonus.pct:(Math.ceil(k/3)<=1?0:ep);
+    const n=bonus?z*k:1+Math.floor(rnd()*rangeMax(k));
+    const M=bonus?n:rangeMax(k);
+    const pr={1:false,2:false};
+    for(const p of [1,2]){if(!need(p))continue;const o=3-p;
+      pr[p]=T[p].press({n,k,M,E,round,gs:gs[p],ownAcq:acq[p],oppDone:!bonus&&!need(o),bonus:bonus?bonus.pct:0,ownSum:sumOf(p),oppSum:sumOf(o),ownPen:pen[p],oppPen:pen[o],st:st[p]})}
+    const a=pr[1]&&need(1),b=pr[2]&&need(2);let ev='none';
+    if(a&&b&&!bonus){
+      const ctx=p=>{const o=3-p;return{v:n,k,M,E,round,gs:gs[p],ownAcq:acq[p],ownSum:sumOf(p),oppSum:sumOf(o),ownPen:pen[p],oppPen:pen[o]}};
+      const f1=T[1].fight(ctx(1)),f2=T[2].fight(ctx(2));
+      if(f1&&f2){const F={};for(const p of [1,2]){let x=Math.round(+T[p].faces(ctx(p)));if(!(x>=1&&x<=99))x=x>99?99:1;F[p]=x}
+        let w=0;for(let i=0;i<3&&!w;i++){const r1=ri(F[1]),r2=ri(F[2]);if(r1!==r2)w=r1>r2?1:2}
+        if(!w)w=rnd()<0.5?1:2;
+        pen[1]+=F[1];pen[2]+=F[2];acq[w].push(n);took(w,k);const l=3-w;if(need(l))acq[l].push(null);ev='take'}
+      else if(f1||f2){const w=f1?1:2;acq[w].push(n);took(w,k);ev='take'}
+      else ev='kaburi'}
+    else if(a||b){const w=a?1:2;acq[w].push(n);if(!bonus)took(w,k);ev='take'}
+    rt++;
+    if(ev==='kaburi')rt=0;
+    else if((need(1)||need(2))&&rnd()*100<E){for(const p of [1,2])if(need(p))acq[p].push(null)}
+    if(!need(1)&&!need(2)){
+      rt=0;
+      if(round>=ROUNDS){
+        if(!bonus&&round===ROUNDS)bonusQ=[1,2].filter(zorome).sort((x,y)=>sumOf(x)-sumOf(y)||x-y);
+        const nx=bonusQ.shift();
+        if(nx){round=ROUNDS+1;bonus={p:nx,pct:3*acq[nx][0]};const o=3-nx;
+          st[nx]=T[nx].bonusInit({pct:bonus.pct,own:Math.max(0,sumOf(nx)-pen[nx]),opp:Math.max(0,sumOf(o)-pen[o])})}
+        else break}
+      else{round++;roundInit()}}
+  }
+  const F={1:Math.max(0,sumOf(1)-pen[1]),2:Math.max(0,sumOf(2)-pen[2])};
+  const r={1:F[1]>0?ri(F[1]):0,2:F[2]>0?ri(F[2]):0};
+  const w=r[1]===r[2]?0:r[1]>r[2]?1:2;
+  return{F,w,pts:w?r[w]*100:0,kSum,kCnt,bonus:{1:acq[1].length===4,2:acq[2].length===4}};
+}
+
+
+const C=['A','B','C','D','E'],PAIRS=[];for(let a=0;a<5;a++)for(let b=a+1;b<5;b++)PAIRS.push([C[a],C[b]]);
+function blank(){const s={};C.forEach(c=>s[c]={g:0,w:0,l:0,d:0,F:0,k:0,kn:0,pts:0,bon:0});const m={};C.forEach(a=>{m[a]={};C.forEach(b=>{if(a!==b)m[a][b]={g:0,w:0}})});return{s,m}}
+onmessage=function(e){const N=e.data.n,R=blank(),t0=Date.now(),STEP=2000;let i=0;
+  function chunk(){const end=Math.min(N,i+STEP);
+    for(;i<end;i++){const pr=PAIRS[i%10],sw=Math.floor(i/10)%2,t1=sw?pr[1]:pr[0],t2=sw?pr[0]:pr[1],g=playGame(t1,t2);
+      for(const [p,c,o] of [[1,t1,t2],[2,t2,t1]]){const x=R.s[c];x.g++;x.F+=g.F[p];x.k+=g.kSum[p];x.kn+=g.kCnt[p];if(g.bonus[p])x.bon++;
+        const mm=R.m[c][o];mm.g++;
+        if(g.w===p){x.w++;x.pts+=g.pts;mm.w++}else if(!g.w)x.d++;else{x.l++;x.pts-=g.pts}}}
+    postMessage({done:i>=N,i,N,ms:Date.now()-t0,R});
+    if(i<N)setTimeout(chunk,0)}
+  chunk()};
+</script>
+<script>
+const $=id=>document.getElementById(id),C=['A','B','C','D','E'],NAME={A:'A 欲張り',B:'B バランス',C:'C 堅実',D:'D ソロ狙い',E:'E ゾロ目狙い'};
+let W=null,last=null;
+const url=URL.createObjectURL(new Blob([$('eng').textContent],{type:'text/javascript'}));
+const pc=(a,b)=>b?(100*a/b).toFixed(1)+'%':'-',f2=(a,b)=>b?(a/b).toFixed(2):'-',fmt=n=>n.toLocaleString('ja-JP');
+function paint(d){const R=d.R;
+  let h='<table><tr><th>性格</th><th>試合</th><th>勝ち</th><th>負け</th><th>引き分け</th><th>勝率</th><th>最終の数字<br>（平均）</th><th>とった回<br>（平均 何回目）</th><th>点<br>（1試合平均）</th><th>ボーナス<br>（率）</th></tr>';
+  const best=Math.max(...C.map(c=>R.s[c].g?R.s[c].w/R.s[c].g:0));
+  for(const c of C){const x=R.s[c],wr=x.g?x.w/x.g:0;h+=`<tr><td>${NAME[c]}</td><td>${fmt(x.g)}</td><td>${fmt(x.w)}</td><td>${fmt(x.l)}</td><td>${fmt(x.d)}</td><td class="${wr===best&&x.g?'hi':''}">${pc(x.w,x.g)}</td><td>${f2(x.F,x.g)}</td><td>${f2(x.k,x.kn)}</td><td>${x.g?(x.pts/x.g>=0?'+':'')+(x.pts/x.g).toFixed(1):'-'}</td><td>${pc(x.bon,x.g)}</td></tr>`}
+  $('tbl').innerHTML=h+'</table>';
+  let m='<table><tr><th>　</th>'+C.map(c=>`<th>${c}</th>`).join('')+'</tr>';
+  for(const a of C){m+=`<tr><td>${NAME[a]}</td>`+C.map(b=>{if(a===b)return'<td>―</td>';const q=R.m[a][b],v=q.g?q.w/q.g:0,o=R.m[b][a],lv=o.g?o.w/o.g:0;return`<td class="${q.g?(v>lv?'hi':'lo'):''}">${pc(q.w,q.g)}</td>`}).join('')+'</tr>'}
+  $('mx').innerHTML=m+'</table><div class="note">引き分けがあるので 2つの勝率を足しても 100%にはなりません</div>';}
+$('go').onclick=()=>{let n=Math.round(+$('num').value);if(!(n>=10))n=10;n=Math.min(n,50000000);$('num').value=n;
+  if(W)W.terminate();W=new Worker(url);$('go').disabled=true;$('stop').disabled=false;$('st').textContent='計算中…';$('bar').style.width='0';
+  W.onmessage=e=>{const d=e.data;last=d;$('bar').style.width=(100*d.i/d.N)+'%';paint(d);
+    $('st').textContent=(d.done?'おわり：':'計算中：')+fmt(d.i)+' / '+fmt(d.N)+' 試合　'+(d.ms/1000).toFixed(1)+'秒';
+    if(d.done){$('go').disabled=false;$('stop').disabled=true;W.terminate();W=null}};
+  W.onerror=e=>{$('st').textContent='エラー：'+e.message;$('go').disabled=false;$('stop').disabled=true};
+  W.postMessage({n})};
+$('stop').onclick=()=>{if(W){W.terminate();W=null}$('go').disabled=false;$('stop').disabled=true;
+  if(last)$('st').textContent='ストップ：'+fmt(last.i)+' / '+fmt(last.N)+' 試合まで（ここまでの結果）　'+(last.ms/1000).toFixed(1)+'秒'};
+</script>
+</body></html>
