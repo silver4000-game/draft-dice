@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261022b">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261022b">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261022b">
+<meta name="draft-dice-rev" content="20261022c">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261022c">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261022c">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -922,14 +922,14 @@ function startBattle(){
   const F={1:Math.max(0,sumOf(1)-S.pen[1]),2:Math.max(0,sumOf(2)-S.pen[2])};   /* 取り合い勝負で使った面を引く（0より下にはならない） */
   if(S.mode==="pvp")send({type:"battle",faces:F});
   runBattle(F);
-  const f=firstStop(F);if(f)armBattleStop(F[f]>0?f:oppOf(f));else{armBattleStop(1);armBattleStop(2)}   /* 0面の人は最初から止まっている → 相手の番から */
+  const f=firstStop(F);if(f)armBattleStop(F[f]>1?f:oppOf(f));else{armBattleStop(1);armBattleStop(2)}   /* 0面・1面の人は最初から止まっている → 相手の番から */
 }
 /* 止める順番: 面の少ない方が先。先の人が止まってから次の人が止められる。同じ面なら順番なし（どちらからでも止められる） */
 function firstStop(F){return F[1]===F[2]?0:F[2]<F[1]?2:1}
 function canStop(p){if(!S.faces||S.phase!=="battle"||S.battleDone||S.stopped[p])return false;const f=firstStop(S.faces);return !f||p===f||!!S.stopped[f]}
 function armBattleStop(p){
   if(!isAuth()||!p)return;const bid=S.bid;
-  if(!(S.faces[p]>0)){later(()=>hostStop(p,bid,0),600);return}   /* 0面は回らないのですぐ止まる（選択ではない） */
+  if(!(S.faces[p]>1))return;   /* 0面・1面は最初から止まっている（回らない・押さない） */
   if(S.mode==="cpu"&&p===2)later(()=>hostStop(2,bid,shownOf(2)),1000+Math.random()*2000);   /* CPUは1〜3秒でタップ。人はタップするまで止まらない */
 }
 /* サイコロ勝負: 自分のサイコロはタップで止める。目は止めた瞬間に作成側（CPU戦は自分）がランダムで決める */
@@ -940,8 +940,8 @@ function runBattle(F){
   setDie($("dieMe"),F[me],null);setDie($("dieOpp"),F[op],null);
   $("dfMe").textContent=F[me]+"面";$("dfOpp").textContent=F[op]+"面";   /* 取り合いで減った後の最終面だけ（式は出さない） */
   ["dieMe","dieOpp"].forEach(id=>{const el=$(id);el.className="die";el.querySelector("svg").style.transform="rotate(0deg)"});
-  [1,2].forEach(p=>{if(!(F[p]>0)){S.stopped[p]=true;S.rolls[0][p]=0;S.shown[p]=0;S.settled++;setDie(dieOf(p),F[p],0)}});   /* 0面の人は最初から 0 で止まっている（回らない・ボタンは押せない・相手を待つだけ） */
-  if(S.settled===2){const bid=S.bid;later(()=>{if(S.bid===bid)settleBattle()},500)}   /* 2人とも0面 → 引き分け */
+  [1,2].forEach(p=>{if(!(F[p]>1)){const v=F[p]>0?1:0;S.stopped[p]=true;S.rolls[0][p]=v;S.shown[p]=v;S.settled++;setDie(dieOf(p),F[p],v)}});   /* 0面の人は 0、1面の人は 1 で最初から止まっている（回らない・ボタンは押せない・相手を待つだけ） */
+  if(S.settled===2){const bid=S.bid;later(()=>{if(S.bid===bid)settleBattle()},500)}   /* 2人とも0面・1面 → すぐ勝ち負け（0と1なら1の勝ち、同じなら引き分け） */
   render();spinLoop(S.bid);
 }
 function dieOf(p){return p===S.me?$("dieMe"):$("dieOpp")}
