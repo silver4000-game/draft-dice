@@ -15,7 +15,8 @@ h2{font-size:15px;color:#f0c75e;margin:14px 0 6px}.note{font-size:12px;opacity:.
 .hi{color:#7dffb0;font-weight:700}.lo{color:#ff8a80}
 </style></head><body>
 <h1>ドラフトダイス CPU総当たり</h1>
-<p class="s">性格 A〜E の CPU どうしを 総当たり（10組・先手と後手を交代）で 自動対戦させます。ルールは 今のゲーム（rev 20261022b）と同じです。</p>
+<p class="s">性格 A〜F の CPU どうしを 総当たり（15組・先手と後手を交代）で 自動対戦させます。同じ相手と 続けて何試合か（シリーズ）戦い、点の合計で シリーズの勝ち負けも出します。ルールは 今のゲーム（rev 20261022c）と同じです。</p>
+<div class="ctl"><label>シリーズ（何試合）<input id="ser" type="number" min="1" step="1" value="10"></label></div>
 <div class="ctl"><label>対戦数 <input id="num" type="number" min="10" step="10" value="200000"></label><button id="go">スタート</button><button id="stop" disabled>ストップ</button></div>
 <div class="bar"><i id="bar"></i></div><div id="st">まだ始めていません</div>
 <h2>性格ごとの結果</h2><div id="tbl"></div>
@@ -25,6 +26,11 @@ h2{font-size:15px;color:#f0c75e;margin:14px 0 6px}.note{font-size:12px;opacity:.
 <div class="ctl"><label>対戦数 <input id="numBY" type="number" min="10" step="10" value="200000"></label><button id="goBY">B譲 対 B取 スタート</button><button id="stopBY" disabled style="background:#c0504d;color:#fff">ストップ</button></div>
 <div class="bar"><i id="barBY"></i></div><div id="stBY">まだ始めていません</div>
 <div id="tblBY"></div><div id="bdBY"></div>
+<h2 style="margin-top:26px">B 対 F（シリーズで勝負）</h2>
+<p class="s">性格B と 性格F が 上の「シリーズ」の試合数ずつ 続けて戦い、点の合計で シリーズの勝ち負けを決めます。先手と後手は 1試合ごとに交代します。</p>
+<div class="ctl"><label>対戦数 <input id="numBF" type="number" min="10" step="10" value="200000"></label><button id="goBF">B 対 F スタート</button><button id="stopBF" disabled style="background:#c0504d;color:#fff">ストップ</button></div>
+<div class="bar"><i id="barBF"></i></div><div id="stBF">まだ始めていません</div>
+<div id="tblBF"></div>
 <div class="note">
 ・最終の数字＝最後のサイコロの面（合計 − マイナス、0より下にならない）<br>
 ・平均の何回目＝ラウンド1〜3で カードをとった回（ボーナスは入れない）<br>
@@ -33,10 +39,12 @@ h2{font-size:15px;color:#f0c75e;margin:14px 0 6px}.note{font-size:12px;opacity:.
 ・C 堅実：1〜3回目で すぐとる。取り合いは ほぼゆずる<br>
 ・D ソロ狙い：Bより少し早め。相手と被りそうな数字（範囲の最大など）を よく見送る<br>
 ・E ゾロ目狙い：7割の試合で 1-1-1〜3-3-3 のゾロ目をねらう。ボーナスは 相手をこえる回を見て止める<br>
+・F 逆転狙い：ふだんは B とまったく同じ。シリーズで負けている点が 大きいほど 少しずつ（4だん階）逆転モードに：大きい数字まで待つ・ゾロ目をねらう・ボーナスで長くねばる・取り合いで勝負して面を多め。勝っている時は B のまま<br>
+・シリーズ：同じ相手と 続けて戦う試合のまとまり。点（勝った人の目×100）の合計が多い方が勝ち<br>
 ・ボーナス：2ずつ増える・終わる確率 5% 固定。B はゲームのCPUと同じ（一番よい回 ±2）。A は遅め、C は早め、D はほぼ同じ
 </div>
 <script id="eng" type="text/plain">
-/* ドラフトダイス CPU 総当たりシミュレーション エンジン（rev 20261022b のルール） */
+/* ドラフトダイス CPU 総当たりシミュレーション エンジン（rev 20261022c のルール） */
 'use strict';
 const ROUNDS=3,EP_SET=[0,5,10,15,20,25];
 let rnd=Math.random;
@@ -121,17 +129,45 @@ const P={
   fight(c){return rnd()<(P.E.isTgt(c)?0.9:0.15)},
   faces(c){return P.E.isTgt(c)?1+ri(3):ri(3)}}
 };
+/* F 逆転狙い: ふだんは B とまったく同じ。何試合か続けて（シリーズ）負けが重なると、少しずつ「ばらつきの大きい」戦い方に変える。
+   L（0〜1、0.25きざみ）= 逆転モードの強さ。勝っている・同点の時は L=0（B のまま。堅実にはならない）
+   x = 負けている点 ÷（FS × √残り試合数）、L = min(1, floor(x×4)/4)  ※FS=400（1試合の点のばらつきの目安） */
+const F_SCALE={v:400};
+P.F=Object.assign({},P.B,{name:'F 逆転狙い',
+  gameInit(sc){const def=sc&&sc.def>0?sc.def:0,rem=sc&&sc.rem>0?sc.rem:1,x=def/(F_SCALE.v*Math.sqrt(rem));return{L:Math.min(1,Math.floor(x*4)/4)}},
+  roundInit(){return{m:U(0.85,1.05)}},
+  press(c){const L=c.gs.L||0;if(!L)return P.B.press(c);
+    if(c.bonus)return c.k>=c.st.bk;
+    const a=c.ownAcq;
+    if(c.st.chase==null)c.st.chase=rnd()<L;   /* このラウンドで ゾロ目を ねらうか（L が大きいほど ねらう） */
+    if(c.st.chase){
+      if(c.round===3&&a[0]!=null&&a[0]===a[1]){const t=a[0];   /* 2つそろっている → 3つ目の同じ数字を待つ */
+        if(c.n===t)return true;
+        if(c.E>=15+10*L)return P.F.evOK(c,L);   /* 終わる確率が高い時は あきらめて ふつうに取る */
+        return false}
+      if(c.round===2&&a[0]!=null&&a[0]<=4&&c.n===a[0]&&c.n>=0.5*cont(c.k,c.E))return true}   /* 小さめの数字なら 同じ数字を取って ゾロ目の準備 */
+    return P.F.evOK(c,L)},
+  evOK(c,L){let fac=c.st.m*(1+0.3*L);const F=c.ownSum-c.ownPen,r=c.round-1;   /* 大きい数字まで 待つ（目安 ×1.0〜1.3） */
+    if(r>0&&F<5*r)fac*=0.8;else if(r>0&&F>=8*r)fac*=1.1;
+    if(c.n<Math.max(2,fac*cont(c.k,c.E)))return false;
+    if(c.n<c.M&&c.E<=10&&rnd()<0.2+0.2*L)return false;
+    return true},
+  bonusInit(i){const L=(i.gs&&i.gs.L)||0,b=P.B.bonusInit(i);return L?{bk:Math.max(1,Math.round(b.bk*(1+0.4*L)))}:b},   /* ボーナスも 長く ねばる（×1.0〜1.4） */
+  fight(c){const L=c.gs.L||0;if(!L)return P.B.fight(c);
+    const hi=c.v>=Math.ceil(0.6*c.M),behind=(c.oppSum-c.oppPen)>(c.ownSum-c.ownPen);return rnd()<(hi?0.75:0.2)+(behind?0.1:0)+0.2*L},
+  faces(c){const L=c.gs.L||0;if(!L)return P.B.faces(c);
+    let f=Math.round(c.v*U(0.3+0.3*L,0.7+0.5*L));const d=(c.oppSum-c.oppPen)-(c.ownSum-c.ownPen);if(d>0)f+=Math.round(d*U(0,0.3+0.5*L));return Math.max(1,f)}});
 /* B譲 / B取: 取り合いの選び方だけ ちがう B（ほかは B とまったく同じ） */
 P.BY=Object.assign({},P.B,{name:'B譲（いつも譲る）',fight(){return false}});
 P.BT=Object.assign({},P.B,{name:'B取（いつも取り合う）',fight(){return true}});
-function playGame(t1,t2){
+function playGame(t1,t2,sc){   /* sc = シリーズの状況 {1:{def,rem},2:{def,rem}}（def=負けている点・rem=残り試合数）。F だけが使う */
   const T={1:P[t1],2:P[t2]},acq={1:[],2:[]},pen={1:0,2:0},kSum={1:0,2:0},kCnt={1:0,2:0};
   let round=1,rt=0,bonus=null,bonusQ=null,ep=0,epB=1;const st={1:null,2:null};
   const sumOf=p=>acq[p].reduce((a,b)=>a+(b||0),0);
   const zorome=p=>{const a=acq[p];return a.length>=3&&a[0]!=null&&a[0]===a[1]&&a[1]===a[2]};
   const need=p=>bonus?(p===bonus.p&&acq[p].length<4):acq[p].length<round;
   const roundInit=()=>{st[1]=T[1].roundInit();st[2]=T[2].roundInit()};
-  const gs={1:T[1].gameInit?T[1].gameInit():{},2:T[2].gameInit?T[2].gameInit():{}};
+  const gs={1:T[1].gameInit?T[1].gameInit(sc&&sc[1]):{},2:T[2].gameInit?T[2].gameInit(sc&&sc[2]):{}};
   const took=(p,k)=>{kSum[p]+=k;kCnt[p]++};
   const cs={ff:0,fy:0,yy:0},yl=[];   /* 取り合いの内訳: ff=2人とも取り合う fy=片方が譲る yy=2人とも譲る / yl=譲った記録 */
   roundInit();let guard=0;
@@ -167,18 +203,18 @@ function playGame(t1,t2){
         if(!bonus&&round===ROUNDS)bonusQ=[1,2].filter(zorome).sort((x,y)=>sumOf(x)-sumOf(y)||x-y);
         const nx=bonusQ.shift();
         if(nx){round=ROUNDS+1;bonus={p:nx,d:2,pct:5};const o=3-nx;   /* ボーナス開始時に 2ずつ増える・終わる確率5% 固定 */
-          st[nx]=T[nx].bonusInit({pct:bonus.pct,d:bonus.d,own:Math.max(0,sumOf(nx)-pen[nx]),opp:Math.max(0,sumOf(o)-pen[o])})}
+          st[nx]=T[nx].bonusInit({gs:gs[nx],pct:bonus.pct,d:bonus.d,own:Math.max(0,sumOf(nx)-pen[nx]),opp:Math.max(0,sumOf(o)-pen[o])})}
         else break}
       else{round++;roundInit()}}
   }
   const F={1:Math.max(0,sumOf(1)-pen[1]),2:Math.max(0,sumOf(2)-pen[2])};
   const r={1:F[1]>0?ri(F[1]):0,2:F[2]>0?ri(F[2]):0};
   const w=r[1]===r[2]?0:r[1]>r[2]?1:2;
-  return{F,w,pts:w?r[w]*100:0,kSum,kCnt,bonus:{1:acq[1].length===4,2:acq[2].length===4},cs,yl,acq,pen};
+  return{F,w,pts:w?r[w]*100:0,kSum,kCnt,bonus:{1:acq[1].length===4,2:acq[2].length===4},cs,yl,acq,pen,gs};
 }
 
-const C=['A','B','C','D','E'],PAIRS=[];for(let a=0;a<5;a++)for(let b=a+1;b<5;b++)PAIRS.push([C[a],C[b]]);
-function blank(){const s={};C.forEach(c=>s[c]={g:0,w:0,l:0,d:0,F:0,k:0,kn:0,pts:0,bon:0});const m={};C.forEach(a=>{m[a]={};C.forEach(b=>{if(a!==b)m[a][b]={g:0,w:0}})});return{s,m}}
+const C=['A','B','C','D','E','F'],PAIRS=[];for(let a=0;a<C.length;a++)for(let b=a+1;b<C.length;b++)PAIRS.push([C[a],C[b]]);
+function blank(){const s={};C.forEach(c=>s[c]={g:0,w:0,l:0,d:0,F:0,k:0,kn:0,pts:0,bon:0,sg:0,sw:0,sl:0,sd:0,act:0});const m={};C.forEach(a=>{m[a]={};C.forEach(b=>{if(a!==b)m[a][b]={g:0,w:0,sg:0,sw:0}})});return{s,m}}
 function blankBY(){const s={};for(const c of ['BY','BT'])s[c]={g:0,w:0,l:0,d:0,F:0,k:0,kn:0,pts:0,bon:0,dash:0,pen:0,g1:0,w1:0};
   return{s,ff:0,fy:0,yy:0,byR:[0,0,0,0],yn:0,yv:0,lt:0,lv:0,ld:0,lup:0,byTook:0}}
 function runBY(N){const R=blankBY(),t0=Date.now(),STEP=2000;let i=0;   /* B譲 対 B取（1試合ごとに先手を交代） */
@@ -194,36 +230,62 @@ function runBY(N){const R=blankBY(),t0=Date.now(),STEP=2000;let i=0;   /* B譲 �
     postMessage({mode:'by',done:i>=N,i,N,ms:Date.now()-t0,R});
     if(i<N)setTimeout(chunk,0)}
   chunk()}
-onmessage=function(e){if(e.data.mode==='by')return runBY(e.data.n);const N=e.data.n,R=blank(),t0=Date.now(),STEP=2000;let i=0;
+/* B 対 F: 何試合か続けて（シリーズ）点の合計で勝ち負け。先手は 1試合ごとに交代 */
+function blankBF(){const s={};for(const c of ['B','F'])s[c]={g:0,w:0,l:0,d:0,F:0,pts:0,bon:0,sg:0,sw:0,sl:0,sd:0};
+  return{s,Lc:[0,0,0,0,0],actS:0,mid:{F:{n:0,w:0},B:{n:0,w:0}}}}
+function runBF(N,S){const R=blankBF(),t0=Date.now(),STEP=2000;let i=0,A=0,B=0,ever=false,midB=0;   /* A=F の合計点 B=B の合計点 */
   function chunk(){const end=Math.min(N,i+STEP);
-    for(;i<end;i++){const pr=PAIRS[i%10],sw=Math.floor(i/10)%2,t1=sw?pr[1]:pr[0],t2=sw?pr[0]:pr[1],g=playGame(t1,t2);
-      for(const [p,c,o] of [[1,t1,t2],[2,t2,t1]]){const x=R.s[c];x.g++;x.F+=g.F[p];x.k+=g.kSum[p];x.kn+=g.kCnt[p];if(g.bonus[p])x.bon++;
+    for(;i<end;i++){const s=Math.floor(i/S),j=i%S;if(j===0){A=0;B=0;ever=false;midB=0}
+      const sw=(s+j)%2,t1=sw?'B':'F',t2=sw?'F':'B',pf=sw?2:1,pb=3-pf,sc={};sc[pf]={def:B-A,rem:S-j};sc[pb]={def:A-B,rem:S-j};
+      const g=playGame(t1,t2,sc),L=g.gs[pf].L||0;R.Lc[Math.round(L*4)]++;if(L)ever=true;
+      for(const [p,c] of [[pf,'F'],[pb,'B']]){const x=R.s[c];x.g++;x.F+=g.F[p];if(g.bonus[p])x.bon++;
+        if(g.w===p){x.w++;x.pts+=g.pts}else if(!g.w)x.d++;else{x.l++;x.pts-=g.pts}}
+      if(g.w===pf)A+=g.pts;else if(g.w===pb)B+=g.pts;
+      if(j===Math.floor(S/2)-1)midB=A<B?'F':B<A?'B':0;   /* 半分おわった時に 負けていた方 */
+      if(j===S-1){const r=A>B?'F':B>A?'B':0;for(const c of ['F','B']){const x=R.s[c];x.sg++;if(!r)x.sd++;else if(r===c)x.sw++;else x.sl++}
+        if(ever)R.actS++;if(midB){R.mid[midB].n++;if(r===midB)R.mid[midB].w++}}}
+    postMessage({mode:'bf',done:i>=N,i,N,ms:Date.now()-t0,R,S});
+    if(i<N)setTimeout(chunk,0)}
+  chunk()}
+onmessage=function(e){if(e.data.mode==='by')return runBY(e.data.n);if(e.data.mode==='bf')return runBF(e.data.n,e.data.s);
+  const N=e.data.n,S=e.data.s||10,R=blank(),t0=Date.now(),STEP=2000;let i=0,A=0,B=0;   /* 同じ組み合わせで S試合続けて（シリーズ）。A,B = そのシリーズの合計点 */
+  function chunk(){const end=Math.min(N,i+STEP);
+    for(;i<end;i++){const s=Math.floor(i/S),j=i%S;if(j===0){A=0;B=0}
+      const pr=PAIRS[s%PAIRS.length],sw=(Math.floor(s/PAIRS.length)+j)%2,t1=sw?pr[1]:pr[0],t2=sw?pr[0]:pr[1],pa=sw?2:1,pb=3-pa,sc={};
+      sc[pa]={def:B-A,rem:S-j};sc[pb]={def:A-B,rem:S-j};
+      const g=playGame(t1,t2,sc);
+      for(const [p,c,o] of [[1,t1,t2],[2,t2,t1]]){const x=R.s[c];x.g++;x.F+=g.F[p];x.k+=g.kSum[p];x.kn+=g.kCnt[p];if(g.bonus[p])x.bon++;if(g.gs[p]&&g.gs[p].L)x.act++;
         const mm=R.m[c][o];mm.g++;
-        if(g.w===p){x.w++;x.pts+=g.pts;mm.w++}else if(!g.w)x.d++;else{x.l++;x.pts-=g.pts}}}
+        if(g.w===p){x.w++;x.pts+=g.pts;mm.w++}else if(!g.w)x.d++;else{x.l++;x.pts-=g.pts}}
+      if(g.w===pa)A+=g.pts;else if(g.w===pb)B+=g.pts;
+      if(j===S-1){const r=A>B?pr[0]:B>A?pr[1]:0;for(const [c,o] of [[pr[0],pr[1]],[pr[1],pr[0]]]){const x=R.s[c];x.sg++;R.m[c][o].sg++;if(!r)x.sd++;else if(r===c){x.sw++;R.m[c][o].sw++}else x.sl++}}}
     postMessage({done:i>=N,i,N,ms:Date.now()-t0,R});
     if(i<N)setTimeout(chunk,0)}
   chunk()};
 </script>
 <script>
-const $=id=>document.getElementById(id),C=['A','B','C','D','E'],NAME={A:'A 欲張り',B:'B バランス',C:'C 堅実',D:'D ソロ狙い',E:'E ゾロ目狙い'};
+const $=id=>document.getElementById(id),C=['A','B','C','D','E','F'],NAME={A:'A 欲張り',B:'B バランス',C:'C 堅実',D:'D ソロ狙い',E:'E ゾロ目狙い',F:'F 逆転狙い'};
 let W=null,last=null;
 const url=URL.createObjectURL(new Blob([$('eng').textContent],{type:'text/javascript'}));
 const pc=(a,b)=>b?(100*a/b).toFixed(1)+'%':'-',f2=(a,b)=>b?(a/b).toFixed(2):'-',fmt=n=>n.toLocaleString('ja-JP');
 function paint(d){const R=d.R;
-  let h='<table><tr><th>性格</th><th>試合</th><th>勝ち</th><th>負け</th><th>引き分け</th><th>勝率</th><th>最終の数字<br>（平均）</th><th>とった回<br>（平均 何回目）</th><th>点<br>（1試合平均）</th><th>ボーナス<br>（率）</th></tr>';
+  let h='<table><tr><th>性格</th><th>試合</th><th>勝ち</th><th>負け</th><th>引き分け</th><th>勝率</th><th>最終の数字<br>（平均）</th><th>とった回<br>（平均 何回目）</th><th>点<br>（1試合平均）</th><th>ボーナス<br>（率）</th><th>シリーズ</th><th>シリーズ<br>勝率</th><th>逆転モード<br>（試合の率）</th></tr>';
   const best=Math.max(...C.map(c=>R.s[c].g?R.s[c].w/R.s[c].g:0));
-  for(const c of C){const x=R.s[c],wr=x.g?x.w/x.g:0;h+=`<tr><td>${NAME[c]}</td><td>${fmt(x.g)}</td><td>${fmt(x.w)}</td><td>${fmt(x.l)}</td><td>${fmt(x.d)}</td><td class="${wr===best&&x.g?'hi':''}">${pc(x.w,x.g)}</td><td>${f2(x.F,x.g)}</td><td>${f2(x.k,x.kn)}</td><td>${x.g?(x.pts/x.g>=0?'+':'')+(x.pts/x.g).toFixed(1):'-'}</td><td>${pc(x.bon,x.g)}</td></tr>`}
+  for(const c of C){const x=R.s[c],wr=x.g?x.w/x.g:0;h+=`<tr><td>${NAME[c]}</td><td>${fmt(x.g)}</td><td>${fmt(x.w)}</td><td>${fmt(x.l)}</td><td>${fmt(x.d)}</td><td class="${wr===best&&x.g?'hi':''}">${pc(x.w,x.g)}</td><td>${f2(x.F,x.g)}</td><td>${f2(x.k,x.kn)}</td><td>${x.g?(x.pts/x.g>=0?'+':'')+(x.pts/x.g).toFixed(1):'-'}</td><td>${pc(x.bon,x.g)}</td><td>${fmt(x.sg)}</td><td>${pc(x.sw,x.sg)}</td><td>${c==='F'?pc(x.act,x.g):'-'}</td></tr>`}
   $('tbl').innerHTML=h+'</table>';
   let m='<table><tr><th>　</th>'+C.map(c=>`<th>${c}</th>`).join('')+'</tr>';
   for(const a of C){m+=`<tr><td>${NAME[a]}</td>`+C.map(b=>{if(a===b)return'<td>―</td>';const q=R.m[a][b],v=q.g?q.w/q.g:0,o=R.m[b][a],lv=o.g?o.w/o.g:0;return`<td class="${q.g?(v>lv?'hi':'lo'):''}">${pc(q.w,q.g)}</td>`}).join('')+'</tr>'}
-  $('mx').innerHTML=m+'</table><div class="note">引き分けがあるので 2つの勝率を足しても 100%にはなりません</div>';}
+  let ms='<table><tr><th>　</th>'+C.map(c=>`<th>${c}</th>`).join('')+'</tr>';
+  for(const a of C){ms+=`<tr><td>${NAME[a]}</td>`+C.map(b=>{if(a===b)return'<td>―</td>';const q=R.m[a][b],v=q.sg?q.sw/q.sg:0,o=R.m[b][a],lv=o.sg?o.sw/o.sg:0;return`<td class="${q.sg?(v>lv?'hi':'lo'):''}">${pc(q.sw,q.sg)}</td>`}).join('')+'</tr>'}
+  $('mx').innerHTML=m+'</table><div class="note">引き分けがあるので 2つの勝率を足しても 100%にはなりません</div><h2>組み合わせごとの シリーズ勝率（行の性格から見た）</h2>'+ms+'</table>';}
+function serLen(){let s=Math.round(+$('ser').value);if(!(s>=1))s=1;s=Math.min(s,1000);$('ser').value=s;return s}
 $('go').onclick=()=>{let n=Math.round(+$('num').value);if(!(n>=10))n=10;n=Math.min(n,50000000);$('num').value=n;
   if(W)W.terminate();W=new Worker(url);$('go').disabled=true;$('stop').disabled=false;$('st').textContent='計算中…';$('bar').style.width='0';
   W.onmessage=e=>{const d=e.data;last=d;$('bar').style.width=(100*d.i/d.N)+'%';paint(d);
     $('st').textContent=(d.done?'おわり：':'計算中：')+fmt(d.i)+' / '+fmt(d.N)+' 試合　'+(d.ms/1000).toFixed(1)+'秒';
     if(d.done){$('go').disabled=false;$('stop').disabled=true;W.terminate();W=null}};
   W.onerror=e=>{$('st').textContent='エラー：'+e.message;$('go').disabled=false;$('stop').disabled=true};
-  W.postMessage({n})};
+  W.postMessage({n,s:serLen()})};
 let WB=null,lastB=null;
 function paintBY(d){const R=d.R,NM={BY:'B譲（いつも譲る）',BT:'B取（いつも取り合う）'},G=R.s.BY.g;
   let h='<table id="byMain"><tr><th>CPU</th><th>試合</th><th>勝ち</th><th>負け</th><th>引き分け</th><th>勝率</th><th>引き分け率</th><th>最終の数字<br>（平均）</th><th>点<br>（1試合平均）</th><th>「―」<br>（1試合平均）</th><th>マイナス面<br>（1試合平均）</th><th>とった回<br>（平均 何回目）</th><th>ボーナス<br>（率）</th><th>先手の時の<br>勝率</th></tr>';
@@ -253,6 +315,27 @@ $('goBY').onclick=()=>{let n=Math.round(+$('numBY').value);if(!(n>=10))n=10;n=Ma
   WB.postMessage({n,mode:'by'})};
 $('stopBY').onclick=()=>{if(WB){WB.terminate();WB=null}$('goBY').disabled=false;$('stopBY').disabled=true;
   if(lastB)$('stBY').textContent='ストップ：'+fmt(lastB.i)+' / '+fmt(lastB.N)+' 試合まで（ここまでの結果）　'+(lastB.ms/1000).toFixed(1)+'秒'};
+let WF=null,lastF=null;
+function paintBF(d){const R=d.R,NM={B:'B バランス',F:'F 逆転狙い'};
+  let h='<table><tr><th>CPU</th><th>試合</th><th>勝ち</th><th>負け</th><th>引き分け</th><th>勝率</th><th>最終の数字<br>（平均）</th><th>点<br>（1試合平均）</th><th>ボーナス<br>（率）</th><th>シリーズ</th><th>シリーズ<br>勝ち</th><th>シリーズ<br>負け</th><th>シリーズ<br>引き分け</th><th>シリーズ<br>勝率</th></tr>';
+  for(const c of ['F','B']){const x=R.s[c],o=R.s[c==='F'?'B':'F'],wr=x.g?x.w/x.g:0,ow=o.g?o.w/o.g:0,sr=x.sg?x.sw/x.sg:0,osr=o.sg?o.sw/o.sg:0;
+    h+=`<tr><td>${NM[c]}</td><td>${fmt(x.g)}</td><td>${fmt(x.w)}</td><td>${fmt(x.l)}</td><td>${fmt(x.d)}</td><td class="${x.g?(wr>ow?'hi':'lo'):''}">${pc(x.w,x.g)}</td><td>${f2(x.F,x.g)}</td><td>${x.g?(x.pts/x.g>=0?'+':'')+(x.pts/x.g).toFixed(1):'-'}</td><td>${pc(x.bon,x.g)}</td><td>${fmt(x.sg)}</td><td>${fmt(x.sw)}</td><td>${fmt(x.sl)}</td><td>${fmt(x.sd)}</td><td class="${x.sg?(sr>osr?'hi':'lo'):''}">${pc(x.sw,x.sg)}</td></tr>`}
+  const G=R.s.F.g,act=G-R.Lc[0],rows=[
+   ['F が 逆転モードだった試合',fmt(act)+' 試合（'+pc(act,G)+'）'],
+   ['　強さ 25% / 50% / 75% / 100%',R.Lc.slice(1).map(fmt).join(' / ')+' 試合'],
+   ['逆転モードが 1回でも出たシリーズ',fmt(R.actS)+'（'+pc(R.actS,R.s.F.sg)+'）'],
+   ['半分の時点で F が負けていた → F が シリーズに勝った',fmt(R.mid.F.w)+' / '+fmt(R.mid.F.n)+'（'+pc(R.mid.F.w,R.mid.F.n)+'）'],
+   ['半分の時点で B が負けていた → B が シリーズに勝った',fmt(R.mid.B.w)+' / '+fmt(R.mid.B.n)+'（'+pc(R.mid.B.w,R.mid.B.n)+'）']];
+  $('tblBF').innerHTML=h+'</table><h2>逆転モードの内訳（シリーズ '+d.S+'試合）</h2><table>'+rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')+'</table>'}
+$('goBF').onclick=()=>{let n=Math.round(+$('numBF').value);if(!(n>=10))n=10;n=Math.min(n,50000000);$('numBF').value=n;const s=serLen();
+  if(WF)WF.terminate();WF=new Worker(url);$('goBF').disabled=true;$('stopBF').disabled=false;$('stBF').textContent='計算中…';$('barBF').style.width='0';
+  WF.onmessage=e=>{const d=e.data;lastF=d;$('barBF').style.width=(100*d.i/d.N)+'%';paintBF(d);
+    $('stBF').textContent=(d.done?'おわり：':'計算中：')+fmt(d.i)+' / '+fmt(d.N)+' 試合　'+(d.ms/1000).toFixed(1)+'秒';
+    if(d.done){$('goBF').disabled=false;$('stopBF').disabled=true;WF.terminate();WF=null}};
+  WF.onerror=e=>{$('stBF').textContent='エラー：'+e.message;$('goBF').disabled=false;$('stopBF').disabled=true};
+  WF.postMessage({n,s,mode:'bf'})};
+$('stopBF').onclick=()=>{if(WF){WF.terminate();WF=null}$('goBF').disabled=false;$('stopBF').disabled=true;
+  if(lastF)$('stBF').textContent='ストップ：'+fmt(lastF.i)+' / '+fmt(lastF.N)+' 試合まで（ここまでの結果）　'+(lastF.ms/1000).toFixed(1)+'秒'};
 $('stop').onclick=()=>{if(W){W.terminate();W=null}$('go').disabled=false;$('stop').disabled=true;
   if(last)$('st').textContent='ストップ：'+fmt(last.i)+' / '+fmt(last.N)+' 試合まで（ここまでの結果）　'+(last.ms/1000).toFixed(1)+'秒'};
 </script>
