@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261021e">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261021e">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261021e">
+<meta name="draft-dice-rev" content="20261021f">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261021f">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261021f">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -147,7 +147,6 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .pill.h4 b{text-shadow:0 0 8px #ff3b3b99}
 .pill.up{animation:pillUp .7s ease-out}
 .stat.bon .pill{min-width:0;padding:4px 9px 5px}.stat.bon .pill b{font-size:19px;white-space:nowrap}   /* ボーナス中の「◯ずつ増える」「◯% 固定」は少し小さい字で1行に収める */
-.stat.lot .pill b{visibility:hidden}   /* 抽選中は下のバッジの値を隠す */
 .pill.down{animation:pillDown .7s ease-out}
 @keyframes pillUp{0%{transform:scale(1)}30%{transform:scale(1.16);box-shadow:0 0 22px var(--c)}100%{transform:scale(1)}}
 @keyframes pillDown{0%{transform:scale(1);filter:brightness(1.8)}35%{transform:scale(.9)}100%{transform:scale(1);filter:none}}
@@ -172,17 +171,11 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .dhint{font-size:14px;font-weight:900;color:#e8c36a;white-space:nowrap;visibility:hidden;animation:hintBlink 1s ease-in-out infinite}
 .dhint.on{visibility:visible}.dhint.wait{animation:none;opacity:.75;color:#f4ead0;font-size:13px}
 @keyframes hintBlink{0%,100%{opacity:1}50%{opacity:.35}}
-/* ボーナスの抽選（取り合いと同じ暗い全画面） */
-.lot{display:none;position:fixed;inset:0;background:#000c;z-index:100;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center}
-.lot.on{display:flex}
-.lot .lSub{font-size:13px;font-weight:800;color:#e8c36a}
-.lot .lReels{display:flex;flex-direction:column;gap:12px;align-items:center;margin-top:6px}
-.lot .pill{min-width:210px;padding:8px 14px 10px;transition:filter .2s}
-.lot .pill small{font-size:13px}
-.lot .pill b{font-size:32px;white-space:nowrap;margin-top:4px}
-.lot .pill.spin b{opacity:.85;filter:blur(.4px)}
-.lot .pill.stop{animation:pillUp .7s ease-out;filter:brightness(1.15)}
-.lot .lDone{font-size:15px;font-weight:900;color:#7dffb0;min-height:22px;letter-spacing:.06em;visibility:hidden}.lot .lDone.on{visibility:visible;animation:banPop 1.6s ease-out forwards}
+/* ボーナスの抽選（その場で 下の2つの枠の中の数字が回る。回っている間は枠が光って点滅） */
+.stat .pill.spin{animation:lotGlow .32s ease-in-out infinite alternate}
+.stat .pill.spin b{opacity:.85}
+.stat .pill.stop{animation:pillUp .7s ease-out;filter:brightness(1.15)}
+@keyframes lotGlow{0%{box-shadow:0 0 0 1px #0006,0 0 6px var(--c);transform:scale(1)}100%{box-shadow:0 0 0 2px var(--c),0 0 22px var(--c);transform:scale(1.06)}}
 /* 取り合い勝負 */
 .con{display:none;position:fixed;inset:0;background:#000c;z-index:100;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center}   /* やり直しの確認と同じ暗い全画面 */
 .con.on{display:flex}
@@ -349,7 +342,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 <div class="ruleRow" style="flex-direction:column;gap:8px"><div class="xCol"><div class="xRow"><span class="xk me ">5</span><span class="xp">＋</span><span class="xk me ">3</span><span class="xp">＋</span><span class="xk me ">8</span><span class="xp">－</span><span class="xk me minus">4</span><span class="xt">＝<span class="xv"><b>12</b><i>面</i></span></span></div><span class="ruleArr">↓</span><span class="xH"><span class="rD me"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 83.9,16.1 98.0,50.0 83.9,83.9 50.0,98.0 16.1,83.9 2.0,50.0 16.1,16.1"/></svg><b>9</b></span><span class="xDl">12面</span></span></div><div class="ruleTxt"><span class="ruleGold">3ラウンド</span>　数字を<span class="ruleGold">1つずつ</span>とる<br>合計 － マイナス ＝ <span class="ruleGold">サイコロの面</span></div></div>
 <div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt"><span class="xCol"><span class="rD me win"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 83.9,16.1 98.0,50.0 83.9,83.9 50.0,98.0 16.1,83.9 2.0,50.0 16.1,16.1"/></svg><b>12</b></span><span class="xCap">自分 12</span></span><span class="xVs">VS</span><span class="xCol"><span class="rD op lose"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 83.9,16.1 98.0,50.0 83.9,83.9 50.0,98.0 16.1,83.9 2.0,50.0 16.1,16.1"/></svg><b>6</b></span><span class="xCap">相手 6</span></span></div><div class="ruleArt"><span class="xPt plus">勝ち ＋1200</span><span class="xPt minus">負け －1200</span></div><div class="ruleTxt"><span class="ruleGold">目が大きい方</span>が勝ち<br>勝った人の目×100 を<span class="ruleYes">もらう</span><br>負けた人は 同じだけ<span class="ruleNo">へる</span></div></div>
 <div class="ruleHead">ー　数字　ー</div>
-<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="rStages"><div class="rStage"><span>1〜3回目</span><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#e8c36a" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>2</b></span><span class="rg">1〜3</span><span class="xSec">2.4秒</span><span class="xE" style="color:#7dffb0">0%</span></div><div class="rStage"><span>4〜6回目</span><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#e8c36a" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>5</b></span><span class="rg">1〜6</span><span class="xSec">2.4秒</span><span class="xE" style="color:#ffe066">5〜20%</span></div><div class="rStage"><span>7〜9回目</span><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#e8c36a" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>8</b></span><span class="rg">1〜9</span><span class="xSec">2.4秒</span><span class="xE" style="color:#ffe066">5〜20%</span></div><span class="xDots">…</span></div><div class="ruleTxt">円が1周するごとに 数字が1つ出る<br>3回ごとに 数字は<span class="ruleGold">＋3</span>（上限なし）<br>終わる確率は 3回ごとに ランダムにかわる（5%きざみ）<br>4回目からは <span class="ruleNo">5〜20%</span><br>7回目からは 前の3回と <span class="ruleNo">同じ%には ならない</span></div></div>
+<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="rStages"><div class="rStage"><span>1〜3回目</span><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#e8c36a" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>2</b></span><span class="rg">1〜3</span><span class="xSec">2.4秒</span><span class="xE" style="color:#7dffb0">0%</span></div><div class="rStage"><span>4〜6回目</span><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#e8c36a" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>5</b></span><span class="rg">1〜6</span><span class="xSec">2.4秒</span><span class="xE" style="color:#ffe066">5〜25%</span></div><div class="rStage"><span>7〜9回目</span><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#e8c36a" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>8</b></span><span class="rg">1〜9</span><span class="xSec">2.4秒</span><span class="xE" style="color:#ffe066">5〜25%</span></div><span class="xDots">…</span></div><div class="ruleTxt">円が1周するごとに 数字が1つ出る<br>3回ごとに 数字は<span class="ruleGold">＋3</span>（上限なし）<br>終わる確率は 3回ごとに ランダムにかわる（5%きざみ）<br>4回目からは <span class="ruleNo">5〜25%</span><br>7回目からは 前の3回と <span class="ruleNo">同じ%には ならない</span></div></div>
 <div class="ruleHead">ー　獲得　ー</div>
 <div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt"><span class="xBtn gold">獲得</span><span class="ruleArr">→</span><span class="xBtn res">予約中</span><span class="ruleArr">→</span><span class="rG "><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><circle cx="50" cy="50" r="40" fill="none" stroke="#7dffb0" stroke-width="10" stroke-linecap="round" stroke-dasharray="251.33" stroke-dashoffset="0.00"/></svg><b>5</b></span><span class="ruleArr">→</span><span class="xk me ">5</span></div><div class="ruleTxt">円が<span class="ruleGold">いっぱいになった時</span>の数字がもらえる<br>取り消しはできない　<span class="ruleGold">1ラウンドに1つ</span></div></div>
 <div class="ruleHead">ー　終了　ー</div>
@@ -361,7 +354,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 <div class="ruleRow" style="flex-direction:column;gap:8px"><div class="xCol"><span class="xCard">7</span><div class="ruleArt" style="gap:22px"><span class="xCol"><span class="xCap">相手 8面</span><span class="rD op lose"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,26.0 91.6,74.0 50.0,98.0 8.4,74.0 8.4,26.0"/></svg><b>3</b></span></span><span class="xCol"><span class="xCap">自分 15面</span><span class="rD me win"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 83.9,16.1 98.0,50.0 83.9,83.9 50.0,98.0 16.1,83.9 2.0,50.0 16.1,16.1"/></svg><b>11</b></span></span></div></div><div class="ruleTxt"><span class="ruleGold">目が大きい方</span>が勝ち<br>同じ目は ふりなおし（3回同じなら<span class="ruleGold">抽選</span>）</div></div>
 <div class="ruleRow" style="flex-direction:column;gap:8px"><div class="xCol"><span class="xWho">相手</span><div class="xRow"><span class="xk miss op">―</span><span class="xp">－</span><span class="xk op minus">8</span></div><div class="xRow"><span class="xk me ">7</span><span class="xp">－</span><span class="xk me minus">15</span></div><span class="xWho">自分</span></div><div class="ruleTxt">勝った人が 数字をもらう<br>負けた人は そのラウンド<span class="ruleNo">「―」</span><br><span class="ruleNo">2人とも</span> 使った面が<span class="ruleNo">マイナス</span>になる</div></div>
 <div class="ruleHead">ー　ゾロ目ボーナス　ー</div>
-<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt"><span class="xk me ">2</span><span class="xp">＋</span><span class="xk me ">2</span><span class="xp">＋</span><span class="xk me ">2</span><span class="ruleArr">→</span><span class="rG"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><path d="M90.00 50.00A40 40 0 0 1 88.45 61.03" fill="none" stroke="hsl(0,95%,62%)" stroke-width="10"/><path d="M89.39 56.95A40 40 0 0 1 85.95 67.53" fill="none" stroke="hsl(10,95%,62%)" stroke-width="10"/><path d="M87.59 63.68A40 40 0 0 1 82.36 73.51" fill="none" stroke="hsl(20,95%,62%)" stroke-width="10"/><path d="M84.64 70.00A40 40 0 0 1 77.79 78.77" fill="none" stroke="hsl(30,95%,62%)" stroke-width="10"/><path d="M80.64 75.71A40 40 0 0 1 72.37 83.16" fill="none" stroke="hsl(40,95%,62%)" stroke-width="10"/><path d="M75.71 80.64A40 40 0 0 1 66.27 86.54" fill="none" stroke="hsl(50,95%,62%)" stroke-width="10"/><path d="M70.00 84.64A40 40 0 0 1 59.68 88.81" fill="none" stroke="hsl(60,95%,62%)" stroke-width="10"/><path d="M63.68 87.59A40 40 0 0 1 52.79 89.90" fill="none" stroke="hsl(70,95%,62%)" stroke-width="10"/><path d="M56.95 89.39A40 40 0 0 1 45.82 89.78" fill="none" stroke="hsl(80,95%,62%)" stroke-width="10"/><path d="M50.00 90.00A40 40 0 0 1 38.97 88.45" fill="none" stroke="hsl(90,95%,62%)" stroke-width="10"/><path d="M43.05 89.39A40 40 0 0 1 32.47 85.95" fill="none" stroke="hsl(100,95%,62%)" stroke-width="10"/><path d="M36.32 87.59A40 40 0 0 1 26.49 82.36" fill="none" stroke="hsl(110,95%,62%)" stroke-width="10"/><path d="M30.00 84.64A40 40 0 0 1 21.23 77.79" fill="none" stroke="hsl(120,95%,62%)" stroke-width="10"/><path d="M24.29 80.64A40 40 0 0 1 16.84 72.37" fill="none" stroke="hsl(130,95%,62%)" stroke-width="10"/><path d="M19.36 75.71A40 40 0 0 1 13.46 66.27" fill="none" stroke="hsl(140,95%,62%)" stroke-width="10"/><path d="M15.36 70.00A40 40 0 0 1 11.19 59.68" fill="none" stroke="hsl(150,95%,62%)" stroke-width="10"/><path d="M12.41 63.68A40 40 0 0 1 10.10 52.79" fill="none" stroke="hsl(160,95%,62%)" stroke-width="10"/><path d="M10.61 56.95A40 40 0 0 1 10.22 45.82" fill="none" stroke="hsl(170,95%,62%)" stroke-width="10"/><path d="M10.00 50.00A40 40 0 0 1 11.55 38.97" fill="none" stroke="hsl(180,95%,62%)" stroke-width="10"/><path d="M10.61 43.05A40 40 0 0 1 14.05 32.47" fill="none" stroke="hsl(190,95%,62%)" stroke-width="10"/><path d="M12.41 36.32A40 40 0 0 1 17.64 26.49" fill="none" stroke="hsl(200,95%,62%)" stroke-width="10"/><path d="M15.36 30.00A40 40 0 0 1 22.21 21.23" fill="none" stroke="hsl(210,95%,62%)" stroke-width="10"/><path d="M19.36 24.29A40 40 0 0 1 27.63 16.84" fill="none" stroke="hsl(220,95%,62%)" stroke-width="10"/><path d="M24.29 19.36A40 40 0 0 1 33.73 13.46" fill="none" stroke="hsl(230,95%,62%)" stroke-width="10"/><path d="M30.00 15.36A40 40 0 0 1 37.64 11.96" fill="none" stroke="hsl(240,95%,62%)" stroke-width="10"/></svg><b>2</b></span><span style="display:flex;flex-direction:column;gap:4px"><span class="xPill" style="--c:#f0d27a"><small>増える数</small><b>2ずつ増える</b></span><span class="xPill" style="--c:#ffab40"><small>終わる確率</small><b>15% 固定</b></span></span></div><div class="ruleTxt">3つとも同じ数字（―はダメ）なら<br><span class="ruleGold">自分だけ ラウンド4</span>（1.75秒ごと）<br>始まる時に <span class="ruleGold">抽選</span><br>増える数は <span class="ruleGold">1〜3</span>（◯ずつ増える）<br><span class="xSm">（2ずつ増える なら 2→4→6…）</span><br>終わる確率は <span class="ruleNo">5・10・15・20%</span>（◯% 固定）<br><span class="xSm">2人ともなら 合計が小さい方から<br>（同じなら 部屋を作った人から）</span></div></div>
+<div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt"><span class="xk me ">2</span><span class="xp">＋</span><span class="xk me ">2</span><span class="xp">＋</span><span class="xk me ">2</span><span class="ruleArr">→</span><span class="rG"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="#0a241c" stroke-width="10"/><path d="M90.00 50.00A40 40 0 0 1 88.45 61.03" fill="none" stroke="hsl(0,95%,62%)" stroke-width="10"/><path d="M89.39 56.95A40 40 0 0 1 85.95 67.53" fill="none" stroke="hsl(10,95%,62%)" stroke-width="10"/><path d="M87.59 63.68A40 40 0 0 1 82.36 73.51" fill="none" stroke="hsl(20,95%,62%)" stroke-width="10"/><path d="M84.64 70.00A40 40 0 0 1 77.79 78.77" fill="none" stroke="hsl(30,95%,62%)" stroke-width="10"/><path d="M80.64 75.71A40 40 0 0 1 72.37 83.16" fill="none" stroke="hsl(40,95%,62%)" stroke-width="10"/><path d="M75.71 80.64A40 40 0 0 1 66.27 86.54" fill="none" stroke="hsl(50,95%,62%)" stroke-width="10"/><path d="M70.00 84.64A40 40 0 0 1 59.68 88.81" fill="none" stroke="hsl(60,95%,62%)" stroke-width="10"/><path d="M63.68 87.59A40 40 0 0 1 52.79 89.90" fill="none" stroke="hsl(70,95%,62%)" stroke-width="10"/><path d="M56.95 89.39A40 40 0 0 1 45.82 89.78" fill="none" stroke="hsl(80,95%,62%)" stroke-width="10"/><path d="M50.00 90.00A40 40 0 0 1 38.97 88.45" fill="none" stroke="hsl(90,95%,62%)" stroke-width="10"/><path d="M43.05 89.39A40 40 0 0 1 32.47 85.95" fill="none" stroke="hsl(100,95%,62%)" stroke-width="10"/><path d="M36.32 87.59A40 40 0 0 1 26.49 82.36" fill="none" stroke="hsl(110,95%,62%)" stroke-width="10"/><path d="M30.00 84.64A40 40 0 0 1 21.23 77.79" fill="none" stroke="hsl(120,95%,62%)" stroke-width="10"/><path d="M24.29 80.64A40 40 0 0 1 16.84 72.37" fill="none" stroke="hsl(130,95%,62%)" stroke-width="10"/><path d="M19.36 75.71A40 40 0 0 1 13.46 66.27" fill="none" stroke="hsl(140,95%,62%)" stroke-width="10"/><path d="M15.36 70.00A40 40 0 0 1 11.19 59.68" fill="none" stroke="hsl(150,95%,62%)" stroke-width="10"/><path d="M12.41 63.68A40 40 0 0 1 10.10 52.79" fill="none" stroke="hsl(160,95%,62%)" stroke-width="10"/><path d="M10.61 56.95A40 40 0 0 1 10.22 45.82" fill="none" stroke="hsl(170,95%,62%)" stroke-width="10"/><path d="M10.00 50.00A40 40 0 0 1 11.55 38.97" fill="none" stroke="hsl(180,95%,62%)" stroke-width="10"/><path d="M10.61 43.05A40 40 0 0 1 14.05 32.47" fill="none" stroke="hsl(190,95%,62%)" stroke-width="10"/><path d="M12.41 36.32A40 40 0 0 1 17.64 26.49" fill="none" stroke="hsl(200,95%,62%)" stroke-width="10"/><path d="M15.36 30.00A40 40 0 0 1 22.21 21.23" fill="none" stroke="hsl(210,95%,62%)" stroke-width="10"/><path d="M19.36 24.29A40 40 0 0 1 27.63 16.84" fill="none" stroke="hsl(220,95%,62%)" stroke-width="10"/><path d="M24.29 19.36A40 40 0 0 1 33.73 13.46" fill="none" stroke="hsl(230,95%,62%)" stroke-width="10"/><path d="M30.00 15.36A40 40 0 0 1 37.64 11.96" fill="none" stroke="hsl(240,95%,62%)" stroke-width="10"/></svg><b>2</b></span><span style="display:flex;flex-direction:column;gap:4px"><span class="xPill" style="--c:#f0d27a"><small>増える数</small><b>2ずつ増える</b></span><span class="xPill" style="--c:#ffab40"><small>終わる確率</small><b>15% 固定</b></span></span></div><div class="ruleTxt">3つとも同じ数字（―はダメ）なら<br><span class="ruleGold">自分だけ ラウンド4</span>（1.75秒ごと）<br>始まる時に <span class="ruleGold">抽選</span><br>増える数は <span class="ruleGold">1〜5</span>（◯ずつ増える）<br><span class="xSm">（2ずつ増える なら 2→4→6…）</span><br>終わる確率は <span class="ruleNo">5・10・15・20・25%</span>（◯% 固定）<br><span class="xSm">2人ともなら 合計が小さい方から<br>（同じなら 部屋を作った人から）</span></div></div>
 <div class="ruleHead">ー　カードの見方　ー</div>
 <div class="ruleRow" style="flex-direction:column;gap:8px"><div class="xCol"><div class="xRow"><span class="xk me ">9</span><span class="xp">＋</span><span class="xk me ">8</span><span class="xp">＋</span><span class="xk miss me">―</span><span class="xp">－</span><span class="xk me minus">5</span><span class="xt">＝<span class="xv"><b>12</b><i>面</i></span></span></div><div class="xLegend"><span><span class="xk me ">9</span>＝とった数字</span><span><span class="xk miss me">―</span>＝0</span><span><span class="xk me minus">5</span>＝マイナス</span></div></div><div class="ruleTxt">マイナスは<span class="ruleGold">1枚だけ</span>（取り合いで使った面の合計）<br>0ならマイナスは出ない<br>＝の右が<span class="ruleGold">サイコロの面</span>（0より下にならない）</div></div>
 <div class="ruleRow" style="flex-direction:column;gap:8px"><div class="ruleArt"><span class="xBlue">自分</span><span class="xRed">相手</span></div><div class="ruleTxt">自分のカードは<span style="color:#6aa8ff;font-weight:900">青</span>　相手は<span style="color:#ff5a6a;font-weight:900">赤</span></div></div>
@@ -397,7 +390,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 </section>
 <section id="result"><div class="box"><div id="rTitle">Win</div><div id="rCalc" style="font-size:14px;line-height:1.7;margin:8px 0;color:#e8c36a"></div><div id="rPts" style="font-size:40px;font-weight:900;margin:6px 0 16px"></div><div class="row"><button id="again">もう1度</button><button id="home">やめる</button></div></div></section>
 <div class="con" id="con"></div>
-<div class="lot" id="lot"><div class="cTitle">ボーナス抽選</div><div class="lSub" id="lotWho"></div><div class="lReels"><div class="pill" id="lotD"><small>増える数</small><b id="lotDv">1ずつ増える</b></div><div class="pill h1" id="lotP"><small>終わる確率</small><b id="lotPv">5% 固定</b></div></div><div class="lDone" id="lotDone">決定！</div></div>
+
 <div id="ask"><div style="color:#e8c36a;font-weight:800">モード選択に戻りますか？</div><div class="row"><button id="askYes" class="gold">はい</button><button id="askNo">いいえ</button></div></div>
 </div>
 <script>
@@ -615,9 +608,11 @@ function paintStat(battle,k,ep){
   $("stat").classList.toggle("off",!on);$("stat").style.display=battle?"none":"";
   if(!on){S.shownStage=0;$("stat").classList.remove("bon","lot");return}
   const st=Math.ceil(k/3),pr=$("pRange"),pe=$("pEnd");
-  $("vRange").textContent=S.bonus?bonusD()+"ずつ増える":rangeLo()+"〜"+rangeHi(k);$("vEnd").textContent=S.bonus?ep+"% 固定":ep+"%";   /* ボーナス中は 抽選で決まった「◯ずつ増える」「◯% 固定」 */
-  $("stat").classList.toggle("bon",!!S.bonus);$("stat").classList.toggle("lot",!!(S.bonus&&S.bonus.lot));
-  pe.className="pill h"+heat(ep);
+  const L=S.bonus&&S.bonus.lot?(S.lotS||{d:"?",p:"?",sd:"",sp:""}):null;   /* 抽選中は 枠の中に 回っている数字（始まる前は ?） */
+  $("vRange").textContent=S.bonus?(L?L.d:bonusD())+"ずつ増える":rangeLo()+"〜"+rangeHi(k);$("vEnd").textContent=S.bonus?(L?L.p:ep)+"% 固定":ep+"%";   /* ボーナス中は 抽選で決まった「◯ずつ増える」「◯% 固定」 */
+  $("stat").classList.toggle("bon",!!S.bonus);$("stat").classList.toggle("lot",!!L);
+  pe.className="pill h"+heat(L?(+L.p||5):ep)+(L&&L.sp?" "+L.sp:"");
+  if(L)pr.className="pill"+(L.sd?" "+L.sd:"");else pr.classList.remove("spin","stop");
   if(S.shownStage&&st!==S.shownStage){const c=st>S.shownStage?"up":"down";[pr,pe].forEach(e=>{e.classList.remove("up","down");void e.offsetWidth;e.classList.add(c)})}
   S.shownStage=st;
 }
@@ -639,10 +634,10 @@ function winK(){return S.rt+1}                 /* このラウンドの何回目
 function rangeMax(k){return 3*Math.ceil(k/3)}    /* 1〜3回目:3, 4〜6回目:6, 7〜9回目:9 ... */
 function rangeLo(){return 1}                     /* ボーナスラウンドも最小1 */
 function rangeHi(k){return rangeMax(k)}
-function bonusD(){return S.bonus?S.bonus.d|0:0}   /* ボーナスの増える数（始まる時に 1〜3 を抽選） */
-const BD_SET=[1,2,3];
-const EP_SET=[5,10,15,20];
-function endPct(k){if(S.bonus)return S.bonus.pct;const b=Math.ceil(k/3);return b<=1?0:(S.epB===b?S.ep:0)}  /* 1〜3回目:0%。4〜6回目は 5/10/15/20% から、7回目からは 5/10/15/20% から「前の3回と同じ%以外」をランダムに決める（部屋を作った側が決めて同期） */
+function bonusD(){return S.bonus?S.bonus.d|0:0}   /* ボーナスの増える数（始まる時に 1〜5 を抽選） */
+const BD_SET=[1,2,3,4,5];
+const EP_SET=[5,10,15,20,25];
+function endPct(k){if(S.bonus)return S.bonus.pct;const b=Math.ceil(k/3);return b<=1?0:(S.epB===b?S.ep:0)}  /* 1〜3回目:0%。4〜6回目は 5/10/15/20/25% から、7回目からは 5/10/15/20/25% から「前の3回と同じ%以外」をランダムに決める（部屋を作った側が決めて同期） */
 function ensureEp(){if(!isAuth()||S.bonus)return;const b=Math.ceil(winK()/3);if(b<=1){S.ep=0;S.epB=1}else if(S.epB!==b){const prev=b===2?0:S.ep,c=EP_SET.filter(v=>v!==prev);S.epB=b;S.ep=c[Math.floor(Math.random()*c.length)]}}
 const NET_GRACE=400;   /* 対人戦で 入室側の押した情報が通信で遅れて届く分の待ち（ms） */
 function beginWindow(){
@@ -680,7 +675,7 @@ function settleWindow(ev){
       /* 3ラウンド後: ゾロ目の人はボーナスラウンド（2人ともなら合計が小さい方から、同じなら作成側から） */
       if(!S.bonus&&S.round===ROUNDS)S.bonusQ=[1,2].filter(zorome).sort((a,b)=>sumOf(a)-sumOf(b)||a-b);
       const nx=S.bonusQ.shift();
-      if(nx){S.round=ROUNDS+1;pause+=D.PAUSE_RD;   /* ボーナス開始時に 増える数（1〜3）と 終わる確率（5/10/15/20%）を抽選（部屋を作った側が決めて同期） */
+      if(nx){S.round=ROUNDS+1;pause+=D.PAUSE_RD;   /* ボーナス開始時に 増える数（1〜5）と 終わる確率（5/10/15/20/25%）を抽選（部屋を作った側が決めて同期） */
         const bd=BD_SET[Math.floor(Math.random()*BD_SET.length)],bp=EP_SET[Math.floor(Math.random()*EP_SET.length)];
         S.bonus={p:nx,d:bd,pct:bp,lot:true};ev.bonus=nx;ev.bd=bd;ev.bp=bp;ev.lotAt=pause;pause+=LOT.TOTAL;S.pressed={1:false,2:false};cpuBonusInit()}
       else{S.bonus=null;ev.end=true;S.phase="battle"}
@@ -712,44 +707,40 @@ function applyEv(ev){
     d+=900;
   }
   if(ev.next)later(()=>banner("ラウンド "+ev.next),d?d-200:0);
-  if(ev.bonus){later(()=>banner("ボーナスラウンド"),d?d-200:0);later(()=>runLottery(ev.bonus,ev.bd,ev.bp),ev.lotAt||0)}
+  if(ev.bonus){S.lotS=null;later(()=>banner("ボーナスラウンド"),d?d-200:0);later(()=>runLottery(ev.bonus,ev.bd,ev.bp),ev.lotAt||0)}
   if(ev.end)later(()=>banner("サイコロ勝負"),d?d-200:700);
 }
-/* ボーナスの抽選: 2つのリールを同時に回し、だんだん遅くして 増える数→終わる確率 の順に止める。
+/* ボーナスの抽選（その場で）: 下の「増える数」「終わる確率」の枠の中の数字を同時に回し、だんだん遅くして 増える数→終わる確率 の順に止める。
    止まる値は作成側が先に決めて送る。動き方は止まる値だけで決まるので 両方の画面で同じに見える */
-const LOT={STOP1:2000,STOP2:2800,HOLD:1200,TOTAL:2800+1200+300};
+const LOT={STOP1:2000,STOP2:2800,HOLD:600,TOTAL:2800+600+300};
 function lotSteps(T){const t=[];let x=0;while(x<T){t.push(x);x+=45+430*Math.pow(x/T,2.2)}t.push(x);return t.map(v=>Math.round(v*T/x))}   /* 最初は45msごと → だんだん遅く（最後は約0.45秒）。最後の1つが T ちょうど＝止まる時 */
 function lotSeq(vals,target,n){const i0=vals.indexOf(target),L=vals.length,a=[];for(let j=0;j<n;j++)a.unshift(vals[((i0-j)%L+L*99)%L]);return a}   /* 順番に回って 最後に target で止まる */
-function lotPaint(dv,pv){$("lotDv").textContent=dv+"ずつ増える";$("lotPv").textContent=pv+"% 固定";$("lotP").className=$("lotP").className.replace(/\bh\d\b/,"h"+heat(pv))}
 function runLottery(who,bd,bp){
-  const el=$("lot"),pd=$("lotD"),pp=$("lotP"),dn=$("lotDone");
-  $("lotWho").textContent=(who===S.me?"自分":"相手")+"のボーナス";
-  pd.className="pill spin";pp.className="pill h1 spin";dn.classList.remove("on");el.classList.add("on");
   const s1=lotSteps(LOT.STOP1),s2=lotSteps(LOT.STOP2),q1=lotSeq(BD_SET,bd,s1.length),q2=lotSeq(EP_SET,bp,s2.length);
-  let cd=q1[0],cp=q2[0];lotPaint(cd,cp);
+  const L=S.lotS={who:who,d:q1[0],p:q2[0],sd:"spin",sp:"spin"};render();
   const n1=s1.length-1,n2=s2.length-1;   /* 最後の1つ（止まる時）は下で */
-  s1.forEach((t,i)=>{if(i&&i<n1)later(()=>{cd=q1[i];lotPaint(cd,cp);sfxTick()},t)});
-  s2.forEach((t,i)=>{if(i&&i<n2)later(()=>{cp=q2[i];lotPaint(cd,cp);if(t>LOT.STOP1)sfxTick()},t)});   /* 2つ同時に動く間は音を1つだけ */
-  later(()=>{cd=bd;lotPaint(cd,cp);pd.className="pill stop";tone(200,0.12,"triangle",0.08)},LOT.STOP1);   /* 止まる音＝サイコロが止まる音 */
-  later(()=>{cp=bp;lotPaint(cd,cp);pp.className="pill h"+heat(bp)+" stop";tone(200,0.12,"triangle",0.08);sfxGet();dn.classList.add("on")},LOT.STOP2);   /* 決まった音＝獲得の音 */
-  later(()=>{el.classList.remove("on");if(S.bonus&&S.bonus.p===who)S.bonus.lot=false;render()},LOT.STOP2+LOT.HOLD);
+  s1.forEach((t,i)=>{if(i&&i<n1)later(()=>{L.d=q1[i];render();sfxTick()},t)});
+  s2.forEach((t,i)=>{if(i&&i<n2)later(()=>{L.p=q2[i];render();if(t>LOT.STOP1)sfxTick()},t)});   /* 2つ同時に動く間は音を1つだけ */
+  later(()=>{L.d=bd;L.sd="stop";render();tone(200,0.12,"triangle",0.08)},LOT.STOP1);   /* 止まる音＝サイコロが止まる音 */
+  later(()=>{L.p=bp;L.sp="stop";render();tone(200,0.12,"triangle",0.08);sfxGet()},LOT.STOP2);   /* 決まった音＝獲得の音 */
+  later(()=>{if(S.bonus&&S.bonus.p===who)S.bonus.lot=false;render()},LOT.STOP2+LOT.HOLD);
 }
-function lotHide(){const el=$("lot");if(el)el.classList.remove("on")}
+function lotHide(){S.lotS=null}
 /* CPU AI: 1人で遊ぶ時の一番よい取り方（DP）を目安にする。
-   数字は 1〜3·ceil(k/3)、終わる確率は 1〜3回目 0%、4回目から3回ごとに {5,10,15,20}% のどれか（7回目からは前の3回と同じ%以外・決まるまでは分からない）。
+   数字は 1〜3·ceil(k/3)、終わる確率は 1〜3回目 0%、4回目から3回ごとに {5,10,15,20,25}% のどれか（7回目からは前の3回と同じ%以外・決まるまでは分からない）。
    CPU_THR[k][i] = その回・その確率で「この数字以上なら取る」（0 = 待つ） */
-const CPU_THR=(function(){const P=[.05,.1,.15,.2],K=600,T=[],nx=new Array(P.length).fill(0);let cur=null;
+const CPU_THR=(function(){const P=[.05,.1,.15,.2,.25],K=600,T=[],nx=new Array(P.length).fill(0);let cur=null;
   for(let k=K;k>=1;k--){const b=Math.ceil(k/3),m=3*b,ps=b<=1?[0]:P,last=k===K||Math.ceil((k+1)/3)!==b,row=[],Wk=[];
-    const sum=nx.reduce((a,v)=>a+v,0),avgEx=i=>b<=1?sum/nx.length:(sum-nx[i])/(nx.length-1);   /* 次の3回は 今の%以外の3つから（1〜3回目の0%の次は 5〜20%の4つから） */
+    const sum=nx.reduce((a,v)=>a+v,0),avgEx=i=>b<=1?sum/nx.length:(sum-nx[i])/(nx.length-1);   /* 次の3回は 今の%以外の4つから（1〜3回目の0%の次は 5〜25%の5つから） */
     ps.forEach((p,i)=>{const c=(1-p)*(k===K?0:last?avgEx(i):cur[i]);let t=0,s=0;for(let n=1;n<=m;n++){if(!t&&n>=c-1e-9)t=n;s+=Math.max(n,c)}row.push(t);Wk.push(s/m)});
     if(b<=1){T[k]=P.map(()=>row[0]);cur=P.map(()=>Wk[0])}else{T[k]=row;cur=Wk}
     if(Math.ceil(k/3)!==Math.ceil((k-1)/3)||k===1){for(let i=0;i<P.length;i++)nx[i]=cur[i]}}
   return T})();
 function cpuThr(k,E){const i=Math.max(0,EP_SET.indexOf(E));return CPU_THR[Math.min(k,CPU_THR.length-1)][i]}
 function cpuRoundInit(){const r=Math.random();S.cpuT=r<0.2?5:r<0.45?6:r<0.7?7:r<0.9?8:9}
-/* CPUのボーナスラウンド: 数字は d, 2d, 3d… と決まって増え（d は抽選の 1〜3）、終わる確率は抽選の p で固定。
+/* CPUのボーナスラウンド: 数字は d, 2d, 3d… と決まって増え（d は抽選の 1〜5）、終わる確率は抽選の p で固定。
    k回目で取った時の期待値は d·k·(1−p)^(k−1)。一番高いのは k ≥ (1−p)/p になる最初の回（d によらない）
-   → 5%:19回目 10%:9回目 15%:6回目 20%:4回目。そこを狙って ±2回 ぶれる */
+   → 5%:19回目 10%:9回目 15%:6回目 20%:4回目 25%:3回目。そこを狙って ±2回 ぶれる */
 function cpuBonusInit(){
   if(!S.bonus)return;const p=Math.min(1,S.bonus.pct/100),best=p>=1?1:Math.max(1,Math.ceil((1-p)/p-1e-9));
   S.cpuBK=Math.max(1,best+Math.floor(Math.random()*5)-2);
@@ -796,7 +787,7 @@ function conResolveChoice(){
     c.stage="done";c.w=f1?1:2;c.dl=0;sendCon();render();
     const id=c.id,w=c.w;later(()=>{if(S.con&&S.con.id===id)conGive(w)},CON.YIELD);return;
   }
-  c.stage="done";c.w=0;c.dl=0;sendCon();render();   /* 2人とも譲った → 譲った時と同じ画面で「2人とも譲った」を見せてから 2人とも「―」 */
+  c.stage="done";c.w=0;c.dl=0;sendCon();render();   /* 2人とも譲った → 譲った時と同じ画面で「ゆずり合った」（文字だけ）を見せてから 2人とも「―」 */
   const id=c.id;later(()=>{if(S.con&&S.con.id===id){S.con=null;settleWindow({t:"kaburi",v:c.v,k:c.k})}},CON.YIELD);
 }
 function conPickTimer(){   /* 取り合いの面選びは制限時間なし（人が決定するまで待つ） */ }
@@ -880,7 +871,7 @@ function paintCon(){
       '<div class="dcol"><div class="die cMe tap" id="cdMe"><svg viewBox="0 0 100 100"><polygon/></svg><b>?</b></div><div class="cFace" id="cfMe">'+c.F[me]+'面</div></div></div>'+
       '<div class="dhint" id="cdHint">タップで止める</div></div><div class="cRes" id="cRes"></div>';
   }else if(c.stage==="done"){
-    h=c.w===0?'<div class="cTitle">2人とも譲った</div><div class="cNum">'+c.v+'</div><div class="cSub">2人とも「―」</div>'
+    h=c.w===0?'<div class="cTitle">ゆずり合った</div>'
       :'<div class="cTitle">'+(c.w===me?"譲られた":"譲った")+'</div><div class="cNum">'+c.v+'</div><div class="cSub">'+(c.w===me?"自分がもらう":"&nbsp;")+'</div>';   /* 自分が譲った時の「相手がもらう」は出さない（行は残してレイアウトを動かさない） */
   }
   el.innerHTML=h;
