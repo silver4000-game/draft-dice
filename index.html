@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261022f">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261022f">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261022f">
+<meta name="draft-dice-rev" content="20261022g">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261022g">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261022g">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -351,7 +351,31 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 @keyframes bub{0%{opacity:0;transform:scale(.86)}12%{opacity:1;transform:scale(1)}75%{opacity:1}100%{opacity:0}}
 
 
-</style></head><body>
+</style><!-- top-bar-color-20261022g -->
+<meta name="theme-color" content="#1a3e2d">
+<style>html,body{background-color:#1a3e2d}</style>
+<script>
+/* ホーム画面アプリ(iOS 26〜)の上の帯の色: ページの背景色と theme-color に合わせる（白いモヤを出さない） */
+(function(){
+  var d=document;
+  function rgb(c){var m=/rgba?\(([^)]+)\)/.exec(c||"");if(!m)return null;var a=m[1].split(",");if(a.length>3&&parseFloat(a[3])<0.5)return null;return "rgb("+a[0].trim()+","+a[1].trim()+","+a[2].trim()+")";}
+  function pick(){
+    var w=window.innerWidth,el=d.elementFromPoint(w/2,2);
+    for(;el&&el!==d.body&&el!==d.documentElement;el=el.parentElement){
+      var r=el.getBoundingClientRect();if(r.width<w*0.9||r.top>2)continue;
+      var c=rgb(getComputedStyle(el).backgroundColor);if(c)return c;
+    }
+    return rgb(getComputedStyle(d.documentElement).backgroundColor)||rgb(getComputedStyle(d.body).backgroundColor);
+  }
+  var meta,t=0;
+  function upd(){t=0;try{var c=pick();if(!c)return;if(!meta){meta=d.querySelector('meta[name="theme-color"]');if(!meta){meta=d.createElement("meta");meta.name="theme-color";d.head.appendChild(meta);}}if(meta.content!==c)meta.content=c;}catch(e){}}
+  function sch(){if(!t)t=setTimeout(upd,120);}
+  function go(){upd();try{new MutationObserver(sch).observe(d.documentElement,{attributes:true,subtree:true,attributeFilter:["class","style"]});}catch(e){}
+    window.addEventListener("resize",sch);window.addEventListener("pageshow",sch);d.addEventListener("visibilitychange",sch);}
+  if(d.readyState==="loading")d.addEventListener("DOMContentLoaded",go);else go();
+})();
+</script>
+</head><body>
 <div id="app">
 <section id="mode" class="on"><h1>ドラフトダイス</h1>
 <div class="hero">
@@ -589,7 +613,7 @@ function paintPicks(id,p){
     const has=i<S.acq[p].length,v=S.acq[p][i];
     if(i)h+='<span class="plus">＋</span>';
     const cur=S.phase==="draft"&&i===S.round-1&&!has&&(!S.bonus||S.bonus.p===p);
-    const isNew=S.lastNew&&S.lastNew.i===i&&has;
+    const isNew=!!S.lastNew&&S.lastNew[p]===i&&has;   /* 今取った人のカードだけ動かす（もう取ってあるカードは動かさない） */
     h+='<div class="pk'+(has?(v==null?" miss":" got"):"")+(has&&v>=100?" w3":"")+(cur?" cur":"")+(isNew?" new":"")+'">'+(has?pickTxt(v):"")+'</div>';
   }
   const pen=S.pen&&S.pen[p]||0,ml=(S.penL&&S.penL[p])||[];
@@ -745,16 +769,16 @@ function applyEv(ev){
   const me=S.me,op=oppOf(me);
   let d=0;
   if(ev.t==="take"){
-    S.lastNew={i:S.acq[ev.who].length-1};
+    S.lastNew={[ev.who]:S.acq[ev.who].length-1};
     sfxGet();   /* 獲得時は演出なし・効果音だけ（自分も相手も同じ音） */
     numFx("");d=900;
     if(ev.who===me)S.pressed[me]=false;
   }
-  else if(ev.t==="kaburi"){S.lastNew={i:S.acq[me].length-1};sfxTaken();numFx("");d=900;S.pressed[me]=false}   /* 2人とも譲った: 2人の枠が「―」になる（譲った画面はその前に出している） */
+  else if(ev.t==="kaburi"){S.lastNew={};(ev.both||[1,2]).forEach(p=>{S.lastNew[p]=S.acq[p].length-1});sfxTaken();numFx("");d=900;S.pressed[me]=false}   /* 2人とも譲った: 2人の枠が「―」になる（譲った画面はその前に出している） */
   if(ev.ended){
     if(ev.ended.indexOf(me)>=0)S.pressed[me]=false;
     const mm=ev.ended.indexOf(me)>=0,om=ev.ended.indexOf(op)>=0;
-    const show=()=>{S.hold=null;S.lastNew={i:ev.k?S.acq[me].length-1:0};S.endShow=true;if(mm)sfxTaken();render();numFx("pop")};  /* 円の中の数字の所に「終了」。取れなかった人の枠は―になる */
+    const show=()=>{S.hold=null;S.lastNew={};ev.ended.forEach(p=>{S.lastNew[p]=S.acq[p].length-1});S.endShow=true;if(mm)sfxTaken();render();numFx("pop")};  /* 円の中の数字の所に「終了」。取れなかった人の枠は―になる */
     if(d){S.hold=ev.v;later(show,d)}else show();   /* 獲得のあと「終了」を出すまでは 取られた数字をそのまま見せる（一瞬「?」にしない） */
     d+=900;
   }
