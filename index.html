@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261022i">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261022i">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261022i">
+<meta name="draft-dice-rev" content="20261022j">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261022j">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261022j">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -606,7 +606,8 @@ function gaugeLoop(){
 }
 requestAnimationFrame(gaugeLoop);
 
-function paintDiff(){const d=S.totals[S.me]||0;const sc=$("sc");sc.textContent=d>0?"+"+d:d===0?"±0":String(d);sc.className="diff "+(d>0?"plus":d<0?"minus":"zero");fitDiff()}
+function paintDiff(){const d=(S.shownTot!=null?S.shownTot:S.totals[S.me])||0;   /* 通算の枠は リザルト画面のあと（次の試合・ホーム）で新しい数字にする */
+const sc=$("sc");sc.textContent=d>0?"+"+d:d===0?"±0":String(d);sc.className="diff "+(d>0?"plus":d<0?"minus":"zero");fitDiff()}
 function fitDiff(){const sc=$("sc"),bx=sc&&sc.parentElement;if(!bx)return;sc.style.fontSize="";const av=bx.clientWidth-12;if(!(av>0))return;let fs=20;while(fs>9&&sc.getBoundingClientRect().width>av){fs--;sc.style.fontSize=fs+"px"}}   /* 枠に入らない時だけ文字を小さく */
 function paintPicks(id,p){
   const box=$(id);let h="";
@@ -700,6 +701,7 @@ function snap(){return{n:S.n,win:S.win,round:S.round,rt:S.rt,acq:{1:S.acq[1].sli
 function resetDraft(){S.endShow=false;S.hold=null;S.pen={1:0,2:0};S.penL={1:[],2:[]};S.con=null;S.conKey="";S.bonus=null;S.ep=0;S.epB=1;S.bonusQ=[];S.round=1;S.n=null;S.win=0;S.rt=0;S.acq={1:[],2:[]};S.pressed={1:false,2:false};S.phase="draft";S.waiting=true;S.faces=null;S.rolls=null;S.battleDone=false;S.applied=false;S.winner=0;S.got=0;S.votes={};S.lastNew=null;
   setDie($("dieOpp"),6,null);setDie($("dieMe"),6,null);$("dieOpp").className="die";$("dieMe").className="die";$("dfOpp").textContent="";$("dfMe").textContent="";$("dhMe").classList.remove("on");S.stopped={1:false,2:false};S.stopReq=false}
 function startMatch(){
+  S.shownTot=null;   /* リザルト画面のあと: 通算の枠を新しい数字に */
   S.cpuGS=null;   /* CPU の「通算で負けているか」は 試合ごとに 見直す */
   resetDraft();fxHide();
   $("again").textContent="もう1度";$("again").style.display="";
@@ -1088,6 +1090,7 @@ function settleBattle(){
 function finishBattle(w,roll){
   if(S.applied)return;S.applied=true;
   S.winner=w;S.got=roll*100;   /* roll = 目の差 */
+  if(S.shownTot==null)S.shownTot=S.totals[S.me]||0;   /* 枠の表示は 前の通算のまま（中の点の計算はここで行う） */
   if(w){S.totals[w]+=S.got;S.totals[oppOf(w)]-=S.got}saveHub();
   banner(!w?"引き分け":w===S.me?"勝ち":"負け");
   if(!w)tone(440,0.2,"triangle",0.06);else if(w===S.me)sfxWinJ();else sfxLose();
@@ -1221,7 +1224,7 @@ function boot(host,code){
 }
 
 /* ---------- screens ---------- */
-function goHome(){hardStopSounds();saveHub();if(S.mode==="pvp")hangup(true);S.phase="idle";S.waiting=true;$("ask").classList.remove("on");show("mode")}
+function goHome(){S.shownTot=null;hardStopSounds();saveHub();if(S.mode==="pvp")hangup(true);S.phase="idle";S.waiting=true;$("ask").classList.remove("on");show("mode")}
 document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{S.mode=b.dataset.mode;S.matchNo=1;if(S.mode==="pvp"){$("roomSt").textContent="";show("room")}else{S.me=1;S.host=true;startMatch()}});
 $("btnRules").onclick=()=>{show("rules");$("rules").scrollTop=0};
 $("rulesBack").onclick=()=>show("mode");
