@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261022g">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261022g">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261022g">
+<meta name="draft-dice-rev" content="20261022h">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261022h">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261022h">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -353,7 +353,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 
 </style><!-- top-bar-color-20261022g -->
 <meta name="theme-color" content="#1a3e2d">
-<style>html,body{background-color:#1a3e2d}</style>
+<style>html,body{background-color:#1a3e2d;background-image:linear-gradient(#1a3e2d,rgba(26,62,45,0) 56px),radial-gradient(ellipse at center,#286848,#142c22)}</style>
 <script>
 /* ホーム画面アプリ(iOS 26〜)の上の帯の色: ページの背景色と theme-color に合わせる（白いモヤを出さない） */
 (function(){
@@ -746,7 +746,7 @@ function settleWindow(ev){
   if(ev.t==="kaburi"){ev.both=[1,2].filter(need);ev.both.forEach(p=>S.acq[p].push(null))}   /* 2人とも譲った → 2人ともそのラウンド「―」で次のラウンドへ（終わる判定はしない） */
   else if((need(1)||need(2))&&Math.random()*100<endPct(k)){ev.ended=[1,2].filter(need);ev.ended.forEach(p=>S.acq[p].push(null))}
   if(!need(1)&&!need(2)){
-    if(ev.ended)pause+=D.PAUSE_EV;
+    if(ev.ended&&ev.t!=="take")pause+=D.PAUSE_EV;   /* 獲得と同時に終了した時は「終了」を同時に出すので、待ちは「獲得なしで終了」と同じ長さ */
     S.rt=0;S.n=null;
     if(S.round>=ROUNDS){
       /* 3ラウンド後: ゾロ目の人はボーナスラウンド（2人ともなら合計が小さい方から、同じなら作成側から） */
@@ -779,8 +779,8 @@ function applyEv(ev){
     if(ev.ended.indexOf(me)>=0)S.pressed[me]=false;
     const mm=ev.ended.indexOf(me)>=0,om=ev.ended.indexOf(op)>=0;
     const show=()=>{S.hold=null;S.lastNew={};ev.ended.forEach(p=>{S.lastNew[p]=S.acq[p].length-1});S.endShow=true;if(mm)sfxTaken();render();numFx("pop")};  /* 円の中の数字の所に「終了」。取れなかった人の枠は―になる */
-    if(d){S.hold=ev.v;later(show,d)}else show();   /* 獲得のあと「終了」を出すまでは 取られた数字をそのまま見せる（一瞬「?」にしない） */
-    d+=900;
+    if(ev.t==="take"){S.hold=null;S.lastNew=S.lastNew||{};ev.ended.forEach(p=>{S.lastNew[p]=S.acq[p].length-1});S.endShow=true;if(mm)sfxTaken();numFx("pop")}   /* 獲得と同時に「終了」: 取ったカードが動いている間に「終了」と「―」を出す（このあとの render で表示） */
+    else{show();d+=900}
   }
   if(ev.next)later(()=>banner("ラウンド "+ev.next),d?d-200:0);
   if(ev.bonus)later(()=>banner("ボーナスラウンド"),d?d-200:0);
