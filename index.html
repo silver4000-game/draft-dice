@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261022j">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261022j">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261022j">
+<meta name="draft-dice-rev" content="20261022k">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261022k">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261022k">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -370,13 +370,16 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
   }
   var meta,strip,t=0;
   function upd(){t=0;try{var c=pick();if(!c)return;if(strip&&strip.style.backgroundColor!==c)strip.style.backgroundColor=c;if(!meta){meta=d.querySelector('meta[name="theme-color"]');if(!meta){meta=d.createElement("meta");meta.name="theme-color";d.head.appendChild(meta);}}if(meta.content!==c)meta.content=c;}catch(e){}}
-  function sch(){if(!t)t=setTimeout(upd,120);}
-  function go(){try{strip=d.getElementById("iosTopStrip");if(!strip){strip=d.createElement("div");strip.id="iosTopStrip";strip.setAttribute("aria-hidden","true");d.body.insertBefore(strip,d.body.firstChild);}}catch(e){}upd();try{new MutationObserver(sch).observe(d.documentElement,{attributes:true,subtree:true,attributeFilter:["class","style"]});}catch(e){}
+  function key(s){return (String(s||"").match(/(display|visibility|background[\w-]*)\s*:[^;]*/g)||[]).join(";");}
+  function sch(recs){   /* 画面が切りかわったら すぐ（同じフレームで）色を合わせる。待ち時間なし */
+    if(recs&&recs.length){var hit=false;for(var i=0;i<recs.length;i++){var r=recs[i];if(r.target===strip)continue;if(r.attributeName!=="style"){hit=true;break;}if(key(r.oldValue)!==key(r.target.getAttribute("style"))){hit=true;break;}}if(!hit)return;}
+    upd();}
+  function go(){try{strip=d.getElementById("iosTopStrip");if(!strip){strip=d.createElement("div");strip.id="iosTopStrip";strip.setAttribute("aria-hidden","true");d.body.insertBefore(strip,d.body.firstChild);}}catch(e){}upd();try{new MutationObserver(sch).observe(d.documentElement,{attributes:true,attributeOldValue:true,subtree:true,attributeFilter:["class","style"]});}catch(e){}
     window.addEventListener("resize",sch);window.addEventListener("pageshow",sch);d.addEventListener("visibilitychange",sch);}
   if(d.readyState==="loading")d.addEventListener("DOMContentLoaded",go);else go();
 })();
 </script>
-</head><body>
+</head><body><div id="iosTopStrip" aria-hidden="true" style="background-color:#1a3e2d"></div>
 <div id="app">
 <section id="mode" class="on"><h1>ドラフトダイス</h1>
 <div class="hero">
