@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261027i">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261027i">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261027i">
+<meta name="draft-dice-rev" content="20261027j">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261027j">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261027j">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -926,7 +926,7 @@ function cpuThink(){
   if(H_AI.press(cpuCtx(S.n,k))){const w=S.win;later(()=>{if(S.phase==="draft"&&!S.waiting&&S.win===w&&need(2))S.pressed[2]=true},winDur(k)*(0.1+Math.random()*0.77))}
 }
 /* ---------- 取り合い勝負（被った時） ---------- */
-const CON={CHOICE:10000,PICK:15000,GRACE:1200,SPIN1:1500,SPIN2:1000,TIE:900,SHOW:1300,YIELD:1100,MIN:2,DIG:4};
+const CON={CHOICE:10000,PICK:15000,GRACE:1200,SPIN1:1500,SPIN2:1000,TIE:900,SHOW:1300,YIELD:1100,MIN:2,DIG:2};   /* 入力は2けたまで＝上限99 */
 function startContest(v,k){
   S.con={id:++S.conId,v:v,k:k,stage:"choice",dl:0,choice:{1:null,2:null},pick:{1:null,2:null},ent:""};
   S.waiting=true;S.n=v;sendCon();sfxKaburi();render();
@@ -947,7 +947,7 @@ function conResolveChoice(){
   if(f1&&f2){   /* 2人とも勝負 → 面を選ぶ（制限時間なし） */
     c.stage="pick";c.dl=0;c.ent="";sendCon();render();
     const id=c.id;
-    if(S.mode==="cpu"){const n=Math.max(CON.MIN,Math.min(9999,H_AI.faces(cpuCtx(c.v,c.k))));later(()=>hostConPick(2,n,id),1500+Math.random()*2500)}
+    if(S.mode==="cpu"){const n=Math.max(CON.MIN,Math.min(10**CON.DIG-1,H_AI.faces(cpuCtx(c.v,c.k))));later(()=>hostConPick(2,n,id),1500+Math.random()*2500)}
     return;
   }
   if(f1||f2){   /* 片方が譲った → 勝負を選んだ方がもらう */
@@ -958,7 +958,7 @@ function conResolveChoice(){
   const id=c.id;later(()=>{if(S.con&&S.con.id===id){S.con=null;settleWindow({t:"kaburi",v:c.v,k:c.k})}},CON.YIELD);
 }
 function conPickTimer(){   /* 取り合いの面選びは制限時間なし（人が決定するまで待つ） */ }
-function entVal(){const v=parseInt(S.con&&S.con.ent||"",10);return v>=CON.MIN?v:0}   /* 2面から（上限なし。入力は4けたまで） */
+function entVal(){const v=parseInt(S.con&&S.con.ent||"",10);return v>=CON.MIN?v:0}   /* 2面から99面まで（入力は2けたまで） */
 function hostConPick(p,n,id){
   const c=S.con;if(!isAuth()||!c||c.id!==id||c.stage!=="pick"||c.pick[p])return;
   n=Math.round(+n);if(!(n>=CON.MIN&&n<10**CON.DIG))n=CON.MIN;
