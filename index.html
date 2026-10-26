@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261027g">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261027g">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261027g">
+<meta name="draft-dice-rev" content="20261027h">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261027h">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261027h">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -206,6 +206,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .hCont{font-size:11px;font-weight:900;color:#7dffb0;white-space:nowrap}
 .hArt .rD{width:30px;height:30px}.hArt .rD b{font-size:14px}
 .hBat{font-size:12px;font-weight:900;color:#ffb347;white-space:nowrap}
+.cChuiBtn{height:44px;min-width:150px;margin-top:4px;font-size:16px;letter-spacing:.2em;border-width:2px;border-color:#f0d27a;border-radius:12px;color:#ffe9a8;background:linear-gradient(#7a5516,#47300a);box-shadow:0 0 10px #f0d27a77,inset 0 1px 0 #ffe9a855;opacity:1}   /* 面選びの「注意」ボタン: 説明ボタンより大きく・金の枠と光で目立たせる */
 .cHelp>button{flex:none;margin-top:12px;min-width:140px}
 .cHelp .hTxt.hRed{font-size:15px;font-weight:900;color:#ff5a6a;line-height:1.45;word-break:keep-all}
 .hPicks{display:flex;align-items:center;justify-content:center;gap:3px;font-weight:900}
@@ -214,6 +215,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .hPicks .hF{margin-left:3px;font-size:13px;color:#e8c36a;white-space:nowrap}.hPicks .hF b{font-family:Cinzel,serif;font-size:22px;color:#ff8a95}
 .hArt.hDice{gap:22px;align-items:flex-start}.hArt.hDice .rD{width:54px;height:54px}.hArt.hDice .rD b{font-size:20px}
 .hCol{display:flex;flex-direction:column;align-items:center;gap:3px}.hCol small{font-size:11px;font-weight:900;color:#f4ead0}
+.hHeadS{font-size:14px;white-space:nowrap}   /* せまい画面で「る」だけ折り返さないように */
 .hCalc{font-size:15px;font-weight:900;color:#f0d27a;white-space:nowrap}
 .cWait,.cT{font-size:13px;font-weight:800;color:#f4ead0;min-height:18px}
 .cT{color:#e8c36a;opacity:.85}
@@ -504,7 +506,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 </section>
 <section id="result"><div class="box"><div id="rTitle">Win</div><div id="rCalc" style="font-size:14px;line-height:1.7;margin:24px 0 26px;color:#e8c36a"></div><div id="rPts" style="font-size:40px;font-weight:900;margin:6px 0 16px"></div><div class="row"><button id="again">もう1度</button><button id="home">やめる</button></div></div></section>
 <div class="con" id="con"></div>
-<div class="cHelp" id="cChui"><div class="cTitle">注意</div><div class="hList"><div class="hItem"><div class="hTxt hRed">選んだ数だけ<wbr>最後のサイコロの面が減るよ</div></div><div class="hItem"><div class="hHead">最後のダイス勝負ではマイナスも計算する</div><div class="hPicks"><span class="xWho hW">自分</span><div class="pk got">3</div><span class="plus">＋</span><div class="pk got">2</div><span class="plus">－</span><div class="pk got minus">13</div><span class="hF">＝<b>−8</b>面</span></div><div class="hArt hDice"><span class="hCol"><span class="rD op"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,26.0 91.6,74.0 50.0,98.0 8.4,74.0 8.4,26.0"/></svg><b>3</b></span><small>相手</small></span><span class="hCol"><span class="rD me neg"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,26.0 91.6,74.0 50.0,98.0 8.4,74.0 8.4,26.0"/></svg><b>−8</b></span><small>自分</small></span></div><div class="hCalc">−8 と 3 → 差は11 → 1100点</div></div></div><button id="cChuiBack">もどる</button></div>
+<div class="cHelp" id="cChui"><div class="cTitle">注意</div><div class="hList"><div class="hItem"><div class="hTxt hRed">選んだ数だけ<wbr>最後のサイコロの面が減るよ</div></div><div class="hItem"><div class="hHead hHeadS">最後のダイス勝負ではマイナスも計算する</div><div class="hPicks"><span class="xWho hW">自分</span><div class="pk got">3</div><span class="plus">＋</span><div class="pk got">2</div><span class="plus">＋</span><div class="pk got">4</div><span class="plus">－</span><div class="pk got minus">17</div><span class="hF">＝<b>−8</b>面</span></div><div class="hArt hDice"><span class="hCol"><span class="rD op"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,26.0 91.6,74.0 50.0,98.0 8.4,74.0 8.4,26.0"/></svg><b>3</b></span><small>相手</small></span><span class="hCol"><span class="rD me neg"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,26.0 91.6,74.0 50.0,98.0 8.4,74.0 8.4,26.0"/></svg><b>−8</b></span><small>自分</small></span></div><div class="hCalc">−8 と 3 → 差は11 → 1100点</div></div></div><button id="cChuiBack">もどる</button></div>
 <div class="cHelp" id="cHelp"><div class="cTitle">被ったとき</div><div class="hList"><div class="hItem"><div class="hHead">お互いゆずる</div><div class="hArt"><span class="xCard">7</span><span class="hRows"><span class="hR"><span class="xWho hW">相手</span><span class="xBtn">ゆずる</span></span><span class="hR"><span class="xWho hW">自分</span><span class="xBtn">ゆずる</span></span></span><span class="ruleArr">→</span><span class="hRows"><span class="hR"><span class="xk miss op">―</span></span><span class="hR"><span class="xk miss me">―</span></span></span></div><div class="hTxt">お互い未獲得のまま<br>ラウンド終了</div></div><div class="hItem"><div class="hHead">自分だけゆずる</div><div class="hArt"><span class="xCard">7</span><span class="hRows"><span class="hR"><span class="xWho hW">相手</span><span class="xBtn gold">取り合う</span></span><span class="hR"><span class="xWho hW">自分</span><span class="xBtn">ゆずる</span></span></span><span class="ruleArr">→</span><span class="hRows"><span class="hR"><span class="xk op">7</span></span><span class="hR"><span class="hCont">続きから</span></span></span></div><div class="hTxt">数字は相手が獲得して、<br>自分は続きから数字を選び直す</div></div><div class="hItem"><div class="hHead">自分だけ取り合う</div><div class="hArt"><span class="xCard">7</span><span class="hRows"><span class="hR"><span class="xWho hW">相手</span><span class="xBtn">ゆずる</span></span><span class="hR"><span class="xWho hW">自分</span><span class="xBtn gold">取り合う</span></span></span><span class="ruleArr">→</span><span class="hRows"><span class="hR"><span class="hCont">続きから</span></span><span class="hR"><span class="xk me">7</span></span></span></div><div class="hTxt">相手がゆずってくれたので<br>数字を獲得</div></div><div class="hItem"><div class="hHead">お互い取り合う</div><div class="hArt"><span class="xCard">7</span><span class="hRows"><span class="hR"><span class="xWho hW">相手</span><span class="xBtn gold">取り合う</span></span><span class="hR"><span class="xWho hW">自分</span><span class="xBtn gold">取り合う</span></span></span><span class="ruleArr">→</span><span class="hRows"><span class="hR"><span class="rD op"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,26.0 91.6,74.0 50.0,98.0 8.4,74.0 8.4,26.0"/></svg><b>?</b></span></span><span class="hR"><span class="rD me"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,26.0 91.6,74.0 50.0,98.0 8.4,74.0 8.4,26.0"/></svg><b>?</b></span></span></span><span class="hBat">バトル！</span></div><div class="hTxt">数字を取り合う<br>バトルがはじまるよ</div></div></div><button id="cHelpBack">もどる</button></div>
 
 <div id="ask"><div style="color:#e8c36a;font-weight:800">モード選択に戻りますか？</div><div class="row"><button id="askYes" class="gold">はい</button><button id="askNo">いいえ</button></div></div>
@@ -1032,7 +1034,7 @@ function paintCon(){
     ["1","2","3","4","5","6","7","8","9","C","0"].forEach(k=>{g+='<button data-k="'+k+'"'+dis+'>'+k+'</button>'});   /* 上から 1 2 3 / 4 5 6 / 7 8 9 / C 0（9の下は空き） */
     h='<div class="cCard cPickCard"><b>'+c.v+'</b></div><div class="cPickTitle">選んだ面のダイスで相手と勝負！</div><div class="cDisp"><b>'+(ent||"&nbsp;")+'</b><span>面</span></div><div class="cKeys">'+g+'</div>'+
       '<div class="cBtns"><button class="gold" data-go="1"'+(mp||!entVal()?" disabled":"")+'>決定</button></div>'+
-      '<div class="cWait">'+(mp?"相手が選んでいます…":"")+'</div><button class="cHelpBtn" data-help="2">注意</button>';   /* 赤い注意文は「注意」ページへ移した */
+      '<div class="cWait">'+(mp?"相手が選んでいます…":"")+'</div><button class="cHelpBtn cChuiBtn" data-help="2">注意</button>';   /* 赤い注意文は「注意」ページへ移した */
   }else if(c.stage==="dice"){
     h='<div class="cCard"><b>'+c.v+'</b></div><div class="cDiceWrap"><div class="cDice">'+
       '<div class="dcol"><div class="die cOpp" id="cdOpp"><svg viewBox="0 0 100 100"><polygon/></svg><b>?</b></div><div class="cFace" id="cfOpp">'+c.F[op]+'面</div></div>'+
