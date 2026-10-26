@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261027h">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261027h">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261027h">
+<meta name="draft-dice-rev" content="20261027i">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261027i">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261027i">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -1179,7 +1179,7 @@ function showResult(){
   const hi=w||me,lo=oppOf(hi);   /* 大きい目 − 小さい目 ＝ 点（引き分けは 自分 − 相手 ＝ 0） */
   const eq=r&&r[1]!=null&&r[2]!=null?'<div class="rsEq">'+dieH(hi,r[hi])+'<span class="rsOp">－</span>'+dieH(lo,r[lo])+'<span class="rsOp">＝</span><span class="rsPt">'+(Math.abs(r[hi]-r[lo])*100)+'</span></div>':'';
   $("rCalc").innerHTML=eq;   /* 大きい目のサイコロ − 小さい目のサイコロ ＝ 点 */
-  $("rPts").innerHTML='<div style="font-size:18px;font-weight:800;color:#e8c36a;margin-top:10px">今回</div><div style="color:'+col(mineGot)+'">'+(mineGot>0?"+":mineGot===0?"±":"")+mineGot+'</div><div style="font-size:18px;font-weight:800;color:#e8c36a;margin-top:10px">今までの通算</div><div style="color:'+col(life)+'">'+(life===0?"±0":(life>0?"+":"")+life)+'</div>';
+  $("rPts").innerHTML='<div style="font-size:18px;font-weight:800;color:#e8c36a;margin-top:10px;margin-bottom:-9px">〈今回〉</div><div style="color:'+col(mineGot)+'">'+(mineGot>0?"+":mineGot===0?"±":"")+mineGot+'</div><div style="font-size:18px;font-weight:800;color:#e8c36a;margin-top:10px;margin-bottom:-9px">〈通算〉</div><div style="color:'+col(life)+'">'+(life===0?"±0":(life>0?"+":"")+life)+'</div>';
   show("result");
 }
 function goAgain(){if(S.phase!=="result")return;S.matchNo++;S.votes={};startMatch()}
