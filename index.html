@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261027c">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261027c">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261027c">
+<meta name="draft-dice-rev" content="20261027d">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261027d">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261027d">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -355,6 +355,14 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .rEnds{display:grid;grid-template-columns:repeat(3,auto);justify-content:center;gap:8px 8px}
 .rFrameTxt{margin-top:10px;font-size:14px;font-weight:800;min-width:0;flex:none}
 /* /RULES-5FRAMES */
+/* RULES-BATTLE (20261027d) */
+.rBoard4 .rCenter{margin:8px 0 10px}
+.rDice .diceRow{gap:26px}
+.rBoard .die{width:78px;height:78px}.rBoard .die b{font-size:30px}
+.rBoard .die.op polygon{stroke:#ff5a6a;stroke-width:5}.rBoard .die.me polygon{stroke:#6aa8ff;stroke-width:5}
+.rBoard .dface{font-size:14px}
+/* /RULES-BATTLE */
+
 
 
 
@@ -434,7 +442,13 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 <div class="ruleSteps">
 <div class="ruleStep"><span class="ruleNum rBadge">1</span><div class="ruleStepBody">中央に表示されている数字が一定時間毎に変わるので好きなタイミングで獲得ボタンを押す。</div></div>
 <div class="ruleStep"><span class="ruleNum rBadge">2</span><div class="ruleStepBody">これを3ラウンド分繰り返す。</div></div>
-<div class="ruleStep"><span class="ruleNum rBadge">3</span><div class="ruleStepBody">獲得した数の合計の面のダイスで相手と勝負</div></div>
+</div></div>
+<div class="ruleFrame"><div class="ruleHead">ー　勝負　ー</div>
+<div class="rBoard rBoard4"><div class="rSide"><div class="picks rPicks op"><div class="pk got">6</div><span class="plus">＋</span><div class="pk got">4</div><span class="plus">＋</span><div class="pk got">5</div><span class="faces"><span class="eq">＝</span><span class="fv"><b>15</b><i>面</i></span></span></div></div>
+<div class="rCenter"><div class="dice on rDice"><div class="diceRow"><div class="dcol"><div class="dlab">相手</div><div class="die op"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 83.9,16.1 98.0,50.0 83.9,83.9 50.0,98.0 16.1,83.9 2.0,50.0 16.1,16.1"/></svg><b>6</b></div><div class="dface">15面</div></div><div class="dcol"><div class="dlab">自分</div><div class="die me"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 83.9,16.1 98.0,50.0 83.9,83.9 50.0,98.0 16.1,83.9 2.0,50.0 16.1,16.1"/></svg><b>12</b></div><div class="dface">16面</div></div></div></div></div>
+<div class="rSide"><div class="picks rPicks me"><div class="pk got">5</div><span class="plus">＋</span><div class="pk got">3</div><span class="plus">＋</span><div class="pk got">8</div><span class="faces"><span class="eq">＝</span><span class="fv"><b>16</b><i>面</i></span></span></div></div></div>
+<div class="ruleSteps">
+<div class="ruleStep"><span class="ruleNum rBadge">1</span><div class="ruleStepBody">獲得した数の合計の面のダイスで相手と勝負</div></div>
 </div></div>
 <div class="ruleFrame"><div class="ruleHead">ー　結果　ー</div>
 <div class="rResBox"><div class="rsEq rrEq"><span class="rsCol"><span class="rsDie me"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,26.0 91.6,74.0 50.0,98.0 8.4,74.0 8.4,26.0"/></svg><b>12</b></span><small>自分</small></span><span class="rsOp">－</span><span class="rsCol"><span class="rsDie op"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,26.0 91.6,74.0 50.0,98.0 8.4,74.0 8.4,26.0"/></svg><b>6</b></span><small>相手</small></span><span class="rsOp">＝</span><span class="rsPt">600</span></div></div>
