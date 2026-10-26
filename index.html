@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261027k">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261027k">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261027k">
+<meta name="draft-dice-rev" content="20261027l">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261027l">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261027l">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -446,9 +446,9 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 <div class="ui"><div class="row"><button data-mode="pvp">対人戦</button><button data-mode="cpu">コンピュータ戦</button></div><button id="btnRules" style="margin-top:14px;min-height:36px;font-size:13px">ルール説明</button></div></section>
 
 <section id="rules"><h1>ルール</h1><div class="rules-body">
-<div class="ruleFrame"><div class="ruleHead">ー　流れ　ー</div>
+<div class="ruleFrame"><div class="ruleHead">ー　数字集め　ー</div>
 <div class="rBoard"><div class="rSide"><div class="picks rPicks op"><div class="pk got">4</div><span class="plus">＋</span><div class="pk got">7</div><span class="plus">＋</span><div class="pk cur"></div><span class="faces"><span class="eq">＝</span><span class="fv"><b>11</b><i>面</i></span></span></div></div>
-<div class="rCenter"><div class="gauge rGauge "><svg viewBox="0 0 200 200"><circle class="bg" cx="100" cy="100" r="86"/><circle class="fg" cx="100" cy="100" r="86" style="stroke-dasharray:540.35;stroke-dashoffset:205.33"/></svg><div class="num">6</div></div><div class="rinfo rRinfo">ラウンド 3/3</div><div class="stat rStat"><div class="pill rPill"><small>出る数字</small><b>1〜6</b></div><div class="pill h0 rPill"><small>終わる確率</small><b>0%</b></div></div></div>
+<div class="rCenter"><div class="gauge rGauge "><svg viewBox="0 0 200 200"><circle class="bg" cx="100" cy="100" r="86"/><circle class="fg" cx="100" cy="100" r="86" style="stroke-dasharray:540.35;stroke-dashoffset:205.33"/></svg><div class="num">6</div></div><div class="stat rStat"><div class="pill rPill"><small>出る数字</small><b>1〜6</b></div><div class="pill h0 rPill"><small>終わる確率</small><b>0%</b></div></div></div>
 <div class="rSide"><div class="picks rPicks me"><div class="pk got">5</div><span class="plus">＋</span><div class="pk got">3</div><span class="plus">＋</span><div class="pk cur"></div><span class="faces"><span class="eq">＝</span><span class="fv"><b>8</b><i>面</i></span></span></div></div></div>
 <div class="rBtnWrap"><span class="rGrab">獲得</span></div>
 <div class="ruleSteps">
@@ -478,7 +478,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 <div class="ruleArt"><div class="xModal"><div class="xmT">被った！</div><span class="xCard">7</span><div class="xBtns"><span class="xBtn">ゆずる</span><span class="xBtn gold">取り合う</span></div></div></div>
 <div class="ruleTxt rFrameTxt">相手と欲しい数字が被った場合は<br>その数字を取り合う勝負が始まる！</div></div>
 <div class="ruleFrame"><div class="ruleHead">ー　ゾロ目　ー</div>
-<div class="ruleArt"><span class="xk me ">2</span><span class="xp">＋</span><span class="xk me ">2</span><span class="xp">＋</span><span class="xk me ">2</span><span class="ruleArr">→</span><span class="rG rRb"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="86" fill="none" stroke="#0a241c" stroke-width="14"/><defs><mask id="rRbMask" maskUnits="userSpaceOnUse" x="-20" y="-20" width="240" height="240"><circle cx="100" cy="100" r="86" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round" stroke-dasharray="540.35" stroke-dashoffset="162.11"/></mask></defs><g id="rRbG" mask="url(#rRbMask)"></g></svg><b>2</b></span><span class="stat bon" style="flex-direction:column;gap:4px;margin-top:0"><div class="pill"><small>出る数字</small><b><span class="bv">2</span><span class="bu">ずつ増える</span></b></div><div class="pill h1"><small>終わる確率</small><b><span class="bv">5%</span><span class="bu"> 固定</span></b></div></span></div>
+<div class="ruleArt"><span class="xk me ">1</span><span class="xp">＋</span><span class="xk me ">1</span><span class="xp">＋</span><span class="xk me ">1</span><span class="ruleArr">→</span><span class="rG rRb"><svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="86" fill="none" stroke="#0a241c" stroke-width="14"/><defs><mask id="rRbMask" maskUnits="userSpaceOnUse" x="-20" y="-20" width="240" height="240"><circle cx="100" cy="100" r="86" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round" stroke-dasharray="540.35" stroke-dashoffset="162.11"/></mask></defs><g id="rRbG" mask="url(#rRbMask)"></g></svg><b>2</b></span><span class="stat bon" style="flex-direction:column;gap:4px;margin-top:0"><div class="pill"><small>出る数字</small><b><span class="bv">2</span><span class="bu">ずつ増える</span></b></div><div class="pill h1"><small>終わる確率</small><b><span class="bv">5%</span><span class="bu"> 固定</span></b></div></span></div>
 <div class="ruleTxt rFrameTxt">獲得した3つの数字がゾロ目なら<br>ボーナスラウンド突入！</div></div>
 </div><button id="rulesBack">戻る</button></section>
 
