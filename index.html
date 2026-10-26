@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261027b">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261027b">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261027b">
+<meta name="draft-dice-rev" content="20261027c">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261027c">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261027c">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -447,7 +447,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 <div class="ruleSteps">
 <div class="ruleStep"><span class="ruleNum rBadge">1</span><div class="ruleStepBody">中央の数字は3回表示される毎に出る数字の範囲と終わる確率が変わる</div></div>
 <div class="ruleStep"><span class="ruleNum rBadge">2</span><div class="ruleStepBody">出る数字の範囲は3回毎に3ずつ増える。<div class="ruleArt rPills"><div class="pill rPill"><small>出る数字</small><b>1〜3</b></div><span class="ruleArr">→</span><div class="pill rPill"><small>出る数字</small><b>1〜6</b></div><span class="ruleArr">→</span><div class="pill rPill"><small>出る数字</small><b>1〜9</b></div></div></div></div>
-<div class="ruleStep"><span class="ruleNum rBadge">3</span><div class="ruleStepBody">終わる確率とは、今出ている数字の表示が切り替わったタイミングで数字が出なくなり、獲得することが出来なくなる確率のこと。<div class="ruleArt rPills rEnds"><div class="pill h0 rPill"><small>終わる確率</small><b>0%</b></div><div class="pill h1 rPill"><small>終わる確率</small><b>5%</b></div><div class="pill h1 rPill"><small>終わる確率</small><b>10%</b></div><div class="pill h2 rPill"><small>終わる確率</small><b>15%</b></div><div class="pill h2 rPill"><small>終わる確率</small><b>20%</b></div><div class="pill h3 rPill"><small>終わる確率</small><b>25%</b></div></div></div></div>
+<div class="ruleStep"><span class="ruleNum rBadge">3</span><div class="ruleStepBody">終わる確率は3回毎にランダムで変わる。<br>終わる確率とは数字が出なくなりラウンドが強制終了する確率のこと。<div class="ruleArt rPills rEnds"><div class="pill h0 rPill"><small>終わる確率</small><b>0%</b></div><div class="pill h1 rPill"><small>終わる確率</small><b>5%</b></div><div class="pill h1 rPill"><small>終わる確率</small><b>10%</b></div><div class="pill h2 rPill"><small>終わる確率</small><b>15%</b></div><div class="pill h2 rPill"><small>終わる確率</small><b>20%</b></div><div class="pill h3 rPill"><small>終わる確率</small><b>25%</b></div></div></div></div>
 </div></div>
 <div class="ruleFrame"><div class="ruleHead">ー　被り　ー</div>
 <div class="ruleArt"><div class="xModal"><div class="xmT">被った！</div><span class="xCard">7</span><div class="xBtns"><span class="xBtn">ゆずる</span><span class="xBtn gold">取り合う</span></div></div></div>
@@ -1151,8 +1151,8 @@ function showResult(){
   const dieH=(p,v)=>'<span class="rsCol"><span class="rsDie '+(p===me?"me":"op")+(v<0?" neg":"")+'"><svg viewBox="0 0 100 100"><polygon points="'+polyPts(6)+'"/></svg><b>'+fmtV(v)+'</b></span><small>'+(p===me?"自分":"相手")+'</small></span>';
   const hi=w||me,lo=oppOf(hi);   /* 大きい目 − 小さい目 ＝ 点（引き分けは 自分 − 相手 ＝ 0） */
   const eq=r&&r[1]!=null&&r[2]!=null?'<div class="rsEq">'+dieH(hi,r[hi])+'<span class="rsOp">－</span>'+dieH(lo,r[lo])+'<span class="rsOp">＝</span><span class="rsPt">'+(Math.abs(r[hi]-r[lo])*100)+'</span></div>':'';
-  $("rCalc").innerHTML='<div style="font-size:18px;font-weight:800;color:#e8c36a;margin-top:10px">今回</div>'+eq;   /* 大きい目のサイコロ − 小さい目のサイコロ ＝ 点 */
-  $("rPts").innerHTML='<div style="color:'+col(mineGot)+'">'+(mineGot>0?"+":mineGot===0?"±":"")+mineGot+'</div><div style="font-size:18px;font-weight:800;color:#e8c36a;margin-top:10px">今までの通算</div><div style="color:'+col(life)+'">'+(life===0?"±0":(life>0?"+":"")+life)+'</div>';
+  $("rCalc").innerHTML=eq;   /* 大きい目のサイコロ − 小さい目のサイコロ ＝ 点 */
+  $("rPts").innerHTML='<div style="font-size:18px;font-weight:800;color:#e8c36a;margin-top:10px">今回</div><div style="color:'+col(mineGot)+'">'+(mineGot>0?"+":mineGot===0?"±":"")+mineGot+'</div><div style="font-size:18px;font-weight:800;color:#e8c36a;margin-top:10px">今までの通算</div><div style="color:'+col(life)+'">'+(life===0?"±0":(life>0?"+":"")+life)+'</div>';
   show("result");
 }
 function goAgain(){if(S.phase!=="result")return;S.matchNo++;S.votes={};startMatch()}
