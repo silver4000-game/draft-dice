@@ -3,9 +3,9 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 <!-- layout: safari-bar-lock-20261004 -->
-<meta name="draft-dice-rev" content="20261027j">
-<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261027j">
-<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261027j">
+<meta name="draft-dice-rev" content="20261027k">
+<link rel="apple-touch-icon" href="apple-touch-icon.png?v=20261027k">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png?v=20261027k">
 <script>
 /* UI tap sound: same as Dorokei sfxTap (sine 540Hz, 48ms, vol 0.028) */
 let uiTapCtx;
@@ -335,6 +335,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .ruleFrame:first-child{margin-top:6px}
 .ruleFrame .ruleHead{margin:0 0 10px}
 .ruleFrame .ruleSteps{margin:10px 0 0}
+.ruleFrame .ruleStepBody{font-size:14px}   /* 説明文の大きさをゾロ目・被りの文（14px）にそろえる */
 .rBadge{width:22px;height:22px;min-width:22px;border-radius:50%;border:1.5px solid #e8c36a;font-size:13px;display:inline-flex;align-items:center;justify-content:center;line-height:1;margin-top:1px}
 .rBoard{width:100%;border-radius:14px;background:radial-gradient(ellipse at center,#146047,#0a3328);border:3px solid #0a241c;display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:6px;padding:10px 4px;overflow:hidden;box-sizing:border-box}
 .rBoard3{padding:8px 4px}
@@ -361,7 +362,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 .rrEq .rsDie{width:50px;height:50px}.rrEq .rsDie b{font-size:20px}
 .rrEq .rsOp{font-size:24px;line-height:50px}.rrEq .rsPt{font-size:28px;line-height:50px}
 .rResBox .xBtns{margin-top:8px}
-.rNote{margin-top:8px;font-size:13px;font-weight:800;color:#f4ead0}
+.rNote{margin-top:8px;font-size:14px;font-weight:800;color:#f4ead0}
 .rPills{margin-top:8px;gap:6px}
 .rEnds{display:grid;grid-template-columns:repeat(3,auto);justify-content:center;gap:8px 8px}
 .rFrameTxt{margin-top:10px;font-size:14px;font-weight:800;min-width:0;flex:none}
@@ -506,7 +507,7 @@ input{width:min(92vw,280px);padding:12px;border-radius:12px;border:1px solid #e8
 </section>
 <section id="result"><div class="box"><div id="rTitle">Win</div><div id="rCalc" style="font-size:14px;line-height:1.7;margin:24px 0 26px;color:#e8c36a"></div><div id="rPts" style="font-size:40px;font-weight:900;margin:6px 0 16px"></div><div class="row"><button id="again">もう1度</button><button id="home">やめる</button></div></div></section>
 <div class="con" id="con"></div>
-<div class="cHelp" id="cChui"><div class="cTitle">注意</div><div class="hList"><div class="hItem"><div class="hTxt hRed">選んだ数だけ<wbr>最後のサイコロの面が減るよ</div></div><div class="hItem"><div class="hHead hHeadS">最後のダイス勝負ではマイナスも計算する</div><div class="hPicks"><span class="xWho hW">自分</span><div class="pk got">3</div><span class="plus">＋</span><div class="pk got">2</div><span class="plus">＋</span><div class="pk got">4</div><span class="plus">－</span><div class="pk got minus">17</div><span class="hF">＝<b>−8</b>面</span></div><div class="hArt hDice"><span class="hCol"><span class="rD op"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,26.0 91.6,74.0 50.0,98.0 8.4,74.0 8.4,26.0"/></svg><b>3</b></span><small>相手</small></span><span class="hCol"><span class="rD me neg"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,26.0 91.6,74.0 50.0,98.0 8.4,74.0 8.4,26.0"/></svg><b>−8</b></span><small>自分</small></span></div><div class="hCalc">−8 と 3 → 差は11 → 1100点</div></div></div><button id="cChuiBack">もどる</button></div>
+<div class="cHelp" id="cChui"><div class="cTitle">注意</div><div class="hList"><div class="hItem"><div class="hTxt hRed">選んだ数だけ<wbr>最後のサイコロの面が減るよ</div></div><div class="hItem"><div class="hHead hHeadS">最後のダイス勝負ではマイナスも計算する</div><div class="hPicks"><span class="xWho hW">自分</span><div class="pk got">3</div><span class="plus">＋</span><div class="pk got">2</div><span class="plus">＋</span><div class="pk got">4</div><span class="plus">－</span><div class="pk got minus">17</div><span class="hF">＝<b>−8</b>面</span></div><div class="hArt hDice"><span class="hCol"><span class="rD op"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,26.0 91.6,74.0 50.0,98.0 8.4,74.0 8.4,26.0"/></svg><b>3</b></span><small>相手</small></span><span class="hCol"><span class="rD me neg"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,26.0 91.6,74.0 50.0,98.0 8.4,74.0 8.4,26.0"/></svg><b>−8</b></span><small>自分</small></span></div><div class="hCalc">1100ポイント負け</div></div></div><button id="cChuiBack">もどる</button></div>
 <div class="cHelp" id="cHelp"><div class="cTitle">被ったとき</div><div class="hList"><div class="hItem"><div class="hHead">お互いゆずる</div><div class="hArt"><span class="xCard">7</span><span class="hRows"><span class="hR"><span class="xWho hW">相手</span><span class="xBtn">ゆずる</span></span><span class="hR"><span class="xWho hW">自分</span><span class="xBtn">ゆずる</span></span></span><span class="ruleArr">→</span><span class="hRows"><span class="hR"><span class="xk miss op">―</span></span><span class="hR"><span class="xk miss me">―</span></span></span></div><div class="hTxt">お互い未獲得のまま<br>ラウンド終了</div></div><div class="hItem"><div class="hHead">自分だけゆずる</div><div class="hArt"><span class="xCard">7</span><span class="hRows"><span class="hR"><span class="xWho hW">相手</span><span class="xBtn gold">取り合う</span></span><span class="hR"><span class="xWho hW">自分</span><span class="xBtn">ゆずる</span></span></span><span class="ruleArr">→</span><span class="hRows"><span class="hR"><span class="xk op">7</span></span><span class="hR"><span class="hCont">続きから</span></span></span></div><div class="hTxt">数字は相手が獲得して、<br>自分は続きから数字を選び直す</div></div><div class="hItem"><div class="hHead">自分だけ取り合う</div><div class="hArt"><span class="xCard">7</span><span class="hRows"><span class="hR"><span class="xWho hW">相手</span><span class="xBtn">ゆずる</span></span><span class="hR"><span class="xWho hW">自分</span><span class="xBtn gold">取り合う</span></span></span><span class="ruleArr">→</span><span class="hRows"><span class="hR"><span class="hCont">続きから</span></span><span class="hR"><span class="xk me">7</span></span></span></div><div class="hTxt">相手がゆずってくれたので<br>数字を獲得</div></div><div class="hItem"><div class="hHead">お互い取り合う</div><div class="hArt"><span class="xCard">7</span><span class="hRows"><span class="hR"><span class="xWho hW">相手</span><span class="xBtn gold">取り合う</span></span><span class="hR"><span class="xWho hW">自分</span><span class="xBtn gold">取り合う</span></span></span><span class="ruleArr">→</span><span class="hRows"><span class="hR"><span class="rD op"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,26.0 91.6,74.0 50.0,98.0 8.4,74.0 8.4,26.0"/></svg><b>?</b></span></span><span class="hR"><span class="rD me"><svg viewBox="0 0 100 100"><polygon points="50.0,2.0 91.6,26.0 91.6,74.0 50.0,98.0 8.4,74.0 8.4,26.0"/></svg><b>?</b></span></span></span><span class="hBat">バトル！</span></div><div class="hTxt">数字を取り合う<br>バトルがはじまるよ</div></div></div><button id="cHelpBack">もどる</button></div>
 
 <div id="ask"><div style="color:#e8c36a;font-weight:800">モード選択に戻りますか？</div><div class="row"><button id="askYes" class="gold">はい</button><button id="askNo">いいえ</button></div></div>
